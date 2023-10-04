@@ -1,0 +1,9 @@
+[project]
+name = "llm-proxy"
+version = "0.1"
+dependencies = ["openai==0.28.1","python-dotenv==1.0.0"]
+
+[project.optional-dependencies]
+dev = [
+    "black"
+]
