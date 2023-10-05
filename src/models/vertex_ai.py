@@ -1,15 +1,11 @@
 import os 
-
 from google.cloud import aiplatform
 import vertexai
 from vertexai.language_models import TextGenerationModel
-
 from dotenv import load_dotenv
 load_dotenv()
 
 project_id = os.getenv('GOOGLE_PROJECT_ID')
-
-from google.cloud import aiplatform
 
 aiplatform.init(
     project=project_id,
