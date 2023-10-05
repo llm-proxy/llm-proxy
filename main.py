@@ -1,19 +1,24 @@
+import cohere
 import os
-import openai
 
 from dotenv import load_dotenv
 load_dotenv()
 
-openai.api_key = os.getenv('OPENAI_API_KEY')
+api_key = os.getenv('API_KEY')
 
-def get_open_ai_completion(prompt, model="gpt-3.5-turbo"):
-    messages = [{"role": "user", "content": prompt}]
-    response = openai.ChatCompletion.create(
-    model=model,
-    messages=messages,
-    temperature=0,
+co = cohere.Client(api_key)
+
+def cohere_ai_completion(prompt):
+    response = co.chat(
+    # chat_history is not a needed parameter
+    chat_history=[
+        {"role": "USER", "message": "Who discovered gravity?"},
+        {"role": "CHATBOT", "message": "The man who is widely credited with discovering gravity is Sir Isaac Newton"}
+    ],
+    message=prompt,
+    connectors=[{"id": "web-search"}] # perform web search before answering the question
     )
-    return response.choices[0].message["content"]
+    return response.text
 
-prompt="what is 1+1?"
-print(get_open_ai_completion(prompt))
+prompt = "How many years ago was the universe created?"
+print(cohere_ai_completion(prompt))
