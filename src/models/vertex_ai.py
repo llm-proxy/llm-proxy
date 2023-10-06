@@ -16,6 +16,7 @@ def interview(
     temperature: float,
     project_id: str,
     location: str,
+    prompt: str
 ) -> str:
     """Ideation example with a Large Language Model"""
 
@@ -29,9 +30,9 @@ def interview(
     }
 
     model = TextGenerationModel.from_pretrained("text-bison@001")
-    response = model.predict(
-        "define an llm"
-    )
-    print(f"Response from Model: {response.text}")
+    response = model.predict(prompt)
+    response = f"Response from Model: {response.text}"
+    return response
 
-interview(0,project_id,'us-central1')
+def getAnswer(prompt: str):
+    return interview(0,project_id,'us-central1',prompt)

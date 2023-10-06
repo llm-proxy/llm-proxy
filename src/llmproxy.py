@@ -1,5 +1,5 @@
 import os
-from models import openai
+from src.models import openai,vertex_ai
 
 
 def getCompletion(prompt: str) -> str:
@@ -9,3 +9,7 @@ def getCompletion(prompt: str) -> str:
         return openai_res.message
 
     return openai_res.payload
+
+def getVertexCompletion(prompt: str) -> str:
+    vertex_res = vertex_ai.getAnswer(prompt)
+    return vertex_res
