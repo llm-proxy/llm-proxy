@@ -1,55 +1,58 @@
+from utils.enums import BaseEnum
 import openai
-from openai import error
-import os
 from dataclasses import dataclass
 
-# Figure out a way to generalize this to all files
-from dotenv import load_dotenv
 
-load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
+class OpenAIModel(str, BaseEnum):
+    GPT_4 = "gpt-4"
+    GPT_4_32K = "gpt-4-32k"
+    GPT_3_5_TURBO = "gpt-3.5-turbo"
+    GPT_3_5_TURBO_16K = "gpt-3.5-turbo-16k"
 
 
 @dataclass
 class OpenAICompletionResponse:
-    payload: str
-    message: str
-    err: str
+    payload: str = ""
+    message: str = ""
+    err: str = ""
 
 
-# Might need to replace error handling with classes, since we are redundantly typing the openai errors
-# We need to also decide on a standard return structure
-def get_open_ai_completion(
-    prompt: str, model: str = "gpt-3.5-turbo"
-) -> OpenAICompletionResponse:
-    try:
-        messages = [{"role": "user", "content": prompt}]
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=messages,
-            temperature=0,
-        )
-    except error.AuthenticationError:
+class OpenAI:
+    def __init__(
+        self,
+        prompt: str = "",
+        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO,
+        temp: float = 0,
+        api_key: str = "",
+    ) -> None:
+        self.prompt = prompt
+        self.model = model
+        self.temp = temp
+        openai.api_key = api_key
+
+    def get_completion(self) -> OpenAICompletionResponse:
+        if self.model not in OpenAIModel:
+            return self.handle_error(
+                exception="Model not supported", error_type="ValueError"
+            )
+        try:
+            messages = [{"role": "user", "content": self.prompt}]
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=messages,
+                temperature=self.temp,
+            )
+        except openai.error.OpenAIError as e:
+            return self.handle_error(exception=e, error_type=type(e).__name__)
+        except Exception as e:
+            # This might need to be changed to a different error
+            raise Exception("Unknown Error")
+
         return OpenAICompletionResponse(
-            payload="",
-            message="Sorry no API key was provided",
-            err="Authentication Error",
+            payload=response.choices[0].message["content"],
+            message="OK",
+            err="",
         )
-    except error.RateLimitError:
-        return OpenAICompletionResponse(
-            payload="",
-            message="Sorry, you have exceeded your quota. Please check your billing details",
-            err="RateLimitError",
-        )
-    except Exception:
-        return OpenAICompletionResponse(
-            payload="",
-            message="Sorry, something went wrong. Please report this issue and try again later",
-            err="Unknown Error",
-        )
-    return OpenAICompletionResponse(
-        payload=response.choices[0].message["content"],
-        message="OK",
-        err="",
-    )
+
+    def handle_error(self, exception: str, error_type: str) -> OpenAICompletionResponse:
+        return OpenAICompletionResponse(message=exception, err=error_type)

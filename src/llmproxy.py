@@ -1,11 +1,22 @@
 import os
-from models import openai
+from models.openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
-def getCompletion(prompt: str) -> str:
-    openai_res = openai.get_open_ai_completion(prompt)
+def get_completion(prompt: str) -> str:
+    # Using class allows us to not worry about passing in params every time we call a function
+    openai = OpenAI(
+        prompt=prompt,
+        api_key=openai_api_key,
+    )
 
-    if openai_res.err:
-        return openai_res.message
+    res = openai.get_completion()
 
-    return openai_res.payload
+    if res.err:
+        return res.message
+
+    return res.payload
