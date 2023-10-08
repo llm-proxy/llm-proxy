@@ -32,7 +32,7 @@ class OpenAI:
 
     def get_completion(self) -> OpenAICompletionResponse:
         if self.model not in OpenAIModel:
-            return self.handle_error(
+            return self._handle_error(
                 exception="Model not supported", error_type="ValueError"
             )
         try:
@@ -43,7 +43,7 @@ class OpenAI:
                 temperature=self.temp,
             )
         except openai.error.OpenAIError as e:
-            return self.handle_error(exception=e, error_type=type(e).__name__)
+            return self._handle_error(exception=e, error_type=type(e).__name__)
         except Exception as e:
             # This might need to be changed to a different error
             raise Exception("Unknown Error")
@@ -54,5 +54,7 @@ class OpenAI:
             err="",
         )
 
-    def handle_error(self, exception: str, error_type: str) -> OpenAICompletionResponse:
+    def _handle_error(
+        self, exception: str, error_type: str
+    ) -> OpenAICompletionResponse:
         return OpenAICompletionResponse(message=exception, err=error_type)
