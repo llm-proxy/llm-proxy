@@ -9,3 +9,5 @@ src/llm_proxy.egg-info/top_level.txt
 src/models/cohere.py
 src/models/openai.py
 src/models/vertexai.py
+src/tests/unit_tests/models/test_openai.py
+src/utils/enums.py
