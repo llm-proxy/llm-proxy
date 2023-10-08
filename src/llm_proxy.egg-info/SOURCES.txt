@@ -6,6 +6,8 @@ src/llm_proxy.egg-info/SOURCES.txt
 src/llm_proxy.egg-info/dependency_links.txt
 src/llm_proxy.egg-info/requires.txt
 src/llm_proxy.egg-info/top_level.txt
+src/models/__init__.py
 src/models/cohere.py
+src/models/mistral.py
 src/models/openai.py
 src/models/vertexai.py
