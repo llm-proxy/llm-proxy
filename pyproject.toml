@@ -1,7 +1,7 @@
 [project]
 name = "llm-proxy"
 version = "0.1"
-dependencies = ["openai==0.28.1","python-dotenv==1.0.0"]
+dependencies = ["openai==0.28.1","python-dotenv==1.0.0", "google-cloud-aiplatform==1.34.0"]
 
 [project.optional-dependencies]
 dev = [

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
+project_id = os.getenv("GOOGLE_PROJECT_ID")
 
 
 def get_completion(prompt: str) -> str:
