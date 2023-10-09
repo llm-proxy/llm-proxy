@@ -1,7 +1,0 @@
-Metadata-Version: 2.1
-Name: llm-proxy
-Version: 0.1
-Requires-Dist: openai==0.28.1
-Requires-Dist: python-dotenv==1.0.0
-Provides-Extra: dev
-Requires-Dist: black; extra == "dev"
