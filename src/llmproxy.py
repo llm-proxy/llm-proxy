@@ -1,19 +1,23 @@
 import os
-from models import openai
+from models.openai import OpenAI
 from models.mistral import Mistral
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
+openai_api_key = os.getenv("OPENAI_API_KEY")
 mistral_api_key = os.getenv('MISTRAL_API')
 
+
 def getCompletion(prompt: str) -> str:
-    openai_res = openai.get_open_ai_completion(prompt)
+    # Using class allows us to not worry about passing in params every time we call a function
+    openai = OpenAI(prompt=prompt, api_key=openai_api_key)
 
-    if openai_res.err:
-        return openai_res.message
+    if res.err:
+        return res.message
 
-    return openai_res.payload
+    return res.payload
 
 def textGenerate(prompt: str) -> str:
     mistral = Mistral(
