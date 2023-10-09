@@ -27,7 +27,7 @@ class Mistral:
                 "inputs": self.prompt,
             })
         except Exception as e:
-            raise Exception("Unknown Error")
+            raise Exception(e)
 
         return CompletionResponse(
             payload=output[0]['generated_text'],
