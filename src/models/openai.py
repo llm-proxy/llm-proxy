@@ -1,7 +1,6 @@
-from models.base import BaseChatbot
+from models.base import BaseChatbot, CompletionResponse
 from utils.enums import BaseEnum
 import openai
-from dataclasses import dataclass
 
 
 class OpenAIModel(str, BaseEnum):
@@ -9,13 +8,6 @@ class OpenAIModel(str, BaseEnum):
     GPT_4_32K = "gpt-4-32k"
     GPT_3_5_TURBO = "gpt-3.5-turbo"
     GPT_3_5_TURBO_16K = "gpt-3.5-turbo-16k"
-
-
-@dataclass
-class OpenAICompletionResponse:
-    payload: str = ""
-    message: str = ""
-    err: str = ""
 
 
 class OpenAI(BaseChatbot):
@@ -29,9 +21,10 @@ class OpenAI(BaseChatbot):
         self.prompt = prompt
         self.model = model
         self.temp = temp
+        # We may have to pull this directly from .env and use different .env file/names for testing
         openai.api_key = api_key
 
-    def get_completion(self) -> OpenAICompletionResponse:
+    def get_completion(self) -> CompletionResponse:
         if self.model not in OpenAIModel:
             return self._handle_error(
                 exception="Model not supported", error_type="ValueError"
@@ -49,13 +42,11 @@ class OpenAI(BaseChatbot):
             # This might need to be changed to a different error
             raise Exception("Unknown Error")
 
-        return OpenAICompletionResponse(
+        return CompletionResponse(
             payload=response.choices[0].message["content"],
             message="OK",
             err="",
         )
 
-    def _handle_error(
-        self, exception: str, error_type: str
-    ) -> OpenAICompletionResponse:
-        return OpenAICompletionResponse(message=exception, err=error_type)
+    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
+        return CompletionResponse(message=exception, err=error_type)
