@@ -10,9 +10,11 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 mistral_api_key = os.getenv('MISTRAL_API')
 
 
-def getCompletion(prompt: str) -> str:
+def get_completion(prompt: str) -> str:
     # Using class allows us to not worry about passing in params every time we call a function
     openai = OpenAI(prompt=prompt, api_key=openai_api_key)
+
+    res = openai.get_completion()
 
     if res.err:
         return res.message
@@ -20,9 +22,13 @@ def getCompletion(prompt: str) -> str:
     return res.payload
 
 def textGenerate(prompt: str) -> str:
-    mistral = Mistral(
-        prompt = prompt,
-        api_key = mistral_api_key,
-    )
+    mistral = Mistral(prompt = prompt, api_key = mistral_api_key)
+
+    res = mistral.get_completion()
+
+    if res.err:
+        return res.message
+
+    return res.payload
 
     return mistral.get_completion()

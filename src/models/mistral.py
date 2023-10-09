@@ -1,17 +1,5 @@
-import os
+from models.base import BaseChatbot, CompletionResponse
 import requests
-from dotenv import load_dotenv
-from dataclasses import dataclass
-
-load_dotenv()
-
-api_key = os.getenv('BADKEY')
-
-@dataclass
-class MistralAICompletionResponse:
-    payload: str
-    message: str
-    err: str
 
 class Mistral:
     
@@ -25,7 +13,7 @@ class Mistral:
         self.api_key = api_key
         self.temp = temp
 
-    def get_completion(self) -> MistralAICompletionResponse:
+    def get_completion(self) -> CompletionResponse:
 
         API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1"
         headers = {"Authorization": f"Bearer {self.api_key}"}
@@ -38,4 +26,8 @@ class Mistral:
             "inputs": self.prompt,
         })
 
-        return output[0]['generated_text']
+        return CompletionResponse(
+            payload=output[0]['generated_text'],
+            message="OK",
+            err="",
+        )
