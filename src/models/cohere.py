@@ -19,6 +19,3 @@ def cohere_ai_completion(prompt):
     connectors=[{"id": "web-search"}] # perform web search before answering the question
     )
     return response.text
-
-prompt = "How many years ago was the universe created?"
-print(cohere_ai_completion(prompt))
