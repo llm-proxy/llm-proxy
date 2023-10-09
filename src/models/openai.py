@@ -1,3 +1,4 @@
+from models.base import BaseChatbot
 from utils.enums import BaseEnum
 import openai
 from dataclasses import dataclass
@@ -17,7 +18,7 @@ class OpenAICompletionResponse:
     err: str = ""
 
 
-class OpenAI:
+class OpenAI(BaseChatbot):
     def __init__(
         self,
         prompt: str = "",
