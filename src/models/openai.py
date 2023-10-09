@@ -16,7 +16,7 @@ class OpenAI(BaseChatbot):
         prompt: str = "",
         model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO,
         temp: float = 0,
-        api_key: str = "",
+        api_key: str | None = "",
     ) -> None:
         self.prompt = prompt
         self.model = model
