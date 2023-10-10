@@ -1,6 +1,7 @@
-from models.base import BaseChatbot, CompletionResponse
-from utils.enums import BaseEnum
+from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.utils.enums import BaseEnum
 import openai
+from openai import error
 
 
 class OpenAIModel(str, BaseEnum):
@@ -36,8 +37,8 @@ class OpenAI(BaseChatbot):
                 messages=messages,
                 temperature=self.temp,
             )
-        except openai.error.OpenAIError as e:
-            return self._handle_error(exception=e, error_type=type(e).__name__)
+        except error.OpenAIError as e:
+            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             # This might need to be changed to a different error
             raise Exception("Unknown Error")
