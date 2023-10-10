@@ -1,5 +1,5 @@
-from models.base import BaseChatbot, CompletionResponse
-from utils.enums import BaseEnum
+from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.utils.enums import BaseEnum
 import openai
 
 
