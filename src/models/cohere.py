@@ -1,13 +1,6 @@
 import cohere
-from models.base import BaseChatbot, CompletionResponse
-from utils.enums import BaseEnum
-
-
-@dataclass
-class CompletionResponse:
-    payload: str
-    message: str
-    err: str
+from src.models.base import BaseChatbot, CompletionResponse
+from src.utils.enums import BaseEnum
 
 class CohereModel(str, BaseEnum):
     COMMAND = "command"
@@ -15,8 +8,7 @@ class CohereModel(str, BaseEnum):
     COMMAND_NIGHTLY = "command-nightly"
     COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
 
-
-class Cohere(BaseChatBot):
+class Cohere(BaseChatbot):
     def __init__(
         self,
         message: str = "",
@@ -24,27 +16,29 @@ class Cohere(BaseChatBot):
         temperature: float = 0,
         api_key: str = "",
     ) -> None:
-        self.message = message,
-        self.model = model,
-        self.temperature = temperature,
+        self.message = message
+        self.model = model
+        self.temperature = temperature
         Cohere.api_key = api_key
     
-    def cohere_ai_completion(self) -> CompletionResponse:
+    def get_completion(self) -> CompletionResponse:
         try:
             co = cohere.Client(Cohere.api_key)
             response = co.chat(
             message = self.message,
-            connectors = [{"id": "web-search"}] # perform web search before answering the question
+            model = self.model,
+            connectors = [{"id": "web-search"}], # perform web search before answering the question
+            temperature = self.temperature            
+            )
+            return CompletionResponse(
+                payload=response.text,
+                message="OK",
+                err="",
             )
         except cohere.CohereError as e:
             return CompletionResponse(
                 payload="",
-                message="FAILED",
-                err=e.message,
+                message=e.message,
+                err=e.args,
             )
-        return CompletionResponse(
-            payload=response.text,
-            message="OK",
-            err="",
-        )
     
