@@ -1,4 +1,5 @@
 from google.cloud import aiplatform
+from google.auth import exceptions
 from models.base import BaseChatbot, CompletionResponse
 from utils.enums import BaseEnum
 import vertexai
@@ -38,7 +39,9 @@ class VertexAI(BaseChatbot):
             chat = chat_model.start_chat()
             response = chat.send_message("What is 1+1", **parameters)
             output = f"Response from Model: {response.text}"
+        except exceptions.GoogleAuthError as e:
+            return CompletionResponse(message=e.args[0], err=type(e).__name__)
         except Exception as e:
-            return CompletionResponse(message=str(e), err=type(e).__name__, payload="")
+            raise Exception(e)
 
         return CompletionResponse(payload=output, message="OK", err="")
