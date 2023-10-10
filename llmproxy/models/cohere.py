@@ -20,11 +20,15 @@ class Cohere(BaseChatbot):
         self.model = model
         self.temperature = temperature
         self.api_key = api_key
-    
+        try:
+            self.co = cohere.Client(self.api_key)
+        except:
+            print("An error has occurred")
+            raise
+
     def get_completion(self) -> CompletionResponse:
         try:
-            co = cohere.Client(self.api_key)
-            response = co.chat(
+            response = self.co.chat(
             message = self.message,
             model = self.model,
             connectors = [{"id": "web-search"}], # perform web search before answering the question
