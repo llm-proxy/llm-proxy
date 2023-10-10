@@ -19,11 +19,11 @@ class Cohere(BaseChatbot):
         self.message = message
         self.model = model
         self.temperature = temperature
-        Cohere.api_key = api_key
+        self.api_key = api_key
     
     def get_completion(self) -> CompletionResponse:
         try:
-            co = cohere.Client(Cohere.api_key)
+            co = cohere.Client(self.api_key)
             response = co.chat(
             message = self.message,
             model = self.model,
