@@ -41,4 +41,6 @@ class Cohere(BaseChatbot):
                 message=e.message,
                 err=e.args,
             )
+        except Exception as e:
+            raise Exception("unknown error")
     
