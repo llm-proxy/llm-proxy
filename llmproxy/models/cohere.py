@@ -1,6 +1,6 @@
 import cohere
-from src.models.base import BaseChatbot, CompletionResponse
-from src.utils.enums import BaseEnum
+from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.utils.enums import BaseEnum
 
 class CohereModel(str, BaseEnum):
     COMMAND = "command"
