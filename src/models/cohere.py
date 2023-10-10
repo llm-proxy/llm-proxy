@@ -9,7 +9,7 @@ class CompletionResponse:
     message: str
     err: str
 
-class CohereModel(str, BaseEnum)
+class CohereModel(str, BaseEnum):
     COMMAND = "command"
     COMMAND_LIGHT = "command-light"
     COMMAND_NIGHTLY = "command-nightly"
