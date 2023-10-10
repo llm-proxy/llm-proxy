@@ -16,7 +16,7 @@ class CohereModel(str, BaseEnum):
     COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
 
 
-class Cohere(BaseChatBot)
+class Cohere(BaseChatBot):
     def __init__(
         self,
         message: str = "",
@@ -33,8 +33,8 @@ class Cohere(BaseChatBot)
         try:
             co = cohere.Client(Cohere.api_key)
             response = co.chat(
-            message=prompt,
-            connectors=[{"id": "web-search"}] # perform web search before answering the question
+            message = self.message,
+            connectors = [{"id": "web-search"}] # perform web search before answering the question
             )
         except cohere.CohereError as e:
             return CompletionResponse(
