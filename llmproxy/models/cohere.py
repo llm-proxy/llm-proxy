@@ -22,9 +22,12 @@ class Cohere(BaseChatbot):
         self.api_key = api_key
         try:
             self.co = cohere.Client(self.api_key)
-        except:
-            print("An error has occurred")
-            raise
+        except cohere.CohereError as e:
+            return CompletionResponse(
+                payload="",
+                message=e.message,
+                err=e.args,
+            )
 
     def get_completion(self) -> CompletionResponse:
         try:
