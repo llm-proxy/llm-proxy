@@ -28,9 +28,17 @@ class Mistral:
             })
         except Exception as e:
             raise Exception(e)
+        
+        response = ""
+        if isinstance(output, list) and 'generated_text' in output[0]:
+            response = output[0]['generated_text']
+        elif 'error' in output:
+            response = "ERROR: " + output['error']
+        else:
+            raise ValueError("Unknown output format")
 
         return CompletionResponse(
-            payload=output[0]['generated_text'],
+            payload=response,
             message="OK",
             err="",
         )
