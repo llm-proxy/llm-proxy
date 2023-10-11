@@ -19,19 +19,18 @@ class Cohere(BaseChatbot):
         self.message = message
         self.model = model
         self.temperature = temperature
-        self.api_key = api_key
-        try:
-            self.co = cohere.Client(self.api_key)
-        except cohere.CohereError as e:
-            return CompletionResponse(
-                payload="",
-                message=e.message,
-                err=e.args,
-            )
+        self.api_key = api_key    
 
     def get_completion(self) -> CompletionResponse:
+        if self.api_key is None:
+           return CompletionResponse(
+               payload="",
+               message="No api key",
+               err="ValueError"
+           ) 
         try:
-            response = self.co.chat(
+            co = cohere.Client(self.api_key)
+            response = co.chat(
             message = self.message,
             model = self.model,
             connectors = [{"id": "web-search"}], # perform web search before answering the question
