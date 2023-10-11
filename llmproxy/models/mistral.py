@@ -16,7 +16,7 @@ class Mistral:
     def get_completion(self) -> CompletionResponse:
 
         try:
-            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1"
+            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
