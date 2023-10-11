@@ -36,7 +36,7 @@ class Cohere(BaseChatbot):
         try:
             response = self.co.chat(
             message = self.message,
-            model = " ",
+            model = self.model,
             connectors = [{"id": "web-search"}], # perform web search before answering the question
             temperature = self.temperature            
             )
@@ -49,7 +49,7 @@ class Cohere(BaseChatbot):
             return CompletionResponse(
                 payload="",
                 message=e.message,
-                err=e.__class__,
+                err=e.http_status
             )
         except Exception as e:
             raise Exception("unknown error")
