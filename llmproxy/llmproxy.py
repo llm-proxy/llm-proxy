@@ -1,8 +1,6 @@
 import os
 
-# from llmproxy.models import OpenAI
-from llmproxy.models.openai import OpenAI
-from llmproxy.models.mistral import Mistral
+import llmproxy
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +11,7 @@ mistral_api_key = os.getenv('MISTRAL_API')
 
 def get_completion(prompt: str) -> str:
     # Using class allows us to not worry about passing in params every time we call a function
-    openai = OpenAI(prompt=prompt, api_key=openai_api_key)
+    openai = llmproxy.OpenAI(prompt=prompt, api_key=openai_api_key)
 
     res = openai.get_completion()
 
@@ -23,7 +21,7 @@ def get_completion(prompt: str) -> str:
     return res.payload
 
 def textGenerate(prompt: str) -> str:
-    mistral = Mistral(prompt = prompt, api_key = mistral_api_key)
+    mistral = llmproxy.Mistral(prompt = prompt, api_key = mistral_api_key)
 
     res = mistral.get_completion()
 
