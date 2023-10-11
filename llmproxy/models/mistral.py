@@ -1,4 +1,4 @@
-from models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseChatbot, CompletionResponse
 import requests
 
 class Mistral:
