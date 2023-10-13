@@ -1,6 +1,7 @@
 import os
 from llmproxy.models.openai import OpenAI
 from dotenv import load_dotenv
+from unittest.mock import patch
 
 load_dotenv()
 
@@ -24,6 +25,10 @@ def test_unsupported_model():
     assert response.err == "ValueError"
     assert response.message == "Model not supported"
 
-
-
-
+def test_generic_exception():
+    with patch('openai.ChatCompletion.create', side_effect=Exception("Random error")):
+        chatbot = OpenAI()
+        try:
+            chatbot.get_completion()
+        except Exception as e:
+            assert str(e) == "Unknown Error"
