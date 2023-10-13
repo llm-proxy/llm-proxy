@@ -3,6 +3,10 @@ from llmproxy.models.base import BaseChatbot, CompletionResponse
 
 
 class Llama2(BaseChatbot):
+    INPUT_COST_PER_TOKEN = 0
+    OUTPUT_COST_PER_TOKEN = 45
+    SPECIALIZATIONS = set(("SCIENCE"))
+
     def __init__(
         self,
         prompt: str = "",
@@ -20,7 +24,7 @@ class Llama2(BaseChatbot):
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
     def get_completion(self) -> CompletionResponse:
-        if self.prompt is "":
+        if self.prompt == "":
             return self._handle_error(
                 exception="No prompt detected", error_type="InputError"
             )
@@ -40,7 +44,10 @@ class Llama2(BaseChatbot):
         except Exception as e:
             raise Exception("Error Occur")
 
-        return CompletionResponse(payload=output)
+        if output["error"]:
+            return self._handle_error(exception=output["error"], error_type="..")
+
+        return CompletionResponse(payload=output, message="OK", err="")
 
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)

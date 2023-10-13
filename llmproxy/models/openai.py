@@ -12,6 +12,11 @@ class OpenAIModel(str, BaseEnum):
 
 
 class OpenAI(BaseChatbot):
+    # This would need to be tuned to consider all the different models later
+    INPUT_COST_PER_TOKEN = 30
+    OUTPUT_COST_PER_TOKEN = 40
+    SPECIALIZATIONS = set(("BUSINESS", "MATH", "SCIENCE"))
+
     def __init__(
         self,
         prompt: str = "",
