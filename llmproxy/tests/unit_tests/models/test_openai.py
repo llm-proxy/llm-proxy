@@ -1,6 +1,8 @@
 import os
-from llmproxy.models.openai import OpenAI
+
 from dotenv import load_dotenv
+from llmproxy.models.openai import OpenAI
+from openai import error
 from unittest.mock import patch
 
 load_dotenv()
