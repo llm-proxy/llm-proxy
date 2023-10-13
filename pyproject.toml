@@ -1,9 +1,22 @@
-[project]
+[tool.poetry]
 name = "llm-proxy"
-version = "0.1"
-dependencies = ["openai==0.28.1","python-dotenv==1.0.0", "google-cloud-aiplatform==1.34.0"]
+version = "0.1.0"
+description = "LLM Proxy to reduce cost and complexity of using multiple LLMs"
+authors = ["laxitshahi"]
+readme = "README.md"
 
-[project.optional-dependencies]
-dev = [
-    "black"
-]
+[tool.poetry.dependencies]
+python = "^3.11"
+openai = "^0.28.1"
+python-dotenv = "^1.0.0"
+cohere = "^4.27"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+pytest = "^7.4.2"
+coverage = "^7.3.2"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

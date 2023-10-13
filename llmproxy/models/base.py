@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -11,5 +12,5 @@ class CompletionResponse:
 
 class BaseChatbot(ABC):
     @abstractmethod
-    def get_completion(self, prompt, **Any) -> CompletionResponse:
+    def get_completion(self, prompt: str = "", **kwargs: Any) -> CompletionResponse:
         pass
