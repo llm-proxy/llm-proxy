@@ -15,13 +15,10 @@ class Llama2(BaseChatbot):
     ) -> None:
         self.system_prompt = system_prompt or "Answer politely"
         self.prompt = prompt
-        self.api_key = api_key
-
         self.API_URL = (
             "https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf"
         )
-
-        self.headers = {"Authorization": f"Bearer {self.api_key}"}
+        self.headers = {"Authorization": f"Bearer {api_key}"}
 
     def get_completion(self) -> CompletionResponse:
         if self.prompt == "":
