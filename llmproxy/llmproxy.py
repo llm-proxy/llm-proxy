@@ -22,7 +22,12 @@ def get_completion(prompt: str) -> str:
     return res.payload
 
 
-def get_completion_mistral(prompt: str) -> str:
-    mistral = Mistral(prompt = prompt, api_key = mistral_api_key)
+def get_completion_mistral(prompt: str, model: str) -> str:
+    mistral = Mistral(prompt = prompt, api_key = mistral_api_key, model=model)
 
     res = mistral.get_completion()
+
+    if res.err:
+        return res.message
+
+    return res.payload

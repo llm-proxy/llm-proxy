@@ -1,22 +1,29 @@
 from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.utils.enums import BaseEnum
 import requests
 
-class Mistral:
-    
+class MistralModel(str, BaseEnum):
+    Mistral_7B = "Mistral-7B-v0.1"
+    Mistral_7B_Instruct = "Mistral-7B-Instruct-v0.1"
+class Mistral(BaseChatbot):
     def __init__(
         self, 
         prompt: str = "", 
+        model: MistralModel = MistralModel.Mistral_7B_Instruct.value,
         api_key: str = "", 
         temp: float = 1,
     ) -> None:
         self.prompt = prompt
+        self.model = model
         self.api_key = api_key
         self.temp = temp
 
     def get_completion(self) -> CompletionResponse:
-
+        if self.model not in MistralModel:
+            models = [model.value for model in MistralModel]
+            return CompletionResponse(message="Model not supported, please use one of the following:\n" + "\n".join(models), err="ValueError")
         try:
-            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+            API_URL = f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
