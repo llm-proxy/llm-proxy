@@ -21,7 +21,7 @@ class Mistral(BaseChatbot):
     def get_completion(self) -> CompletionResponse:
         if self.model not in MistralModel:
             models = [model.value for model in MistralModel]
-            return CompletionResponse(message="Model not supported, please use one of the following:\n" + "\n".join(models), err="ValueError")
+            return CompletionResponse(message=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}", err="ValueError")
         try:
             API_URL = f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
             headers = {"Authorization": f"Bearer {self.api_key}"}
