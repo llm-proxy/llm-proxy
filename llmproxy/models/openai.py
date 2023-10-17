@@ -15,7 +15,7 @@ class OpenAI(BaseChatbot):
     def __init__(
         self,
         prompt: str = "",
-        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO,
+        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO.value,
         temp: float = 0,
         api_key: str = "",
     ) -> None:
@@ -28,7 +28,8 @@ class OpenAI(BaseChatbot):
     def get_completion(self) -> CompletionResponse:
         if self.model not in OpenAIModel:
             return self._handle_error(
-                exception="Model not supported", error_type="ValueError"
+                exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
+                error_type="ValueError",
             )
         try:
             messages = [{"role": "user", "content": self.prompt}]
