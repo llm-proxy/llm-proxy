@@ -7,7 +7,7 @@ class Mistral:
         self, 
         prompt: str = "", 
         api_key: str = "", 
-        temp: float = 0,
+        temp: float = 1,
     ) -> None:
         self.prompt = prompt
         self.api_key = api_key
@@ -25,20 +25,22 @@ class Mistral:
                 
             output = query({
                 "inputs": self.prompt,
+                "parameters": {"temperature": self.temp}
             })
         except Exception as e:
             raise Exception(e)
         
         response = ""
+        message = ""
         if isinstance(output, list) and 'generated_text' in output[0]:
             response = output[0]['generated_text']
         elif 'error' in output:
-            response = "ERROR: " + output['error']
+            message = "ERROR: " + output['error']
         else:
             raise ValueError("Unknown output format")
 
         return CompletionResponse(
             payload=response,
-            message="OK",
+            message=message,
             err="",
         )
