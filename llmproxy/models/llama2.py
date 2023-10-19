@@ -1,25 +1,42 @@
 import requests
-from models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.utils.enums import BaseEnum
+
+class Llama2Model(str, BaseEnum):
+    LLAMA_2_7B="Llama-2-7b-chat-hf"
+    LLAMA_2_13B="Llama-2-13b-chat-hf"
+    LLAMA_2_70B="Llama-2-70b-chat-hf"
+
+
 
 class Llama2(BaseChatbot):
 
     def __init__(
         self,
         prompt: str = "",
-        system_prompt: str = None,
+        system_prompt: str = "Answer politely",
         api_key: str = "",
+        temperature: float = 1.0,
+        model: Llama2Model = Llama2Model.LLAMA_2_7B
         ) -> None:
-        self.system_prompt = system_prompt or "Answer politely"
+        self.system_prompt = system_prompt
         self.prompt = prompt
         self.api_key = api_key
-        API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf"
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        self.temperature = temperature
+        self.model = model
+
     def get_completion(self) -> CompletionResponse:
-        if self.prompt is "":
+        if self.prompt == "":
             return self._handle_error(
-                exception="No prompt detected",error_type="InputError"
+                exception="No prompt detected", error_type="InputError"
+            )
+        if self.model not in Llama2Model:
+            return self._handle_error(
+                exception="Invalide Model", error_type="InputError"
             )
         try:
+            headers = {"Authorization": f"Bearer {self.api_key}"}
+            API_URL = f"https://api-inference.huggingface.co/models/meta-llama/{self.model}"
             def query(payload):
                  response = requests.post(API_URL, headers=headers, json=payload)
                  return response.json()
@@ -28,13 +45,18 @@ class Llama2(BaseChatbot):
             payload = {
                 "inputs": prompt_template
             }
-            output = query(payload)
+            output = query(payload)        
 
         except Exception as e:
             raise Exception("Error Occur")
+
+        if output["error"]:
+            return self._handle_error(exception=output["error"],error_type="..")
         
         return CompletionResponse(
-            payload = output
+            payload = output,
+            message = message,
+            err = ""
         )
     
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
