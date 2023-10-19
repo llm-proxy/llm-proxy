@@ -1,4 +1,4 @@
-from src import llmproxy
+from llmproxy import llmproxy
 
 
 def main() -> None:

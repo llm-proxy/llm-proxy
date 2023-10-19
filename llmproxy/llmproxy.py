@@ -1,5 +1,7 @@
 import os
-from models.openai import OpenAI
+
+# from llmproxy.models import OpenAI
+from llmproxy.models.openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
