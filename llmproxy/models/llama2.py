@@ -3,9 +3,9 @@ from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 
 class Llama2Model(str, BaseEnum):
-    LLAMA_2_7B="Llama-2-7b-chat-hf"
-    LLAMA_2_13B="Llama-2-13b-chat-hf"
-    LLAMA_2_70B="Llama-2-70b-chat-hf"
+    LLAMA_2_7B= "Llama-2-7b-chat-hf"
+    LLAMA_2_13B= "Llama-2-13b-chat-hf"
+    LLAMA_2_70B= "Llama-2-70b-chat-hf"
 
 
 
@@ -17,7 +17,7 @@ class Llama2(BaseChatbot):
         system_prompt: str = "Answer politely",
         api_key: str = "",
         temperature: float = 1.0,
-        model: Llama2Model = Llama2Model.LLAMA_2_7B
+        model: Llama2Model = Llama2Model.LLAMA_2_7B.value
         ) -> None:
         self.system_prompt = system_prompt
         self.prompt = prompt
@@ -32,7 +32,8 @@ class Llama2(BaseChatbot):
             )
         if self.model not in Llama2Model:
             return self._handle_error(
-                exception="Invalide Model", error_type="InputError"
+                exception=f"Invalide Model. Please use one of the following model: {', '.join(Llama2Model)}",
+                error_type="InputError"
             )
         try:
             headers = {"Authorization": f"Bearer {self.api_key}"}
@@ -48,7 +49,7 @@ class Llama2(BaseChatbot):
             output = query(payload)        
 
         except Exception as e:
-            raise Exception("Error Occur")
+            raise Exception("Error Occur for prompting Llama2")
 
         if output["error"]:
             return self._handle_error(exception=output["error"],error_type="..")

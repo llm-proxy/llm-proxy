@@ -25,4 +25,8 @@ def get_completion_llama2(prompt: str, system_prompt:str, model: str) -> str:
     
     llama = Llama2(prompt=prompt, system_prompt=system_prompt,api_key=llama2_api_key,model=model)
 
-    res = Llama2.get_completion()
+    res = llama.get_completion()
+
+    if res.err:
+        return res.message
+    return res.payload
