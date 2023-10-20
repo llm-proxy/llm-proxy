@@ -17,7 +17,7 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
 
-    log_format = "%(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
+    log_format = " %(name)s: %(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
 
     FORMATS = {
         logging.DEBUG: grey + log_format + reset,
@@ -38,7 +38,7 @@ def get_logger(logger_name: str = "LOGGER"):
     # :02d format gives us two digits always: ex. 09, 08, 12,...
     filename = f"{today.month:02d}-{today.day:02d}-{today.year}.log"
 
-    log_format = "%(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
+    log_format = " %(name)s: %(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
 
     # Setup logger
     logger = logging.getLogger(logger_name)
@@ -64,3 +64,6 @@ def get_logger(logger_name: str = "LOGGER"):
     logger.addHandler(file_handler)
 
     return logger
+
+
+logger = get_logger("LOG")

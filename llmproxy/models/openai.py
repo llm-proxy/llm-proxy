@@ -1,8 +1,6 @@
 from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils import log
-
-
+from llmproxy.utils.log import logger
 import openai
 from openai import error
 
@@ -27,7 +25,6 @@ class OpenAI(BaseChatbot):
         self.temp = temp
         # We may have to pull this directly from .env and use different .env file/names for testing
         openai.api_key = api_key
-        self.logger = log.get_logger("OPENAI_LOGGER")
 
     def get_completion(self) -> CompletionResponse:
         if self.model not in OpenAIModel:
@@ -43,10 +40,10 @@ class OpenAI(BaseChatbot):
                 temperature=self.temp,
             )
         except error.OpenAIError as e:
-            self.logger.error(e.args[0])
+            logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
-            self.logger.critical(e.args[0])
+            logger.error(e.args[0])
             # This might need to be changed to a different error
             raise Exception("Unknown OpenAI Error")
 
