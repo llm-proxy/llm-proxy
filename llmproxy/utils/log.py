@@ -9,6 +9,18 @@ import datetime as dt
 5. Critical: A serious error; program may be unable to continue running
 """
 
+"""How to setup Logger:
+1. Import pre-configured logger
+from llmproxy.utils.log import logger
+2. Configure logger
+from llmproxy.utils import log
+logger = log.getLogger("name_of_logger_instance")
+"""
+
+"""How to use Logger:
+logger = 
+"""
+
 
 class CustomFormatter(logging.Formatter):
     grey = "\x1b[38;20m"
