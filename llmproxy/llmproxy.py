@@ -3,6 +3,7 @@ import os
 from llmproxy.models.openai import OpenAI
 from llmproxy.models.mistral import Mistral
 from llmproxy.models.llama2 import Llama2
+from llmproxy.models.vertexai import VertexAI
 from llmproxy.models.cohere import Cohere
 from dotenv import load_dotenv
 
@@ -12,7 +13,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 mistral_api_key = os.getenv("MISTRAL_API_KEY")
 llama2_api_key = os.getenv("LLAMA2_API_KEY")
 cohere_api_key = os.getenv("COHERE_API_KEY")
-
+vertexai_project_id = os.getenv("GOOGLE_PROJECT_ID")
 
 def get_completion(prompt: str) -> str:
     # Using class allows us to not worry about passing in params every time we call a function
@@ -58,4 +59,13 @@ def get_completion_cohere(prompt: str, max_token: int, model: str) -> str:
 
     if res.err:
         return res.message
+    return res.payload
+def get_completion_vertexai(prompt: str, location: str) -> str:
+    vertexai = VertexAI(prompt = prompt, location = location, project_id = vertexai_project_id)
+
+    res = vertexai.get_completion()
+
+    if res.err:
+        return res.message
+
     return res.payload
