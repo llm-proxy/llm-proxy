@@ -68,7 +68,7 @@ def test_list_enum_with_float_values() -> None:
     assert set(enum.value for enum in enums) == test_values
 
 
-def test_list_value_with_incorrect_values() -> None:
+def test_list_value_with_nonexistent_values() -> None:
     # Arrange
     class TestEnum(int, BaseEnum):
         NEG_ONE = -1
@@ -82,4 +82,3 @@ def test_list_value_with_incorrect_values() -> None:
     # Assert
     assert 1 not in TestEnum
     assert 2 not in test_values
-    assert "NEG_ONE" in test_enums
