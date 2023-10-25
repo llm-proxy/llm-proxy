@@ -160,7 +160,4 @@ cython_debug/
 #.idea/
 
 # Mac
-**/.DS_Store
 .DS_Store
-DS_Store
-./llmproxy/DS_Store
