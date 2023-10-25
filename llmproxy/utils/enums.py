@@ -13,12 +13,12 @@ class MetaEnum(EnumMeta):
 class BaseEnum(Enum, metaclass=MetaEnum):
     @classmethod
     def list_values(cls):
-        return list(map(lambda c: c.value, cls))
+        return set(map(lambda c: c.value, cls))
 
     @classmethod
     def list_names(cls):
-        return list(map(lambda c: c.name, cls))
+        return set(map(lambda c: c.name, cls))
 
     @classmethod
     def list_enums(cls):
-        return list(map(lambda c: c, cls))
+        return set(map(lambda c: c, cls))
