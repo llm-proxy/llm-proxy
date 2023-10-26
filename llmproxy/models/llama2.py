@@ -56,7 +56,7 @@ class Llama2(BaseChatbot):
         
         return CompletionResponse(
             payload = output,
-            message = message,
+            message = "OK",
             err = ""
         )
     
