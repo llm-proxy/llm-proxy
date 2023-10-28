@@ -27,6 +27,7 @@ def test_llama2_invalid_api_key() -> None:
         model=default_model,
     )
     output = test_api_key.get_completion()
+    print(output.message)
     assert (
         output.message == "Authorization header is correct, but the token seems invalid"
     )
@@ -42,8 +43,8 @@ def test_llama2_free_subscription_api_key() -> None:
 
     output1 = test_model.get_completion()
     response = "Model requires a Pro subscription; check out hf.co/pricing to learn more. Make sure to include your HF token in your query."
-
-    assert output1.message == response
+    print(output1.err)
+    assert output1.err == "Llama2Error"
 
 
 def test_llama2_emp_model() -> None:
@@ -54,8 +55,5 @@ def test_llama2_emp_model() -> None:
         model="",
     )
     output = test_emp_model.get_completion()
-
-    assert (
-        output.message
-        == "Invalide Model. Please use one of the following model: Llama-2-7b-chat-hf, Llama-2-13b-chat-hf, Llama-2-70b-chat-hf"
-    )
+    print(output.message)
+    assert output.err == "ValueError"

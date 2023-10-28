@@ -31,8 +31,8 @@ class Llama2(BaseChatbot):
             )
         if self.model not in Llama2Model:
             return self._handle_error(
-                exception=f"Invalide Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
-                error_type="InputError",
+                exception=f"Invalid Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
+                error_type="ValueError",
             )
         try:
             headers = {"Authorization": f"Bearer {self.api_key}"}
@@ -54,7 +54,7 @@ class Llama2(BaseChatbot):
 
         if output["error"]:
             return self._handle_error(
-                exception=output["error"], error_type="Llama2 Error"
+                exception=output["error"], error_type="Llama2Error"
             )
 
         return CompletionResponse(payload=output, message="OK", err="")
