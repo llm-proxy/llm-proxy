@@ -3,7 +3,7 @@ import os
 from llmproxy.models.mistral import Mistral
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(".env.test")
 
 mistral_api_key = os.getenv("MISTRAL_API_KEY")
 
