@@ -5,21 +5,24 @@ description = "LLM Proxy to reduce cost and complexity of using multiple LLMs"
 authors = ["laxitshahi"]
 readme = "README.md"
 
-[tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
-
 [tool.poetry.dependencies]
 python = "^3.11"
 openai = "^0.28.1"
 python-dotenv = "^1.0.0"
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+cohere = "^4.27"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 pytest = "^7.4.2"
 coverage = "^7.3.2"
 pytest-cov = "^4.1.0"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
 
 [build-system]
 requires = ["poetry-core"]
