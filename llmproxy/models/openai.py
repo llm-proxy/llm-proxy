@@ -1,6 +1,7 @@
 from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
+
 import openai
 from openai import error
 
