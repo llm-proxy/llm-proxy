@@ -35,9 +35,11 @@ def get_completion_mistral(prompt: str, model: str) -> str:
 
     return res.payload
 
-  def get_completion_llama2(prompt: str, system_prompt:str, model: str) -> str:
-    
-    llama = Llama2(prompt=prompt, system_prompt=system_prompt,api_key=llama2_api_key,model=model)
+
+def get_completion_llama2(prompt: str, system_prompt: str, model: str) -> str:
+    llama = Llama2(
+        prompt=prompt, system_prompt=system_prompt, api_key=llama2_api_key, model=model
+    )
 
     res = llama.get_completion()
 
