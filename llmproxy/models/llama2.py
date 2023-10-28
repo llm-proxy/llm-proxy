@@ -31,7 +31,7 @@ class Llama2(BaseChatbot):
             )
         if self.model not in Llama2Model:
             return self._handle_error(
-                exception=f"Invalide Model. Please use one of the following model: {', '.join(Llama2Model.list_value())}",
+                exception=f"Invalide Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
                 error_type="InputError",
             )
         try:
