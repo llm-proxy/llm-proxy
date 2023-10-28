@@ -9,6 +9,6 @@ def main() -> None:
     print(f"OPEN AI: {llmproxy.get_completion(prompt=prompt)}\n")
     print(f"MISTRAL AI: {llmproxy.get_completion_mistral(prompt=prompt, model='test')}")
 
-
+    
 if __name__ == "__main__":
     main()
