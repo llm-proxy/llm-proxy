@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
-mistral_api_key = os.getenv('MISTRAL_API')
+mistral_api_key = os.getenv("MISTRAL_API_KEY")
+
 
 def get_completion(prompt: str) -> str:
     # Using class allows us to not worry about passing in params every time we call a function
@@ -23,7 +24,7 @@ def get_completion(prompt: str) -> str:
 
 
 def get_completion_mistral(prompt: str, model: str) -> str:
-    mistral = Mistral(prompt = prompt, api_key = mistral_api_key, model=model)
+    mistral = Mistral(prompt=prompt, api_key=mistral_api_key, model=model)
 
     res = mistral.get_completion()
 
