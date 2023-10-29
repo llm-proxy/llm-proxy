@@ -13,6 +13,7 @@ mistral_api_key = os.getenv("MISTRAL_API_KEY")
 llama2_api_key = os.getenv("LLAMA2_API_KEY")
 cohere_api_key = os.getenv("COHERE_API_KEY")
 
+
 def get_completion(prompt: str) -> str:
     # Using class allows us to not worry about passing in params every time we call a function
     openai = OpenAI(prompt=prompt, api_key=openai_api_key)
@@ -48,8 +49,10 @@ def get_completion_llama2(prompt: str, system_prompt: str, model: str) -> str:
     return res.payload
 
 
-def get_completion_cohere(prompt: str, max_token: int) -> str:
-    cohere = Cohere(prompt=prompt, api_key=cohere_api_key, max_token=max_token)
+def get_completion_cohere(prompt: str, max_token: int, model: str) -> str:
+    cohere = Cohere(
+        prompt=prompt, api_key=cohere_api_key, max_token=max_token, model=model
+    )
 
     res = cohere.get_completion()
 

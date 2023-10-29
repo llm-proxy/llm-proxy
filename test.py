@@ -8,7 +8,10 @@ def main() -> None:
 
     print(f"OPEN AI: {llmproxy.get_completion(prompt=prompt)}\n")
     print(f"MISTRAL AI: {llmproxy.get_completion_mistral(prompt=prompt, model='test')}")
-    print(f"COHERE AI: {llmproxy.get_completion_cohere(prompt=prompt, max_token=100)}\n")
-    
+    print(
+        f"COHERE AI: {llmproxy.get_completion_cohere(prompt=prompt, max_token=100, model='sdfsdfs')}\n"
+    )
+
+
 if __name__ == "__main__":
     main()
