@@ -60,4 +60,3 @@ class Cohere(BaseChatbot):
             )
         except Exception as e:
             raise Exception("Unknown Cohere error when making API call")
-    
