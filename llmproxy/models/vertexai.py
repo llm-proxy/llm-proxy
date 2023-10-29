@@ -16,7 +16,7 @@ class VertexAI(BaseChatbot):
         temperature: float = 0,
         model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
-        location: str = "",
+        location: str | None = "",
     ) -> None:
         self.prompt = prompt
         self.temperature = temperature
@@ -50,3 +50,6 @@ class VertexAI(BaseChatbot):
             raise Exception(e)
 
         return CompletionResponse(payload=output, message="OK", err="")
+    
+    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
+        return CompletionResponse(message=exception, err=error_type)
