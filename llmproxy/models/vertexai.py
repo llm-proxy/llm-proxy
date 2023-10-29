@@ -14,7 +14,7 @@ class VertexAI(BaseChatbot):
         self,
         prompt: str = "",
         temperature: float = 0,
-        model: VertexAIModel = VertexAIModel.PALM_TEXT,
+        model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
         location: str = "",
     ) -> None:
@@ -40,7 +40,7 @@ class VertexAI(BaseChatbot):
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
             response = chat_model.predict(self.prompt)
-            output = f"Response from Model: {response.text}"
+            output = response.text
 
         except exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
