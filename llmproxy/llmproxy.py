@@ -60,7 +60,7 @@ def get_completion_cohere(prompt: str, max_token: int, model: str) -> str:
         return res.message
     return res.payload
 
-def get_completion_vertexai(prompt: str, location: str) -> str:
+def get_completion_vertexai(prompt: str, location='') -> str:
     vertexai = VertexAI(prompt = prompt, location = location, project_id = vertexai_project_id)
 
     res = vertexai.get_completion()
