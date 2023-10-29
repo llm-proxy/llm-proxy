@@ -14,6 +14,7 @@ pytest-cov = "^4.1.0"
 cohere = "^4.27"
 pandas = "^2.1.2"
 scikit-learn = "1.3.2"
+nltk = "3.8.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
