@@ -1,30 +1,30 @@
-prompt, category
-what is 1+1 equal too?, Math
-What is the square root of 64?, Math
-Solve for x: 2x - 5 = 10, Math
-Calculate the area of a triangle with base 5 and height 8., Math
-Find the derivative of f(x) = 3x^2 + 2x + 1., Math
-Simplify the expression: 3(x + 2) - 2(3x - 1)., Math
-Find the solution to the equation: 4x - 7 = 5x + 3., Math
-Calculate the volume of a cylinder with radius 3 and height 10., Math
-Solve the quadratic equation: x^2 - 4x + 4 = 0, Math
-Find the value of sin(30 degrees)., Math
-What is the powerhouse of a cell?, Science
-Explain the process of photosynthesis., Science
-Describe the concept of gravitational force., Science
-Describe the structure of an atom., Science
-Explain the concept of genetic inheritance., Science
-Describe the process of cellular respiration., Science
-Describe the structure and function of DNA., Science
-Explain the concept of natural selection., Science
-Explain the concept of climate change and its causes., Science
-How to start a start-up?, Business
-What are some marketing strategies for a new product launch?, Business
-How to create a business plan for a small enterprise?, Business
-What are the key components of a successful marketing campaign?, Business
-What are the steps involved in market research for a startup?, Business
-How to create an effective social media marketing strategy?, Business
-What are the key financial considerations for a new business?, Business
-What are the legal requirements for starting a business?, Business
-How to develop a pricing strategy for a product or service?, Business
-What are effective methods for customer acquisition in a startup?, Business
+prompt,category
+what is 1+1 equal too?,Math
+What is the square root of 64?,Math
+Solve for x: 2x - 5 = 10,Math
+Calculate the area of a triangle with base 5 and height 8.,Math
+Find the derivative of f(x) = 3x^2 + 2x + 1.,Math
+Simplify the expression: 3(x + 2) - 2(3x - 1).,Math
+Find the solution to the equation: 4x - 7 = 5x + 3.,Math
+Calculate the volume of a cylinder with radius 3 and height 10.,Math
+Solve the quadratic equation: x^2 - 4x + 4 = 0,Math
+Find the value of sin(30 degrees).,Math
+What is the powerhouse of a cell?,Science
+Explain the process of photosynthesis.,Science
+Describe the concept of gravitational force.,Science
+Describe the structure of an atom.,Science
+Explain the concept of genetic inheritance.,Science
+Describe the process of cellular respiration.,Science
+Describe the structure and function of DNA.,Science
+Explain the concept of natural selection.,Science
+Explain the concept of climate change and its causes.,Science
+How to start a start-up?,Business
+What are some marketing strategies for a new product launch?,Business
+How to create a business plan for a small enterprise?,Business
+What are the key components of a successful marketing campaign?,Business
+What are the steps involved in market research for a startup?,Business
+How to create an effective social media marketing strategy?,Business
+What are the key financial considerations for a new business?,Business
+What are the legal requirements for starting a business?,Business
+How to develop a pricing strategy for a product or service?,Business
+What are effective methods for customer acquisition in a startup?,Business
