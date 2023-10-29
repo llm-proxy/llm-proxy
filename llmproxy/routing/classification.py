@@ -26,6 +26,7 @@ tfidf_vectorizer = TfidfVectorizer(
     tokenizer=custom_tokenizer,
     lowercase=False  # We are converting to lowercase in the custom tokenizer                            
 )
+
 X_train_tfidf = tfidf_vectorizer.fit_transform(X_train)
 
 # Train a Multinomial Naive Bayes classifier
