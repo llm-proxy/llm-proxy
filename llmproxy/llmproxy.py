@@ -5,6 +5,7 @@ from llmproxy.models.mistral import Mistral
 from llmproxy.models.llama2 import Llama2
 from llmproxy.models.vertexai import VertexAI
 from llmproxy.models.cohere import Cohere
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,7 +38,6 @@ def get_completion_mistral(prompt: str, model: str) -> str:
 
     return res.payload
 
-
 def get_completion_llama2(prompt: str, system_prompt: str, model: str) -> str:
     llama = Llama2(
         prompt=prompt, system_prompt=system_prompt, api_key=llama2_api_key, model=model
@@ -49,7 +49,6 @@ def get_completion_llama2(prompt: str, system_prompt: str, model: str) -> str:
         return res.message
     return res.payload
 
-
 def get_completion_cohere(prompt: str, max_token: int, model: str) -> str:
     cohere = Cohere(
         prompt=prompt, api_key=cohere_api_key, max_token=max_token, model=model
@@ -60,6 +59,7 @@ def get_completion_cohere(prompt: str, max_token: int, model: str) -> str:
     if res.err:
         return res.message
     return res.payload
+
 def get_completion_vertexai(prompt: str, location: str) -> str:
     vertexai = VertexAI(prompt = prompt, location = location, project_id = vertexai_project_id)
 
