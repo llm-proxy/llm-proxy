@@ -1,5 +1,5 @@
 from google.cloud import aiplatform
-from google.auth import exceptions
+from google.api_core import exceptions
 from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
@@ -21,7 +21,8 @@ class VertexAI(BaseChatbot):
         self.prompt = prompt
         self.temperature = temperature
         self.model = model
-        aiplatform.init(project=project_id, location=location)
+        self.project_id=project_id
+        self.location=location
 
     def get_completion(self) -> CompletionResponse:
         if self.model not in VertexAIModel:
@@ -30,6 +31,7 @@ class VertexAI(BaseChatbot):
                 error_type = "ValueError"
             )
         try:
+            aiplatform.init(project=self.project_id, location=self.location)
             # TODO developer - override these parameters as needed:
             parameters = {
                 "temperature": self.temperature,  # Temperature controls the degree of randomness in token selection.
@@ -42,9 +44,12 @@ class VertexAI(BaseChatbot):
             response = chat_model.predict(self.prompt)
             output = response.text
 
-        except exceptions.GoogleAuthError as e:
+        except exceptions.GoogleAPIError as e:
             logger.error(e.args[0])
-            return CompletionResponse(message=e.args[0], err=type(e).__name__)
+            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+        except ValueError as e:
+            logger.error(e.args[0])
+            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
             raise Exception(e)
