@@ -3,8 +3,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report
-from nltk.corpus import stopwords
 import re
+from nltk.corpus import stopwords
 
 # Define a custom tokenizer that replaces numbers with "NUM" and removes stop words
 stop_words = set(stopwords.words('english'))
@@ -22,6 +22,7 @@ X_train, X_test, y_train, y_test = train_test_split(data['prompt'], data['catego
 
 # Create TF-IDF vectors
 tfidf_vectorizer = TfidfVectorizer(
+    token_pattern=None,
     tokenizer=custom_tokenizer,
     lowercase=False  # We are converting to lowercase in the custom tokenizer                            
 )
