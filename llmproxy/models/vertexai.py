@@ -1,5 +1,6 @@
 from google.cloud import aiplatform
-from google.api_core import exceptions
+from google.auth import exceptions as auth_exceptions
+from google.api_core import exceptions as api_exceptions
 from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
@@ -44,7 +45,10 @@ class VertexAI(BaseChatbot):
             response = chat_model.predict(self.prompt)
             output = response.text
 
-        except exceptions.GoogleAPIError as e:
+        except api_exceptions.GoogleAPIError as e:
+            logger.error(e.args[0])
+            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+        except auth_exceptions.DefaultCredentialsError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except ValueError as e:
