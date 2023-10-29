@@ -13,6 +13,11 @@ mistral_api_key = os.getenv("MISTRAL_API_KEY")
 llama2_api_key = os.getenv("LLAMA2_API_KEY")
 
 
+def min_cost():
+    openai = OpenAI(prompt="I am a man, not a man", api_key="", model="gpt-4", temp=0)
+    print(openai.get_estimated_max_cost())
+
+
 def get_completion(prompt: str) -> str:
     # Using class allows us to not worry about passing in params every time we call a function
     openai = OpenAI(prompt=prompt, api_key=openai_api_key)
