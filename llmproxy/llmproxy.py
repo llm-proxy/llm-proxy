@@ -3,7 +3,7 @@ import os
 from llmproxy.models.openai import OpenAI
 from llmproxy.models.mistral import Mistral
 from llmproxy.models.llama2 import Llama2
-
+from llmproxy.models.cohere import Cohere
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,6 +11,7 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 mistral_api_key = os.getenv("MISTRAL_API_KEY")
 llama2_api_key = os.getenv("LLAMA2_API_KEY")
+cohere_api_key = os.getenv("COHERE_API_KEY")
 
 
 def get_completion(prompt: str) -> str:
@@ -42,6 +43,18 @@ def get_completion_llama2(prompt: str, system_prompt: str, model: str) -> str:
     )
 
     res = llama.get_completion()
+
+    if res.err:
+        return res.message
+    return res.payload
+
+
+def get_completion_cohere(prompt: str, max_token: int, model: str) -> str:
+    cohere = Cohere(
+        prompt=prompt, api_key=cohere_api_key, max_token=max_token, model=model
+    )
+
+    res = cohere.get_completion()
 
     if res.err:
         return res.message
