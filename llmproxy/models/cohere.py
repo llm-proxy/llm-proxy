@@ -36,7 +36,7 @@ class Cohere(BaseChatbot):
         if self.model not in CohereModel:
             return CompletionResponse(
                 payload="",
-                message=f"Model not supported. Please use one of the following models: {', '.join(Cohere.list_values())}",
+                message=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
                 err="ValueError",
             )
         if self.co is None:
