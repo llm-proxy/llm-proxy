@@ -1,3 +1,8 @@
+"""
+These tests have multiple warnings about deprecation
+They are suppressed and will be addressed later
+"""
+
 import os
 
 from llmproxy.models.vertexai import VertexAI
@@ -6,6 +11,7 @@ from dotenv import load_dotenv
 load_dotenv(".env.test")
 project_id = os.getenv("GOOGLE_PROJECT_ID")
 
+# This test will only work if you have a valid application_default_credentials.json file
 def test_invalid_project_id() -> None:
     #Arrange
     vertexai = VertexAI(project_id="invalid id")
