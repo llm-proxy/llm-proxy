@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 
@@ -13,7 +13,7 @@ class OpenAIModel(str, BaseEnum):
     GPT_3_5_TURBO_16K = "gpt-3.5-turbo-16k"
 
 
-class OpenAI(BaseChatbot):
+class OpenAI(BaseModel):
     def __init__(
         self,
         prompt: str = "",

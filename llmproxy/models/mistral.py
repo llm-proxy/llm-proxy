@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 import requests
 
@@ -8,7 +8,7 @@ class MistralModel(str, BaseEnum):
     Mistral_7B_Instruct = "Mistral-7B-Instruct-v0.1"
 
 
-class Mistral(BaseChatbot):
+class Mistral(BaseModel):
     def __init__(
         self,
         prompt: str = "",

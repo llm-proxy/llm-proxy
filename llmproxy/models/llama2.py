@@ -1,5 +1,5 @@
 import requests
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 
 
@@ -9,7 +9,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B = "Llama-2-70b-chat-hf"
 
 
-class Llama2(BaseChatbot):
+class Llama2(BaseModel):
     def __init__(
         self,
         prompt: str = "",
