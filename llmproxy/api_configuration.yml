@@ -1,0 +1,49 @@
+llm_proxy:
+  name: LLM proxy API
+  version: demo 1.0
+  description: An API that act as a proxy to multiple language models
+
+models:
+  - name: OpenAI
+    class: openai.OpenAI
+    models:
+      - GPT_3-5
+      - GPT-4
+      - GPT_3_5_TURBO
+      - GPT_3_5_TURBO_16K
+      - GPT_4_32k
+    api_key: "{{OPENAI_API_KEY}}"
+    endpoint: https://api.openai.com/v1/engines/{model}/completions
+    temperature: 1.0
+
+  - name: Llama 2
+    class: llama2.Llama2
+    models:
+      - name: Llama-2-7b-chat-hf
+        endpoint: https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf
+      - name: Llama-2-13b-chat-hf
+        endpoint: https://api-inference.huggingface.co/models/meta-llama/Llama-2-13b-chat-hf
+      - name: Llama-2-70b-chat-hf
+        endpoint: https://api-inference.huggingface.co/models/meta-llama/Llama-2-70b-chat-hf
+    api_key: "{{LLAMA2_API_KEY}}"
+
+  - name: Mistral
+    class: mistral.Mistral
+    models:
+      - name: Mistral_7B
+        endpoint: https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1
+      - name: Mistral_7B_Instruct
+        endpoint: https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1
+    api_key: "{{MISTRAL_API_KEY}}"
+    temperature: 1.0
+
+  - name: Cohere
+    class: cohere.Cohere
+    models:
+      - command
+      - command-light
+      - command-nightly
+      - command-light-nightly
+    api_key: "{{COHERE_API_KEY}}"
+    temperature: 1.0
+    max_token: 10000
