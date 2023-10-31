@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 from llmproxy.models.openai import OpenAI
 from openai import error
 from unittest.mock import patch
-load_dotenv()
+
+load_dotenv(".env.test")
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
