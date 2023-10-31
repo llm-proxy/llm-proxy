@@ -16,7 +16,7 @@ def test_invalid_temperature():
     assert "temperature" in response.message.lower()
 
 def test_invalid_api_key():
-    chatbot = OpenAI(api_key="invalid_key2")
+    chatbot = OpenAI(api_key="invalid_key")
     response = chatbot.get_completion()
     assert isinstance(response.err, str)
     assert "incorrect api key provided" in response.message.lower()
