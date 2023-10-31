@@ -3,7 +3,13 @@ llm_proxy:
   version: demo 1.0
   description: An API that act as a proxy to multiple language models
 
-models:
+user_setting:
+  model: OpenAI
+  temperature: 1.0
+  api_key: OPENAI_API_KEY
+  token_generate_limit: 10000
+
+available_models:
   - name: OpenAI
     class: openai.OpenAI
     models:

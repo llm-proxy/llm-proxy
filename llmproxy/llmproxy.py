@@ -1,4 +1,5 @@
 import os
+import yaml
 
 from llmproxy.models.openai import OpenAI
 from llmproxy.models.mistral import Mistral
@@ -12,6 +13,30 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 mistral_api_key = os.getenv("MISTRAL_API_KEY")
 llama2_api_key = os.getenv("LLAMA2_API_KEY")
 cohere_api_key = os.getenv("COHERE_API_KEY")
+
+# mapping models to their respective completion function
+completion_functions = {
+    "OpenAI": get_completion,
+    "Cohere": get_completion_cohere,
+    "Llama2": get_completion_llama2,
+    "Mistral": get_completion_mistral,
+}
+
+
+# use by user for prompting based on user_setting in the api_configuration.yml
+def prompt(prompt: str) -> str:
+    with open("api_configuration.yml", "r") as file:
+        setting = yaml.safe_load(file)
+
+    model = setting["user_setting"]["model"]
+    parameters = {key: value for key, value in setting.items() if key != "model"}
+
+    if model in completion_functions:
+        completion_function = completion_functions[model]
+        result = completion_function(prompt, **parameters)
+        return result
+    else:
+        raise ValueError("Invalid model specified")
 
 
 def get_completion(prompt: str) -> str:
