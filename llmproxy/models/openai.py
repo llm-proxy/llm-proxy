@@ -1,5 +1,7 @@
 from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.log import logger
+
 import openai
 from openai import error
 
@@ -15,7 +17,7 @@ class OpenAI(BaseChatbot):
     def __init__(
         self,
         prompt: str = "",
-        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO,
+        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO.value,
         temp: float = 0,
         api_key: str = "",
     ) -> None:
@@ -28,7 +30,8 @@ class OpenAI(BaseChatbot):
     def get_completion(self) -> CompletionResponse:
         if self.model not in OpenAIModel:
             return self._handle_error(
-                exception="Model not supported", error_type="ValueError"
+                exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
+                error_type="ValueError",
             )
         try:
             messages = [{"role": "user", "content": self.prompt}]
@@ -38,10 +41,12 @@ class OpenAI(BaseChatbot):
                 temperature=self.temp,
             )
         except error.OpenAIError as e:
+            logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
+            logger.error(e.args[0])
             # This might need to be changed to a different error
-            raise Exception("Unknown Error")
+            raise Exception("Unknown OpenAI Error")
 
         return CompletionResponse(
             payload=response.choices[0].message["content"],
