@@ -25,18 +25,28 @@ completion_functions = {
 
 # use by user for prompting based on user_setting in the api_configuration.yml
 def prompt(prompt: str) -> str:
-    with open("api_configuration.yml", "r") as file:
-        setting = yaml.safe_load(file)
+    result = {}
+    try:
+        with open("api_configuration.yml", "r") as file:
+            settings = yaml.safe_load(file)
 
-    model = setting["user_setting"]["model"]
-    parameters = {key: value for key, value in setting.items() if key != "model"}
+        if settings is None or 'user_setting' not in settings:
+            raise ValueError("Invalid or missing 'user_setting' in api_configuration.yaml")
+        
+        for setting in settings['user_setting']:
+            model = setting.get('model')
+            if model is not None and model in completion_functions:
+                parameters = setting
+                completion_function = completion_functions[model]
+                result = completion_function(prompt, **parameters)
+                return result
+            else:
+                result[model] = f"Model '{model}' not found or completion_function not defined."
 
-    if model in completion_functions:
-        completion_function = completion_functions[model]
-        result = completion_function(prompt, **parameters)
-        return result
-    else:
-        raise ValueError("Invalid model specified")
+    except (FileNotFoundError, yaml.YAMLError) as e:
+        result['Error'] = f"An error occurred: {e}"
+
+    return result
 
 
 def get_completion(prompt: str) -> str:
