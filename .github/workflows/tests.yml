@@ -2,6 +2,13 @@ name: test
 
 on: push
 
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+  MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+  LLAMA2_API_KEY: ${{ secrets.LLAMA2_API_KEY }}
+  GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+
 jobs:
     
   tests:
@@ -10,13 +17,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
-      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-      LLAMA2_API_KEY: ${{ secrets.LLAMA2_API_KEY }}
-      GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
     
     steps:
       - name: Checkout
@@ -39,6 +39,11 @@ jobs:
         with:
           workload_identity_provider: 'projects/806914350455/locations/global/workloadIdentityPools/llm-proxy/providers/github'
           service_account: 'github-actions@poised-elf-400922.iam.gserviceaccount.com'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          project_id: '${{ env.GOOGLE_PROJECT_ID }}'
 
       - name: Run test suite
         run: poetry run pytest
