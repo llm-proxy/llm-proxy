@@ -168,5 +168,5 @@ cython_debug/
 .DS_Store
 **/.DS_Store
 
-# Google Credentials
-google_credentials.json
+# Google VertexAI
+application_default_credentials.json

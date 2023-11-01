@@ -17,6 +17,7 @@ datasets = "^2.14.6"
 torch = "^2.1.0"
 tiktoken = "^0.5.1"
 tokenizers = "^0.14.1"
+google-cloud-aiplatform = "^1.35.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
@@ -25,9 +26,8 @@ coverage = "^7.3.2"
 pytest-cov = "^4.1.0"
 
 [tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
+filterwarnings = ["ignore::DeprecationWarning"]
+pythonpath = ["."]
 
 [build-system]
 requires = ["poetry-core"]
