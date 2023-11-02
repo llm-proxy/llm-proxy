@@ -1,3 +1,4 @@
+from math import inf
 from llmproxy.models.base import BaseChatbot, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
@@ -20,12 +21,14 @@ class OpenAI(BaseChatbot):
         model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO.value,
         temp: float = 0,
         api_key: str = "",
+        max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.temp = temp
         # We may have to pull this directly from .env and use different .env file/names for testing
         openai.api_key = api_key
+        self.max_output_tokens = max_output_tokens
 
     def get_completion(self) -> CompletionResponse:
         if self.model not in OpenAIModel:
@@ -39,6 +42,7 @@ class OpenAI(BaseChatbot):
                 model=self.model,
                 messages=messages,
                 temperature=self.temp,
+                max_tokens=self.max_output_tokens,
             )
         except error.OpenAIError as e:
             logger.error(e.args[0])
