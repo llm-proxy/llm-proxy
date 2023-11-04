@@ -46,12 +46,11 @@ class VertexAI(BaseChatbot):
             chat_model = TextGenerationModel.from_pretrained(self.model)
             response = chat_model.predict(self.prompt)
             output = response.text
-            print(response)
 
         except api_exceptions.GoogleAPIError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
-        except auth_exceptions.DefaultCredentialsError as e:
+        except auth_exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except ValueError as e:
