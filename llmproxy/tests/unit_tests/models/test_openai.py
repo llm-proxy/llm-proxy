@@ -18,7 +18,6 @@ def test_invalid_api_key():
 def test_unsupported_model():
     chatbot = OpenAI(api_key=openai_api_key, model="unsupported_model")
     response = chatbot.get_completion()
-    print(response)
     assert "ValueError" == response.err
     assert "Model not supported" in response.message
 
