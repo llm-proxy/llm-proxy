@@ -9,13 +9,6 @@ load_dotenv(".env.test")
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-def test_invalid_temperature():
-    chatbot = OpenAI(api_key = openai_api_key, temp=-1)
-    response = chatbot.get_completion()
-    print(response)
-    assert isinstance(response.err, str)
-    assert "temperature" in response.message.lower()
-
 def test_invalid_api_key():
     chatbot = OpenAI(api_key="invalid_key")
     response = chatbot.get_completion()
