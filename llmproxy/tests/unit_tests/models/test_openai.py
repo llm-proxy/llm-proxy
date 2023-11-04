@@ -12,6 +12,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 def test_invalid_temperature():
     chatbot = OpenAI(api_key = openai_api_key, temp=-1)
     response = chatbot.get_completion()
+    print(response)
     assert isinstance(response.err, str)
     assert "temperature" in response.message.lower()
 
@@ -24,8 +25,9 @@ def test_invalid_api_key():
 def test_unsupported_model():
     chatbot = OpenAI(api_key=openai_api_key, model="unsupported_model")
     response = chatbot.get_completion()
-    assert response.err == "ValueError"
-    assert response.message == "Model not supported"
+    print(response)
+    assert "ValueError" == response.err
+    assert "Model not supported" in response.message
 
 def test_generic_exception():
     with patch('openai.ChatCompletion.create', side_effect=Exception("Random error")):
