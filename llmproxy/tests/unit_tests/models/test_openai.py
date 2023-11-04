@@ -28,7 +28,7 @@ def test_generic_exception():
         try:
             chatbot.get_completion()
         except Exception as e:
-            assert str(e) == "Unknown Error"
+            assert str(e) == "Unknown OpenAI Error"
 
 def test_openai_rate_limit_error():
     with patch('openai.ChatCompletion.create', side_effect=error.OpenAIError("Rate limit exceeded")):
