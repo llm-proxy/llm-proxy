@@ -4,15 +4,17 @@ from tokenizers.trainers import BpeTrainer
 from tokenizers.pre_tokenizers import Whitespace
 from datasets import load_dataset
 
-models_costs = {
-    "Mistral-7B-v0.1": {
-        "prompt": 0.00,
-        "completion": 0.00,
-    },
-    "Mistral-7B-Instruct-v0.1": {
-        "prompt": 0.00,
-        "completion": 0.00,
-    }}
+# to be implamented....
+# models_costs = {
+#     "Mistral-7B-v0.1": {
+#         "prompt": 0.00,
+#         "completion": 0.00,
+#     },
+#     "Mistral-7B-Instruct-v0.1": {
+#         "prompt": 0.00,
+#         "completion": 0.00,
+#     }}
+
 
 
 def tokenize_prompt(prompt, train_dataset, test_dataset, val_dataset):
@@ -41,5 +43,5 @@ num_tokens = tokenize_prompt(prompt, train_dataset, test_dataset, val_dataset)
 print(f"Number of tokens in the prompt: {num_tokens}")
 
 
-#for my refrance only.
+
 #Encoding(num_tokens=11, attributes=[ids, type_ids, tokens, offsets, attention_mask, special_tokens_mask, overflowing])
