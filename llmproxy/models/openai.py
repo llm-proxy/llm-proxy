@@ -29,14 +29,16 @@ class OpenAI(BaseModel):
         openai.api_key = api_key
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self) -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in OpenAIModel:
             return self._handle_error(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
                 error_type="ValueError",
             )
         try:
-            messages = [{"role": "user", "content": self.prompt}]
+            messages = [
+                {"role": "user", "content": self.prompt if self.prompt else prompt}
+            ]
             response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=messages,

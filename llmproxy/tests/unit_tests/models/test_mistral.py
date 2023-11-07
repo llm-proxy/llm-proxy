@@ -22,7 +22,7 @@ def test_mistral_constructor_default() -> None:
 
 def test_mistral_invalid_api_key() -> None:
     # Arrange
-    mistral = Mistral(api_key="not_given")
+    mistral = Mistral(api_key="invalid")
 
     # Act
     check = mistral.get_completion()

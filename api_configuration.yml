@@ -1,0 +1,72 @@
+llm_proxy:
+  name: LLM proxy API
+  version: demo 1.0
+  description: An API that act as a proxy to multiple language models
+
+user_settings:
+  # Example
+  - model: OpenAI
+    # .env name for api key 
+    api_key_var: OPENAI_API_KEY
+    # Maximum number of output tokens
+    max_output_tokens: 10000
+    # Temperature of model (generally 0.0 - 1.0, but can vary)
+    temperature: 1.0
+    # input names of models you want to you (see below for all models provided)
+    models:
+      - GPT_3-5
+      - GPT_3_5_TURBO
+      - GPT_3_5_TURBO_16K
+      - GPT-4
+      - GPT_4_32k
+
+  - model: Llama2
+    temperature: 1.0
+    api_key_var: LLAMA2_API_KEY
+  - model: Mistral
+    temperature: 1.0
+    api_key_var: MISTRAL_API_KEY
+  - model: Cohere
+    temperature: 1.0
+    api_key_var: COHERE_API_KEY
+  - model: VertexAI 
+    temperature: 1.0
+    project_id: GOOGLE_PROJECT_ID
+    secrets_file_path: GOOGLE_APPLICATION_CREDENTIALS
+
+available_models:
+  - name: OpenAI
+    class: llmproxy.models.openai.OpenAI
+    models:
+      - GPT_3-5
+      - GPT_3_5_TURBO
+      - GPT_3_5_TURBO_16K
+      - GPT-4
+      - GPT_4_32k
+    
+  - name: Llama2
+    class: llmproxy.models.llama2.Llama2
+    models:
+      - Llama-2-7b-chat-hf
+      - Llama-2-13b-chat-hf
+      - Llama-2-70b-chat-hf
+
+  - name: Mistral
+    class: llmproxy.models.mistral.Mistral
+    models:
+      - Mistral_7B
+      - Mistral_7B_Instruct
+
+  - name: Cohere
+    class: llmproxy.models.cohere.Cohere
+    models:
+      - command
+      - command-light
+      - command-nightly
+      - command-light-nightly
+
+  - name: Vertexai 
+    class: llmproxy.models.vertexai.VertexAI
+    models:
+      - text-bison@001
+      - chat-bison"

@@ -1,13 +1,16 @@
 import os
 import yaml
+import importlib
+from typing import Any, Dict, List
 
-from llmproxy.models.openai import OpenAI
-from llmproxy.models.mistral import Mistral
-from llmproxy.models.llama2 import Llama2
-from llmproxy.models.vertexai import VertexAI
-from llmproxy.models.cohere import Cohere
-
+# from llmproxy.models.openai import OpenAI
+# from llmproxy.models.mistral import Mistral
+# from llmproxy.models.llama2 import Llama2
+# from llmproxy.models.vertexai import VertexAI
+# from llmproxy.models.cohere import Cohere
+from llmproxy.utils.enums import BaseEnum
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -17,91 +20,93 @@ llama2_api_key = os.getenv("LLAMA2_API_KEY")
 cohere_api_key = os.getenv("COHERE_API_KEY")
 vertexai_project_id = os.getenv("GOOGLE_PROJECT_ID")
 
-# mapping models to their respective completion function
-completion_functions = {
-    "OpenAI": get_completion,
-    "Cohere": get_completion_cohere,
-    "Llama2": get_completion_llama2,
-    "Mistral": get_completion_mistral,
-}
+
+class RouteType(str, BaseEnum):
+    COST = "cost"
+    CATEGORY = "category"
 
 
-# use by user for prompting based on user_setting in the api_configuration.yml
-def prompt(prompt: str) -> str:
-    result = {}
+def _get_settings_from_yml(
+    path_to_yml="api_configuration.yml",
+) -> Dict[str, Any]:
     try:
-        with open("api_configuration.yml", "r") as file:
-            settings = yaml.safe_load(file)
-
-        if settings is None or 'user_setting' not in settings:
-            raise ValueError("Invalid or missing 'user_setting' in api_configuration.yaml")
-        
-        for setting in settings['user_setting']:
-            model = setting.get('model')
-            if model is not None and model in completion_functions:
-                parameters = setting
-                completion_function = completion_functions[model]
-                result = completion_function(prompt, **parameters)
-                return result
-            else:
-                result[model] = f"Model '{model}' not found or completion_function not defined."
-
+        with open(path_to_yml, "r") as file:
+            result = yaml.safe_load(file)
+            print((result))
+            return result
     except (FileNotFoundError, yaml.YAMLError) as e:
-        result['Error'] = f"An error occurred: {e}"
-
-    return result
+        raise e
 
 
-def get_completion_openai(prompt: str) -> str:
-    # Using class allows us to not worry about passing in params every time we call a function
-    openai = OpenAI(prompt=prompt, api_key=openai_api_key)
+def _setup_available_models(settings={}) -> Dict[str, Any]:
+    try:
+        available_models = {}
+        for model in settings["available_models"]:
+            key = model["name"].lower()
+            import_path = model["class"]
 
-    res = openai.get_completion()
+            module_name, class_name = import_path.rsplit(".", 1)
 
-    if res.err:
-        return res.message
+            module = importlib.import_module(module_name)
+            model_class = getattr(module, class_name)
 
-    return res.payload
-
-
-def get_completion_mistral(prompt: str) -> str:
-    mistral = Mistral(prompt=prompt, api_key=mistral_api_key)
-
-    res = mistral.get_completion()
-
-    if res.err:
-        return res.message
-
-    return res.payload
+            available_models[key] = model_class
+        return available_models
+    except Exception as e:
+        raise e
 
 
-def get_completion_llama2(prompt: str) -> str:
-    llama = Llama2(prompt=prompt, api_key=llama2_api_key)
+def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
+    # Setup all user models
+    try:
+        user_models = {}
+        for model in settings["user_settings"]:
+            model_name = model["model"].lower().strip()
 
-    res = llama.get_completion()
+            if model_name in available_models:
+                # Different setup for vertexai
+                if model_name == "vertexai":
+                    model_instance = available_models[model_name](
+                        project_id=os.getenv("GOOGLE_PROJECT_ID")
+                    )
+                    user_models[model_name] = model_instance
+                else:
+                    model_instance = available_models[model_name](
+                        api_key=os.getenv(model["api_key_var"])
+                    )
+                    user_models[model_name] = model_instance
+        return user_models
+    except Exception as e:
+        raise e
 
-    if res.err:
-        return res.message
-    return res.payload
 
+class LLMProxy:
+    def __init__(self) -> None:
+        # ... Read YML and see which models the user wants
+        self.user_models = {}
+        self.route_type = "cost"
 
-def get_completion_cohere(prompt: str) -> str:
-    cohere = Cohere(prompt=prompt, api_key=cohere_api_key)
+        settings = _get_settings_from_yml()
+        # Setup available models
+        available_models = _setup_available_models(settings=settings)
 
-    res = cohere.get_completion()
-    if res.err:
-        return res.message
-    return res.payload
+        self.user_models = _setup_user_models(
+            settings=settings, available_models=available_models
+        )
 
-
-def get_completion_vertexai(prompt: str, location: str = "us-central1") -> str:
-    vertexai = VertexAI(
-        prompt=prompt, location=location, project_id=vertexai_project_id
-    )
-
-    res = vertexai.get_completion()
-
-    if res.err:
-        return res.message
-
-    return res.payload
+    def route(self, route_type: RouteType = RouteType.COST.value) -> str:
+        if route_type not in RouteType:
+            return "Sorry routing option available"
+        print(self.user_models)
+        if route_type == "cost":
+            # Cost routing
+            return ""
+        elif route_type == "category":
+            # Category routing
+            return ""
+        # for name, instance in user_models.items():
+        #     res = instance.get_completion(prompt="What's 1 + 1 + 2 + 2?")
+        #         if res.err:
+        #             print(name, res.message)
+        #         else:
+        #             print(name, res.payload)
