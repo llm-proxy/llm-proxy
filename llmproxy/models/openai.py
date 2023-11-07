@@ -3,6 +3,7 @@ from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 import openai
 from openai import error
+import tiktoken
 
 
 # This should be available later from the yaml file
