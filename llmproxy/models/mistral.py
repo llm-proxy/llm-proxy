@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 import requests
 
@@ -8,18 +8,20 @@ class MistralModel(str, BaseEnum):
     Mistral_7B_Instruct = "Mistral-7B-Instruct-v0.1"
 
 
-class Mistral(BaseChatbot):
+class Mistral(BaseModel):
     def __init__(
         self,
         prompt: str = "",
         model: MistralModel = MistralModel.Mistral_7B_Instruct.value,
         api_key: str = "",
-        temp: float = 1,
+        temp: float = 1.0,
+        max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.api_key = api_key
         self.temp = temp
+        self.max_output_tokens = max_output_tokens
 
     def get_completion(self) -> CompletionResponse:
         if self.model not in MistralModel:
@@ -39,7 +41,13 @@ class Mistral(BaseChatbot):
                 return response.json()
 
             output = query(
-                {"inputs": self.prompt, "parameters": {"temperature": self.temp}}
+                {
+                    "inputs": self.prompt,
+                    "parameters": {
+                        "temperature": self.temp,
+                        "max_length": self.max_output_tokens,
+                    },
+                }
             )
         except Exception as e:
             raise Exception(e)
