@@ -26,7 +26,8 @@ coverage = "^7.3.2"
 pytest-cov = "^4.1.0"
 
 [tool.pytest.ini_options]
-filterwarnings = ["ignore::DeprecationWarning"]
+# filterwarnings = ["ignore::DeprecationWarning"]
+
 pythonpath = ["."]
 
 [build-system]
