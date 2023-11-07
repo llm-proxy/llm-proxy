@@ -17,12 +17,14 @@ class Llama2(BaseModel):
         api_key: str = "",
         temperature: float = 1.0,
         model: Llama2Model = Llama2Model.LLAMA_2_7B.value,
+        max_output_tokens: int = None,
     ) -> None:
         self.system_prompt = system_prompt
         self.prompt = prompt
         self.api_key = api_key
         self.temperature = temperature
         self.model = model
+        self.max_output_tokens = max_output_tokens
 
     def get_completion(self) -> CompletionResponse:
         if self.prompt == "":
@@ -46,8 +48,15 @@ class Llama2(BaseModel):
 
             # Llama2 prompt template
             prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {self.prompt} }}}}\n[/INST]"
-            payload = {"inputs": prompt_template}
-            output = query(payload)
+            output = query(
+                {
+                    "inputs": prompt_template,
+                    "parameters": {
+                        "max_length": self.max_output_tokens,
+                        "temperature": self.temperature,
+                    },
+                }
+            )
 
         except Exception as e:
             raise Exception("Error Occur for prompting Llama2")

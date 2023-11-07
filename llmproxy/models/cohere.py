@@ -14,16 +14,16 @@ class Cohere(BaseModel):
     def __init__(
         self,
         prompt: str = "",
-        model: CohereModel = CohereModel.COMMAND,
-        temperature: float = 0,
+        model: CohereModel = CohereModel.COMMAND.value,
+        temperature: float = 0.0,
         api_key: str = "",
-        max_token: int = 256,
+        max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.temperature = temperature
         self.api_key = api_key
-        self.max_token = max_token
+        self.max_output_tokens = max_output_tokens
         self.co = None
         try:
             self.co = cohere.Client(self.api_key)
@@ -43,7 +43,7 @@ class Cohere(BaseModel):
             return self.error_response
         try:
             response = self.co.chat(
-                max_tokens=self.max_token,
+                max_tokens=self.max_output_tokens,
                 message=self.prompt,
                 model=self.model,
                 temperature=self.temperature,

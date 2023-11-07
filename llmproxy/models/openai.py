@@ -20,12 +20,14 @@ class OpenAI(BaseModel):
         model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO.value,
         temp: float = 0,
         api_key: str = "",
+        max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.temp = temp
         # We may have to pull this directly from .env and use different .env file/names for testing
         openai.api_key = api_key
+        self.max_output_tokens = max_output_tokens
 
     def get_completion(self) -> CompletionResponse:
         if self.model not in OpenAIModel:
@@ -39,6 +41,7 @@ class OpenAI(BaseModel):
                 model=self.model,
                 messages=messages,
                 temperature=self.temp,
+                max_tokens=self.max_output_tokens,
             )
         except error.OpenAIError as e:
             logger.error(e.args[0])
