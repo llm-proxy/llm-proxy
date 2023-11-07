@@ -2,6 +2,8 @@ from llmproxy import llmproxy
 from llmproxy.utils.log import logger
 from llmproxy.models.cohere import CohereModel
 
+""" Temp Test file, will be removed in future in favour of unit/integration tests"""
+
 
 def main() -> None:
     prompt = "What is 1+1?"

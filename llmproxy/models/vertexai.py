@@ -1,7 +1,7 @@
 from google.cloud import aiplatform
 from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
@@ -12,7 +12,7 @@ class VertexAIModel(str, BaseEnum):
     PALM_CHAT = "chat-bison"
 
 
-class VertexAI(BaseChatbot):
+class VertexAI(BaseModel):
     def __init__(
         self,
         prompt: str = "",

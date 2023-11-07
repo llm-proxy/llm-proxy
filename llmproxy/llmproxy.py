@@ -41,10 +41,7 @@ def get_completion_mistral(prompt: str) -> str:
 
 
 def get_completion_llama2(prompt: str) -> str:
-    llama = Llama2(
-        prompt=prompt,
-        api_key=llama2_api_key,
-    )
+    llama = Llama2(prompt=prompt, api_key=llama2_api_key)
 
     res = llama.get_completion()
 
@@ -57,7 +54,6 @@ def get_completion_cohere(prompt: str) -> str:
     cohere = Cohere(prompt=prompt, api_key=cohere_api_key)
 
     res = cohere.get_completion()
-
     if res.err:
         return res.message
     return res.payload

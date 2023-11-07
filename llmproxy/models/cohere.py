@@ -1,5 +1,5 @@
 import cohere
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 
 
@@ -10,7 +10,7 @@ class CohereModel(str, BaseEnum):
     COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
 
 
-class Cohere(BaseChatbot):
+class Cohere(BaseModel):
     def __init__(
         self,
         prompt: str = "",

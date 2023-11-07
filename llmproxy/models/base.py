@@ -16,7 +16,12 @@ class CompletionResponse:
     err: str = ""
 
 
-class BaseChatbot(ABC):
+class BaseModel(ABC):
+    """Abstract based class used to interface with (Language) Models.
+    Current only one: Language.
+    Likely more to be introduced if more types of LLMs are introduced (Speech, CNNs, Video...)
+    """
+
     @abstractmethod
-    def get_completion(self, prompt: str = "", **kwargs: Any) -> CompletionResponse:
+    def get_completion(self, **kwargs: Any) -> CompletionResponse:
         pass
