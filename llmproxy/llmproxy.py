@@ -1,14 +1,9 @@
 import os
 import yaml
 import importlib
-from typing import Any, Dict, List
-
-# from llmproxy.models.openai import OpenAI
-# from llmproxy.models.mistral import Mistral
-# from llmproxy.models.llama2 import Llama2
-# from llmproxy.models.vertexai import VertexAI
-# from llmproxy.models.cohere import Cohere
 from llmproxy.utils.enums import BaseEnum
+from typing import Any, Dict
+
 from dotenv import load_dotenv
 import os
 
@@ -41,16 +36,22 @@ def _get_settings_from_yml(
 def _setup_available_models(settings={}) -> Dict[str, Any]:
     try:
         available_models = {}
-        for model in settings["available_models"]:
-            key = model["name"].lower()
-            import_path = model["class"]
+        for provider in settings["available_models"]:
+            key = provider["name"].lower()
+            import_path = provider["class"]
+
+            provider_models = set()
+            for model in provider.get("models", []):
+                provider_models.add(model["name"])
+
+            print(provider_models)
 
             module_name, class_name = import_path.rsplit(".", 1)
 
             module = importlib.import_module(module_name)
             model_class = getattr(module, class_name)
 
-            available_models[key] = model_class
+            available_models[key] = {"class": model_class, "models": provider_models}
         return available_models
     except Exception as e:
         raise e
@@ -60,21 +61,35 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
     # Setup all user models
     try:
         user_models = {}
-        for model in settings["user_settings"]:
-            model_name = model["model"].lower().strip()
-
+        for provider in settings["user_settings"]:
+            model_name = provider["model"].lower().strip()
             if model_name in available_models:
                 # Different setup for vertexai
-                if model_name == "vertexai":
-                    model_instance = available_models[model_name](
-                        project_id=os.getenv("GOOGLE_PROJECT_ID")
-                    )
-                    user_models[model_name] = model_instance
-                else:
-                    model_instance = available_models[model_name](
-                        api_key=os.getenv(model["api_key_var"])
-                    )
-                    user_models[model_name] = model_instance
+                if "models" not in provider or provider["models"] is None:
+                    raise Exception("No models provided in user_settings")
+                for model in provider["models"]:
+                    if model_name == "vertexai":
+                        if model in available_models[model_name]["models"]:
+                            model_instance = available_models[model_name]["class"](
+                                project_id=os.getenv("GOOGLE_PROJECT_ID"),
+                                max_output_tokens=provider["max_output_tokens"],
+                                temperature=provider["temperature"],
+                                model=model,
+                            )
+                            user_models[model] = model_instance
+                        else:
+                            raise Exception(model + " is not a valid model")
+                    else:
+                        if model in available_models[model_name]["models"]:
+                            model_instance = available_models[model_name]["class"](
+                                api_key=os.getenv(provider["api_key_var"]),
+                                max_output_tokens=provider["max_output_tokens"],
+                                temperature=provider["temperature"],
+                                model=model,
+                            )
+                            user_models[model] = model_instance
+                        else:
+                            raise Exception(model + " is not a valid model")
         return user_models
     except Exception as e:
         raise e

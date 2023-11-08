@@ -14,13 +14,13 @@ class Mistral(BaseModel):
         prompt: str = "",
         model: MistralModel = MistralModel.Mistral_7B_Instruct.value,
         api_key: str = "",
-        temp: float = 1.0,
+        temperature: float = 1.0,
         max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.api_key = api_key
-        self.temp = temp
+        self.temperature = temperature
         self.max_output_tokens = max_output_tokens
 
     def get_completion(self, prompt: str = "") -> CompletionResponse:
@@ -44,7 +44,7 @@ class Mistral(BaseModel):
                 {
                     "inputs": self.prompt if self.prompt else prompt,
                     "parameters": {
-                        "temperature": self.temp,
+                        "temperature": self.temperature,
                         "max_length": self.max_output_tokens,
                     },
                 }

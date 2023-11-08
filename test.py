@@ -3,6 +3,7 @@ from llmproxy.utils.log import logger
 from llmproxy.models.cohere import CohereModel
 from llmproxy.llmproxy import LLMProxy
 
+
 """ Temp Test file, will be removed in future in favour of unit/integration tests"""
 
 
