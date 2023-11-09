@@ -32,7 +32,7 @@ class Cohere(BaseModel):
                 payload="", message=e, err="ValueError"
             )
 
-    def get_completion(self) -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in CohereModel:
             return CompletionResponse(
                 payload="",
@@ -44,7 +44,7 @@ class Cohere(BaseModel):
         try:
             response = self.co.chat(
                 max_tokens=self.max_output_tokens,
-                message=self.prompt,
+                message=prompt if prompt else self.prompt,
                 model=self.model,
                 temperature=self.temperature,
             )
