@@ -17,13 +17,64 @@ cohere_api_key = os.getenv("COHERE_API_KEY")
 vertexai_project_id = os.getenv("GOOGLE_PROJECT_ID")
 
 
-def min_cost():
-    openai = OpenAI(prompt="I am a man, not a man", api_key="", model="gpt-4", temp=0)
-    print(openai.get_estimated_max_cost())
+# Test Min Costs
+prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
 
 
+def min_cost_openai():
+    openai = OpenAI(
+        prompt=prompt,
+        api_key="",
+        model="gpt-3.5-turbo-1106",
+        temperature=0,
+    )
+    return openai.get_estimated_max_cost()
+
+
+def min_cost_cohere():
+    cohere = Cohere(
+        prompt=prompt,
+        api_key=cohere_api_key,
+        model="command",
+        temperature=0,
+    )
+    return cohere.get_estimated_max_cost()
+
+
+def min_cost_llama2():
+    llama2 = Llama2(
+        prompt=prompt,
+        api_key=llama2_api_key,
+        model="Llama-2-7b-chat-hf",
+        temperature=0)
+
+    return llama2.get_estimated_max_cost()
+
+
+def min_cost_mistral():
+    mistral = Mistral(
+        prompt=prompt,
+        api_key=mistral_api_key,
+        model="Mistral-7B-v0.1",
+        temperature=0)
+
+    return mistral.get_estimated_max_cost()
+
+
+def min_cost_vertexai():
+    vertexai = VertexAI(
+        prompt=prompt,
+        project_id=vertexai_project_id,
+        model="text-bison@001",
+        temperature=0)
+
+    return vertexai.get_estimated_max_cost()
+
+
+# Test completion
 def get_completion_openai(prompt: str) -> str:
-    # Using class allows us to not worry about passing in params every time we call a function
+    # Using class allows us to not worry about passing in params every time we
+    # call a function
     openai = OpenAI(prompt=prompt, api_key=openai_api_key)
 
     res = openai.get_completion()

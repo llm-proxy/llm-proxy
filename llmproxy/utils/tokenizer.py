@@ -1,10 +1,13 @@
 from tokenizers import Tokenizer, Encoding
 
+"""" Model current does not handle all special tokens: ["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"]"""
 
-def tokenize(prompt: str = "") -> Encoding:
+
+def bpe_tokenize_encode(prompt: str = "") -> Encoding:
     tokenizer = Tokenizer.from_file("llmproxy/data/tokenizer-wiki.json")
     return tokenizer.encode(prompt)
 
 
-op = tokenize("Hello, y'all! How are you 😁 ?")
-print(op.tokens)
+def vertexai_encode(prompt: str = "") -> str:
+    print(len(prompt.replace(" ", "")))
+    return prompt.replace(" ", "")

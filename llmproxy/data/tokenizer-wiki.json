@@ -58,7 +58,7 @@
   "model": {
     "type": "BPE",
     "dropout": null,
-    "unk_token": null,
+    "unk_token": "[UNK]",
     "continuing_subword_prefix": null,
     "end_of_word_suffix": null,
     "fuse_unk": false,

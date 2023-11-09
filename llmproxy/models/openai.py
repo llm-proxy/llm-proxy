@@ -8,57 +8,59 @@ import tiktoken
 
 # This should be available later from the yaml file
 # Cost is converted into whole numbers to avoid inconsistent floats
-openai_info = {
-    "max-output-tokens": 256,
+open_ai_price_data = {
+    "max-output-tokens": 50,
     "model-costs": {
-        # Cost per 1000 * 10000 tokens
-        "gpt-3.5-turbo-4k": {
-            "prompt": 15,
-            "completion": 20,
+        # Cost per 1k tokens * 1000
+        "gpt-3.5-turbo-1106": {
+            "prompt": 0.0010 / 1000,
+            "completion": 0.0020 / 1000,
         },
-        "gpt-3.5-turbo-16k": {
-            "prompt": 30,
-            "completion": 40,
+        "gpt-3.5-turbo-instruct": {
+            "prompt": 0.0015 / 1000,
+            "completion": 0.0020 / 1000,
         },
         "gpt-4": {
-            "prompt": 300,
-            "completion": 600,
-        },
-        "gpt-4-8k": {
-            "prompt": 300,
-            "completion": 600,
+            "prompt": 0.03 / 1000,
+            "completion": 0.06 / 1000,
         },
         "gpt-4-32k": {
-            "prompt": 600,
-            "completion": 1200,
+            "prompt": 0.06 / 1000,
+            "completion": 0.12 / 1000,
         },
-        "text-embedding-ada-002-v2": {
-            "prompt": 1,
-            "completion": 1,
+        "gpt-4-1106-preview": {
+            "prompt": 0.01 / 1000,
+            "completion": 0.03 / 1000,
+        },
+        "gpt-4-1106-vision-preview": {
+            "prompt": 0.01 / 1000,
+            "completion": 0.03 / 1000,
         },
     },
 }
 
 
 class OpenAIModel(str, BaseEnum):
+    GPT_4_1106_PREVIEW = "gpt-4-1106-preview"
+    GPT_4_1106_VISION_PREVIEW = "gpt-4-1106-vision-preview"
     GPT_4 = "gpt-4"
     GPT_4_32K = "gpt-4-32k"
-    GPT_3_5_TURBO = "gpt-3.5-turbo"
-    GPT_3_5_TURBO_16K = "gpt-3.5-turbo-16k"
+    GPT_3_5_TURBO_1106 = "gpt-3.5-turbo-1106"
+    GPT_3_5_TURBO_INSTRUCT = "gpt-3.5-turbo-instruct"
 
 
 class OpenAI(BaseModel):
     def __init__(
         self,
         prompt: str = "",
-        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO.value,
-        temp: float = 0,
+        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO_1106.value,
+        temperature: float = 0,
         api_key: str = "",
         max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
-        self.temp = temp
+        self.temperature = temperature
         # We may have to pull this directly from .env and use different .env file/names for testing
         openai.api_key = api_key
         self.max_output_tokens = max_output_tokens
@@ -74,7 +76,7 @@ class OpenAI(BaseModel):
             response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=messages,
-                temperature=self.temp,
+                temperature=self.temperature,
                 max_tokens=self.max_output_tokens,
             )
         except error.OpenAIError as e:
@@ -91,35 +93,36 @@ class OpenAI(BaseModel):
             err="",
         )
 
-    def get_estimated_max_cost(self) -> float:
-        encoder = tiktoken.encoding_for_model("cl100k_base")
+    def get_estimated_max_cost(self, prompt: str = "") -> float:
+        if not self.prompt and not prompt:
+            logger.info("No prompt provided.")
+            raise ValueError("No prompt provided.")
 
-        if self.model not in OpenAIModel:
-            encoder = tiktoken.encoding_for_model("cl100k_base")
+        # Assumption, model exists (check should be done at yml load level)
+        encoder = tiktoken.encoding_for_model(self.model)
 
         logger.info(f"Tokenizing model: {self.model}")
 
-        prompt_cost_per_token = openai_info["model-costs"][self.model]["prompt"] / (
-            1000 * 10000
-        )
+        prompt_cost_per_token = open_ai_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = openai_info["model-costs"][self.model][
+        completion_cost_per_token = open_ai_price_data["model-costs"][self.model][
             "completion"
-        ] / (1000 * 10000)
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
-        tokens = encoder.encode(self.prompt)
-        print(tokens)
+        tokens = encoder.encode(prompt if prompt else self.prompt)
+
         logger.info(f"Number of input tokens found: {len(tokens)}")
 
         logger.info(
-            f"Final calculation using {len(tokens)} input tokens and {openai_info['max-output-tokens']} output tokens"
+            f"Final calculation using {len(tokens)} input tokens and {open_ai_price_data['max-output-tokens']} output tokens"
         )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * openai_info["max-output-tokens"],
+            + completion_cost_per_token *
+            open_ai_price_data["max-output-tokens"],
             8,
         )
 

@@ -5,6 +5,16 @@ from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
+from llmproxy.utils import tokenizer
+
+# VERTEX IS PER CHARACTER
+vertexai_price_data = {
+    "max-output-tokens": 50,
+    "model-costs": {
+        "prompt": 0.0005 / 1_000,
+        "completion": 0.0005 / 1_000,
+    },
+}
 
 
 class VertexAIModel(str, BaseEnum):
@@ -39,8 +49,10 @@ class VertexAI(BaseModel):
             aiplatform.init(project=self.project_id, location=self.location)
             # TODO developer - override these parameters as needed:
             parameters = {
-                "temperature": self.temperature,  # Temperature controls the degree of randomness in token selection.
-                "max_output_tokens": self.max_output_tokens,  # Token limit determines the maximum amount of text output.
+                # Temperature controls the degree of randomness in token selection.
+                "temperature": self.temperature,
+                # Token limit determines the maximum amount of text output.
+                "max_output_tokens": self.max_output_tokens,
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
@@ -61,6 +73,40 @@ class VertexAI(BaseModel):
             raise Exception(e)
 
         return CompletionResponse(payload=output, message="OK", err="")
+
+    def get_estimated_max_cost(self, prompt: str = "") -> float:
+        if not self.prompt and not prompt:
+            logger.info("No prompt provided.")
+            raise ValueError("No prompt provided.")
+
+        # Assumption, model exists (check should be done at yml load level)
+
+        logger.info(f"Tokenizing model: {self.model}")
+
+        prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
+        logger.info(f"Prompt Cost per token: {prompt_cost_per_character}")
+
+        completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
+        logger.info(f"Output cost per token: {completion_cost_per_character}")
+
+        tokens = tokenizer.vertexai_encode(prompt if prompt else self.prompt)
+
+        logger.info(f"Number of input tokens found: {len(tokens)}")
+
+        logger.info(
+            f"Final calculation using {len(tokens)} input tokens and {vertexai_price_data['max-output-tokens']} output tokens"
+        )
+
+        cost = round(
+            prompt_cost_per_character * len(tokens)
+            + completion_cost_per_character
+            * vertexai_price_data["max-output-tokens"],
+            8,
+        )
+
+        logger.info(f"Calculated Cost: {cost}")
+
+        return cost
 
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)
