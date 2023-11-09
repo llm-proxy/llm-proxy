@@ -18,7 +18,8 @@ vertexai_price_data = {
 
 
 class VertexAIModel(str, BaseEnum):
-    PALM_TEXT = "text-bison@001"
+    # Add other models
+    PALM_TEXT = "text-bison"
     PALM_CHAT = "chat-bison"
 
 
@@ -29,7 +30,7 @@ class VertexAI(BaseModel):
         temperature: float = 0,
         model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
-        location: str | None = "",
+        location: str | None = "us-central1",
         max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
@@ -56,16 +57,15 @@ class VertexAI(BaseModel):
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(prompt if prompt else self.prompt)
+            response = chat_model.predict(
+                prompt if prompt else self.prompt, **parameters
+            )
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except auth_exceptions.GoogleAuthError as e:
-            logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
-        except ValueError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
@@ -99,8 +99,7 @@ class VertexAI(BaseModel):
 
         cost = round(
             prompt_cost_per_character * len(tokens)
-            + completion_cost_per_character
-            * vertexai_price_data["max-output-tokens"],
+            + completion_cost_per_character * vertexai_price_data["max-output-tokens"],
             8,
         )
 

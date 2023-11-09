@@ -4,6 +4,7 @@ import requests
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
 
+# prices not accurate
 mistral_price_data = {
     "max-output-tokens": 50,
     "model-costs": {
@@ -46,8 +47,7 @@ class Mistral(BaseModel):
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(
-                    API_URL, headers=headers, json=payload)
+                response = requests.post(API_URL, headers=headers, json=payload)
                 return response.json()
 
             output = query(
@@ -91,8 +91,7 @@ class Mistral(BaseModel):
         completion_cost_per_token = mistral_price_data["model-costs"]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
-        tokens = tokenizer.bpe_tokenize_encode(
-            prompt if prompt else self.prompt)
+        tokens = tokenizer.bpe_tokenize_encode(prompt if prompt else self.prompt)
 
         logger.info(f"Number of input tokens found: {len(tokens)}")
 
@@ -102,8 +101,7 @@ class Mistral(BaseModel):
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token
-            * mistral_price_data["max-output-tokens"],
+            + completion_cost_per_token * mistral_price_data["max-output-tokens"],
             8,
         )
 

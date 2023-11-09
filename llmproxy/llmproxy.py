@@ -8,6 +8,7 @@ from llmproxy.models.openai import OpenAI
 from llmproxy.models.vertexai import VertexAI
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
+from llmproxy.utils.log import logger
 
 from dotenv import load_dotenv
 
@@ -105,30 +106,49 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
 
 class LLMProxy:
     def __init__(self) -> None:
-        # ... Read YML and see which models the user wants
         self.user_models = {}
         self.route_type = "cost"
-
+        # Read YML and see which models the user wants
         settings = _get_settings_from_yml()
-
         # Setup available models
         available_models = _setup_available_models(settings=settings)
-
         self.user_models = _setup_user_models(
             settings=settings, available_models=available_models
         )
 
-    def route(self, route_type: RouteType = RouteType.COST.value) -> str:
+    def route(
+        self, route_type: RouteType = RouteType.COST.value, prompt: str = ""
+    ) -> str:
         if route_type not in RouteType:
             return "Sorry routing option available"
-        # for model, instance in self.user_models.items():
-        # op = instance.get_completion(prompt="HELLLOO, what is 1+1?")
-        # print(f"{model}: {op}")
+
+        chosen_model = None
+
         if route_type == "cost":
-            return ""
+            output_model = {"name": "", "cost": float("inf"), "instance": None}
+
+            for model_name, instance in self.user_models.items():
+                logger.info(msg="========Start Cost Estimation===========")
+                cost = instance.get_estimated_max_cost(prompt=prompt)
+                logger.info(msg="========End Cost Estimation===========\n")
+
+                if cost < output_model["cost"]:
+                    output_model.update(
+                        {"name": model_name, "cost": cost, "instance": instance}
+                    )
+
+            logger.info(f"Final model chosen: {output_model['name']}\n")
+            chosen_model = output_model["instance"]
+
         elif route_type == "category":
             # Category routing
-            return ""
+            pass
+
+        logger.info(f"ROUTING...\n")
+        completion_res = chosen_model.get_completion(prompt=prompt)
+        logger.info(f"ROUTING COMPLETE")
+
+        return completion_res
 
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -141,17 +161,8 @@ vertexai_project_id = os.getenv("GOOGLE_PROJECT_ID")
 prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
 
 
-def min_cost_openai():
-    openai = OpenAI(
-        prompt=prompt,
-        api_key="",
-        model="gpt-3.5-turbo-1106",
-        temperature=0,
-    )
-    return openai.get_estimated_max_cost()
-
-
-def min_cost_cohere():
+# Test min cost example
+def min_cost_cohere_example():
     cohere = Cohere(
         prompt=prompt,
         api_key=cohere_api_key,
@@ -161,85 +172,11 @@ def min_cost_cohere():
     return cohere.get_estimated_max_cost()
 
 
-def min_cost_llama2():
-    llama2 = Llama2(
-        prompt=prompt, api_key=llama2_api_key, model="Llama-2-7b-chat-hf", temperature=0
-    )
-
-    return llama2.get_estimated_max_cost()
-
-
-def min_cost_mistral():
-    mistral = Mistral(
-        prompt=prompt, api_key=mistral_api_key, model="Mistral-7B-v0.1", temperature=0
-    )
-
-    return mistral.get_estimated_max_cost()
-
-
-def min_cost_vertexai():
-    vertexai = VertexAI(
-        prompt=prompt,
-        project_id=vertexai_project_id,
-        model="text-bison@001",
-        temperature=0,
-    )
-
-    return vertexai.get_estimated_max_cost()
-
-
-# Test completion
-def get_completion_openai(prompt: str) -> str:
-    # Using class allows us to not worry about passing in params every time we
-    # call a function
-    openai = OpenAI(prompt=prompt, api_key=openai_api_key)
-
-    res = openai.get_completion()
-
-    if res.err:
-        return res.message
-
-    return res.payload
-
-
-def get_completion_mistral(prompt: str) -> str:
-    mistral = Mistral(prompt=prompt, api_key=mistral_api_key)
-
-    res = mistral.get_completion()
-
-    if res.err:
-        return res.message
-
-    return res.payload
-
-
-def get_completion_llama2(prompt: str) -> str:
-    llama = Llama2(prompt=prompt, api_key=llama2_api_key)
-
-    res = llama.get_completion()
-
-    if res.err:
-        return res.message
-    return res.payload
-
-
-def get_completion_cohere(prompt: str) -> str:
+# Test completion example
+def get_completion_cohere_example(prompt: str) -> str:
     cohere = Cohere(prompt=prompt, api_key=cohere_api_key)
 
     res = cohere.get_completion()
     if res.err:
         return res.message
-    return res.payload
-
-
-def get_completion_vertexai(prompt: str, location: str = "us-central1") -> str:
-    vertexai = VertexAI(
-        prompt=prompt, location=location, project_id=vertexai_project_id
-    )
-
-    res = vertexai.get_completion()
-
-    if res.err:
-        return res.message
-
     return res.payload
