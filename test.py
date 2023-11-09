@@ -1,6 +1,3 @@
-from llmproxy import llmproxy
-from llmproxy.utils.log import logger
-from llmproxy.models.cohere import CohereModel
 from llmproxy.llmproxy import LLMProxy
 
 
@@ -8,9 +5,9 @@ from llmproxy.llmproxy import LLMProxy
 
 
 def main() -> None:
-    llmproxy = LLMProxy()
+    proxy_client = LLMProxy()
 
-    llmproxy.route()
+    proxy_client.route(route_type="cost")
 
     # print(llmproxy.prompt("test"))
 
