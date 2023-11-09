@@ -56,7 +56,7 @@ def get_logger(logger_name: str = "LOGGER"):
 
     #  Setup file handler
     file_handler = logging.FileHandler(filename=filename)
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(logging.WARNING)
 
     # Formatter for logs
     formatter = logging.Formatter(log_format)
