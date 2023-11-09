@@ -37,8 +37,14 @@ class Llama2(BaseModel):
         self.model = model
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self) -> CompletionResponse:
-        if self.prompt == "":
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
+        # If empty api key
+        if not self.api_key:
+            return self._handle_error(
+                exception="No API Provided", error_type="InputError"
+            )
+
+        if self.prompt == "" and prompt == "":
             return self._handle_error(
                 exception="No prompt detected", error_type="InputError"
             )
@@ -48,10 +54,10 @@ class Llama2(BaseModel):
                 error_type="ValueError",
             )
         try:
-            headers = {"Authorization": f"Bearer {self.api_key}"}
             API_URL = (
                 f"https://api-inference.huggingface.co/models/meta-llama/{self.model}"
             )
+            headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
                 response = requests.post(
@@ -59,7 +65,7 @@ class Llama2(BaseModel):
                 return response.json()
 
             # Llama2 prompt template
-            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {self.prompt} }}}}\n[/INST]"
+            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt if prompt else self.prompt} }}}}\n[/INST]"
             output = query(
                 {
                     "inputs": prompt_template,

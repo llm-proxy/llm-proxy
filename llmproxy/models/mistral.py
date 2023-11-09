@@ -33,7 +33,7 @@ class Mistral(BaseModel):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self) -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in MistralModel:
             return CompletionResponse(
                 message=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
@@ -52,7 +52,7 @@ class Mistral(BaseModel):
 
             output = query(
                 {
-                    "inputs": self.prompt,
+                    "inputs": prompt if prompt else self.prompt,
                     "parameters": {
                         "temperature": self.temperature,
                         "max_length": self.max_output_tokens,

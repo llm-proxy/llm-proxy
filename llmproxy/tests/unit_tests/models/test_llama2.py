@@ -13,7 +13,7 @@ default_model = Llama2Model.LLAMA_2_7B.value
 
 def test_llama2_empty_prompt() -> None:
     llama2_empty_prompt = Llama2(
-        prompt="", system_prompt=default_system_prompt, model=default_model
+        prompt="", system_prompt=default_system_prompt, model=default_model, api_key=default_api_key
     )
     output = llama2_empty_prompt.get_completion()
     assert output.message == "No prompt detected"

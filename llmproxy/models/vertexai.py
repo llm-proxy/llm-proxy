@@ -39,7 +39,7 @@ class VertexAI(BaseModel):
         self.location = location
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self) -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in VertexAIModel:
             return self._handle_error(
                 exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
@@ -56,7 +56,7 @@ class VertexAI(BaseModel):
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(self.prompt)
+            response = chat_model.predict(prompt if prompt else self.prompt)
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
