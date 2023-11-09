@@ -49,11 +49,12 @@ class Llama2(BaseModel):
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
+                response = requests.post(
+                    API_URL, headers=headers, json=payload)
                 return response.json()
 
             # Llama2 prompt template
-            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {self.prompt if self.prompt else prompt} }}}}\n[/INST]"
+            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt if prompt else self.prompt} }}}}\n[/INST]"
             output = query(
                 {
                     "inputs": prompt_template,

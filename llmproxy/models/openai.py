@@ -37,7 +37,7 @@ class OpenAI(BaseModel):
             )
         try:
             messages = [
-                {"role": "user", "content": self.prompt if self.prompt else prompt}
+                {"role": "user", "content": prompt if prompt else self.prompt}
             ]
             response = openai.ChatCompletion.create(
                 model=self.model,
