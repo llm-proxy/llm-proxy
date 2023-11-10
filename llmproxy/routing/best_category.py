@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from transformers import pipeline
-
+from llmproxy.models import openai, cohere, mistral, llama2, vertexai
+from typing import List, Union
 import os
 import requests
 
@@ -38,14 +39,21 @@ def classify_input(prompt:str) -> str:
     classifier = pipeline(task='zero-shot-classification', model='facebook/bart-large-mnli')
     
     results = classifier(prompt, candidate_labels)
-    print(f'labels = {results["labels"]}')
-    print(f'scores = {results["scores"]}')
+    #print(f'labels = {results["labels"]}')
+    #print(f'scores = {results["scores"]}')
 
     best_category = results['labels'][0]
 
     return best_category
 
-print(classify_input('What are the effects marijuana?'))
 
-def use_best_category(best_category:str):
-    pass
+def use_best_category(prompt:str) -> List[Union(openai, cohere, mistral, llama2, vertexai)]:
+    category = classify_input('What are the effects marijuana?')
+    print(category)
+    if(category=="Code Generation Task" or category=="Text Generation Task" or category=="Natural Language Processing Task"):
+            return [openai, mistral, cohere, llama2, vertexai]
+    elif(category=="Conversational AI Task" or category=="Educational Applications Task" or category=="Healthcare and Medical Task"
+          or category=="Legal Task" or category=="Financial Task" or category=="Content Recommendation Task"):
+         return [openai, cohere, llama2, vertexai]
+    else:
+         return[openai, cohere, llama2]
