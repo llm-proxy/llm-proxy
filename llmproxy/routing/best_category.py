@@ -1,6 +1,10 @@
 from dotenv import load_dotenv
 from transformers import pipeline
-from llmproxy.models import openai, cohere, mistral, llama2, vertexai
+from llmproxy.models.openai import OpenAI
+from llmproxy.models.cohere import Cohere 
+from llmproxy.models.mistral import Mistral
+from llmproxy.models.llama2 import Llama2
+from llmproxy.models.vertexai import VertexAI
 from typing import List, Union
 import os
 import requests
@@ -35,7 +39,7 @@ def classify_input(prompt:str) -> str:
         'Content Recommendation Task',
     ]
 
-    print(f'Prompt = {prompt}')
+    #print(f'Prompt = {prompt}')
     classifier = pipeline(task='zero-shot-classification', model='facebook/bart-large-mnli')
     
     results = classifier(prompt, candidate_labels)
@@ -47,13 +51,17 @@ def classify_input(prompt:str) -> str:
     return best_category
 
 
-def use_best_category(prompt:str) -> List[Union(openai, cohere, mistral, llama2, vertexai)]:
-    category = classify_input('What are the effects marijuana?')
+def use_best_category(prompt:str) -> List[Union(OpenAI, Llama2, Mistral)]:
+    category = classify_input(prompt)
     print(category)
     if(category=="Code Generation Task" or category=="Text Generation Task" or category=="Natural Language Processing Task"):
-            return [openai, mistral, cohere, llama2, vertexai]
+            return [OpenAI, Mistral, Llama2]
     elif(category=="Conversational AI Task" or category=="Educational Applications Task" or category=="Healthcare and Medical Task"
           or category=="Legal Task" or category=="Financial Task" or category=="Content Recommendation Task"):
-         return [openai, cohere, llama2, vertexai]
-    else:
-         return[openai, cohere, llama2]
+         return [OpenAI, Llama2]
+    elif(category=="Translation and Multilingual Applications Task"):
+         return[OpenAI, Llama2]
+     
+if __name__ == "__main__":
+    model_list = use_best_category('What are the effects marijuana?')
+    print(model_list)
