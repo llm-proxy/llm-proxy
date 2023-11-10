@@ -1,5 +1,5 @@
 import requests
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 
 
@@ -9,7 +9,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B = "Llama-2-70b-chat-hf"
 
 
-class Llama2(BaseChatbot):
+class Llama2(BaseModel):
     def __init__(
         self,
         prompt: str = "",
@@ -17,15 +17,23 @@ class Llama2(BaseChatbot):
         api_key: str = "",
         temperature: float = 1.0,
         model: Llama2Model = Llama2Model.LLAMA_2_7B.value,
+        max_output_tokens: int = None,
     ) -> None:
         self.system_prompt = system_prompt
         self.prompt = prompt
         self.api_key = api_key
         self.temperature = temperature
         self.model = model
+        self.max_output_tokens = max_output_tokens
 
-    def get_completion(self) -> CompletionResponse:
-        if self.prompt == "":
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
+        # If empty api key
+        if not self.api_key:
+            return self._handle_error(
+                exception="No API Provided", error_type="InputError"
+            )
+
+        if self.prompt == "" and prompt == "":
             return self._handle_error(
                 exception="No prompt detected", error_type="InputError"
             )
@@ -35,19 +43,27 @@ class Llama2(BaseChatbot):
                 error_type="ValueError",
             )
         try:
-            headers = {"Authorization": f"Bearer {self.api_key}"}
             API_URL = (
                 f"https://api-inference.huggingface.co/models/meta-llama/{self.model}"
             )
+            headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
+                response = requests.post(
+                    API_URL, headers=headers, json=payload)
                 return response.json()
 
             # Llama2 prompt template
-            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {self.prompt} }}}}\n[/INST]"
-            payload = {"inputs": prompt_template}
-            output = query(payload)
+            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt if prompt else self.prompt} }}}}\n[/INST]"
+            output = query(
+                {
+                    "inputs": prompt_template,
+                    "parameters": {
+                        "max_length": self.max_output_tokens,
+                        "temperature": self.temperature,
+                    },
+                }
+            )
 
         except Exception as e:
             raise Exception("Error Occur for prompting Llama2")

@@ -14,6 +14,7 @@ pytest-cov = "^4.1.0"
 cohere = "^4.27"
 transformers = "^4.34.1"
 torch = "^2.1.0"
+google-cloud-aiplatform = "^1.35.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
@@ -22,9 +23,9 @@ coverage = "^7.3.2"
 pytest-cov = "^4.1.0"
 
 [tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
+# filterwarnings = ["ignore::DeprecationWarning"]
+
+pythonpath = ["."]
 
 [build-system]
 requires = ["poetry-core"]
