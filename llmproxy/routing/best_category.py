@@ -51,16 +51,16 @@ def classify_input(prompt:str) -> str:
     return best_category
 
 
-def use_best_category(prompt:str) -> List[Union(OpenAI, Llama2, Mistral)]:
+def use_best_category(prompt:str) -> List[Union(OpenAI, Cohere, Llama2, Mistral, VertexAI)]:
     category = classify_input(prompt)
     print(category)
     if(category=="Code Generation Task" or category=="Text Generation Task" or category=="Natural Language Processing Task"):
-            return [OpenAI, Mistral, Llama2]
+            return [OpenAI, Cohere, VertexAI, Mistral, Llama2]
     elif(category=="Conversational AI Task" or category=="Educational Applications Task" or category=="Healthcare and Medical Task"
           or category=="Legal Task" or category=="Financial Task" or category=="Content Recommendation Task"):
-         return [OpenAI, Llama2]
+         return [OpenAI, Llama2, Cohere, VertexAI]
     elif(category=="Translation and Multilingual Applications Task"):
-         return[OpenAI, Llama2]
+         return[OpenAI, Llama2, Cohere]
      
 if __name__ == "__main__":
     model_list = use_best_category('What are the effects marijuana?')
