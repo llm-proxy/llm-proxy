@@ -11,8 +11,8 @@ user_settings:
     
   - model: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key 
-    max_output_tokens: 10000 
-    temperature: 1.0 
+    max_output_tokens: 256 
+    temperature: 0.0 
     models: # input names of models you want to you (see below for all models provided)
       # Only models specified here will be added to routing pool
       - gpt-3.5-turbo-instruct
@@ -20,31 +20,41 @@ user_settings:
       - gpt-4
       - gpt-4-32k
     # context: "Answer politely"
+  #
   - model: Llama2
-    temperature: 1.0
+    temperature: 0.0
     api_key_var: LLAMA2_API_KEY
-    max_output_tokens: 10000
+    max_output_tokens: 256
     models:
       - Llama-2-7b-chat-hf
       - Llama-2-13b-chat-hf
       - Llama-2-70b-chat-hf
-  #   system_prompt: Answer politely
-  #   # context: "Answer politely"
-  # - model: Mistral
-  #   temperature: 1.0
-  #   api_key_var: MISTRAL_API_KEY
-  #   max_output_tokens: 10000
-  #   # context: "Answer politely"
-  # - model: Cohere
-  #   temperature: 1.0
-  #   api_key_var: COHERE_API_KEY
-  #   max_output_tokens: 10000
-  #   # context: "Answer politely"
-  # - model: VertexAI 
-  #   temperature: 1.0
-  #   max_output_tokens: 10000
-  #   project_id: GOOGLE_PROJECT_ID
-  #   # context: "Answer politely"
+
+  - model: Cohere 
+    temperature: 0.0
+    api_key_var: COHERE_API_KEY 
+    max_output_tokens: 256
+    models:
+      - command
+      - command-light
+      - command-nightly
+      - command-light-nightly
+
+  - model: Mistral
+    temperature: 0.0
+    api_key_var: MISTRAL_API_KEY
+    max_output_tokens: 256
+    models:
+      - Mistral-7B-v0.1
+      - Mistral-7B-Instruct-v0.1
+
+  - model: VertexAI 
+    temperature: 0.0
+    api_key_var: GOOGLE_PROJECT_ID 
+    max_output_tokens: 256 
+    models:
+      - text-bison@001
+      - chat-bison
 
 available_models:
   - name: OpenAI
@@ -67,16 +77,19 @@ available_models:
     class: llmproxy.models.llama2.Llama2
     models:
       - name: Llama-2-7b-chat-hf
+        cost_per_hour: 0.06
       - name: Llama-2-13b-chat-hf
+        cost_per_hour: 0.06
       - name: Llama-2-70b-chat-hf
-    cost_per_hour: 0.06
+        cost_per_hour: 0.06
 
   - name: Mistral
     class: llmproxy.models.mistral.Mistral
     models:
       - name: Mistral-7B-v0.1
+        cost_per_hour: 0.06
       - name: Mistral-7B-Instruct-v0.1
-    cost_per_hour: 0.06
+        cost_per_hour: 0.06
 
   - name: Cohere
     class: llmproxy.models.cohere.Cohere
@@ -100,6 +113,6 @@ available_models:
       - name: text-bison@001
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
-      - name: chat-bison"
+      - name: chat-bison
         cost_per_token_input: 0.000002
         cost_per_token_output: 0.000002

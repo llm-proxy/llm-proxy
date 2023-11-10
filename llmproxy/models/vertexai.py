@@ -39,12 +39,14 @@ class VertexAI(BaseModel):
             aiplatform.init(project=self.project_id, location=self.location)
             # TODO developer - override these parameters as needed:
             parameters = {
-                "temperature": self.temperature,  # Temperature controls the degree of randomness in token selection.
-                "max_output_tokens": self.max_output_tokens,  # Token limit determines the maximum amount of text output.
+                # Temperature controls the degree of randomness in token selection.
+                "temperature": self.temperature,
+                # Token limit determines the maximum amount of text output.
+                "max_output_tokens": self.max_output_tokens,
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(self.prompt if self.prompt else prompt)
+            response = chat_model.predict(prompt if prompt else self.prompt)
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:

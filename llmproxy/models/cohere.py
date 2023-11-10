@@ -44,7 +44,7 @@ class Cohere(BaseModel):
         try:
             response = self.co.chat(
                 max_tokens=self.max_output_tokens,
-                message=self.prompt if self.prompt else prompt,
+                message=prompt if prompt else self.prompt,
                 model=self.model,
                 temperature=self.temperature,
             )

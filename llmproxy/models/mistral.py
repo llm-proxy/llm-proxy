@@ -37,12 +37,13 @@ class Mistral(BaseModel):
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
+                response = requests.post(
+                    API_URL, headers=headers, json=payload)
                 return response.json()
 
             output = query(
                 {
-                    "inputs": self.prompt if self.prompt else prompt,
+                    "inputs": prompt if prompt else self.prompt,
                     "parameters": {
                         "temperature": self.temperature,
                         "max_length": self.max_output_tokens,
