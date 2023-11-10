@@ -104,7 +104,7 @@ class LLMProxy:
     def __init__(
         self,
         path_to_configuration: str = "api_configuration.yml",
-        path_to_env_vars: str | None = None,
+        path_to_env_vars: str = ".env",
     ) -> None:
         self.user_models = {}
         self.route_type = "cost"
