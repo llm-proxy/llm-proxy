@@ -8,9 +8,6 @@ from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
 
 from dotenv import load_dotenv
-import heapq
-
-load_dotenv()
 
 
 class RouteType(str, BaseEnum):
@@ -104,9 +101,15 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
 
 
 class LLMProxy:
-    def __init__(self, path_to_configuration: str = "api_configuration.yml") -> None:
+    def __init__(
+        self,
+        path_to_configuration: str = "api_configuration.yml",
+        path_to_env_vars: str | None = None,
+    ) -> None:
         self.user_models = {}
         self.route_type = "cost"
+
+        load_dotenv(path_to_env_vars)
 
         # Read YML and see which models the user wants
         settings = _get_settings_from_yml(path_to_yml=path_to_configuration)

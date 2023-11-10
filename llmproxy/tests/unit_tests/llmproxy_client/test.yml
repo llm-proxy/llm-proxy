@@ -10,7 +10,7 @@ user_settings:
       - gpt-4
       - gpt-4-32k
     # context: "Answer politely"
-  #
+  
   - model: Llama2
     temperature: 0.1
     api_key_var: LLAMA2_API_KEY
