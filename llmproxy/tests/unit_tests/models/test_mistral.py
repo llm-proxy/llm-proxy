@@ -59,3 +59,14 @@ def test_mistral_temperature_under_0() -> None:
         check.message
         == "ERROR: Input validation error: `temperature` must be strictly positive"
     )
+
+
+def test_get_estimated_max_cost():
+    # Arrange
+    mistral = Mistral(api_key=mistral_api_key,)
+    prompt = "I am a cat in a hat!"
+    estimated_cost = 0.0000954
+
+    # Act
+    actual_cost = mistral.get_estimated_max_cost(prompt=prompt)
+    assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"

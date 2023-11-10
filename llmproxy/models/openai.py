@@ -72,9 +72,7 @@ class OpenAI(BaseModel):
                 error_type="ValueError",
             )
         try:
-            messages = [
-                {"role": "user", "content": prompt if prompt else self.prompt}
-            ]
+            messages = [{"role": "user", "content": prompt or self.prompt}]
             response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=messages,
@@ -113,7 +111,7 @@ class OpenAI(BaseModel):
         ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
-        tokens = encoder.encode(prompt if prompt else self.prompt)
+        tokens = encoder.encode(prompt or self.prompt)
 
         logger.info(f"Number of input tokens found: {len(tokens)}")
 
@@ -123,8 +121,7 @@ class OpenAI(BaseModel):
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token *
-            open_ai_price_data["max-output-tokens"],
+            + completion_cost_per_token * open_ai_price_data["max-output-tokens"],
             8,
         )
 

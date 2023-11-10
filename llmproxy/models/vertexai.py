@@ -57,9 +57,7 @@ class VertexAI(BaseModel):
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(
-                prompt if prompt else self.prompt, **parameters
-            )
+            response = chat_model.predict(prompt or self.prompt, **parameters)
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
@@ -70,7 +68,7 @@ class VertexAI(BaseModel):
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
-            raise Exception(e)
+            raise Exception(f"Unknown Vertexai Error:{e}")
 
         return CompletionResponse(payload=output, message="OK", err="")
 
@@ -89,7 +87,7 @@ class VertexAI(BaseModel):
         completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_character}")
 
-        tokens = tokenizer.vertexai_encode(prompt if prompt else self.prompt)
+        tokens = tokenizer.vertexai_encode(prompt or self.prompt)
 
         logger.info(f"Number of input tokens found: {len(tokens)}")
 

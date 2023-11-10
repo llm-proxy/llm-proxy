@@ -52,7 +52,7 @@ class Mistral(BaseModel):
 
             output = query(
                 {
-                    "inputs": prompt if prompt else self.prompt,
+                    "inputs": prompt or self.prompt,
                     "parameters": {
                         "temperature": self.temperature,
                         "max_length": self.max_output_tokens,
@@ -91,7 +91,7 @@ class Mistral(BaseModel):
         completion_cost_per_token = mistral_price_data["model-costs"]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
-        tokens = tokenizer.bpe_tokenize_encode(prompt if prompt else self.prompt)
+        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
         logger.info(f"Number of input tokens found: {len(tokens)}")
 

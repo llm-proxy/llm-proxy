@@ -60,12 +60,11 @@ class Llama2(BaseModel):
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(
-                    API_URL, headers=headers, json=payload)
+                response = requests.post(API_URL, headers=headers, json=payload)
                 return response.json()
 
             # Llama2 prompt template
-            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt if prompt else self.prompt} }}}}\n[/INST]"
+            prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt or self.prompt} }}}}\n[/INST]"
             output = query(
                 {
                     "inputs": prompt_template,
@@ -100,8 +99,7 @@ class Llama2(BaseModel):
         completion_cost_per_token = llama2_price_data["model-costs"]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
-        tokens = tokenizer.bpe_tokenize_encode(
-            prompt if prompt else self.prompt)
+        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
         logger.info(f"Number of input tokens found: {len(tokens)}")
 
@@ -111,8 +109,7 @@ class Llama2(BaseModel):
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token
-            * llama2_price_data["max-output-tokens"],
+            + completion_cost_per_token * llama2_price_data["max-output-tokens"],
             8,
         )
 

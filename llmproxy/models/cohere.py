@@ -54,7 +54,7 @@ class Cohere(BaseModel):
         try:
             response = self.co.chat(
                 max_tokens=self.max_output_tokens,
-                message=prompt if prompt else self.prompt,
+                message=prompt or self.prompt,
                 model=self.model,
                 temperature=self.temperature,
             )
@@ -86,7 +86,7 @@ class Cohere(BaseModel):
         ]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
-        tokens = self.co.tokenize(text=prompt if prompt else self.prompt).tokens
+        tokens = self.co.tokenize(text=prompt or self.prompt).tokens
 
         logger.info(f"Number of input tokens found: {len(tokens)}")
 

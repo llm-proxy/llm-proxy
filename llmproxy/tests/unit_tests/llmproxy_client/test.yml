@@ -1,14 +1,4 @@
-llm_proxy:
-  name: LLM proxy API
-  version: demo 1.0
-  description: An API that act as a proxy to multiple language models
-
 user_settings:
-  # Example
-  # - routing_mode: 
-  #   - cost_routing:
-  #       enable: false
-    
   - model: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key 
     max_output_tokens: 256 
@@ -115,6 +105,6 @@ available_models:
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
       # Currently not working
-      # - name: chat-bison-32k
+      # - name: chat-bison
       #   cost_per_token_input: 0.000002
       #   cost_per_token_output: 0.000002

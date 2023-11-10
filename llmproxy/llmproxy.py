@@ -2,15 +2,13 @@ import os
 import yaml
 import importlib
 from llmproxy.models.cohere import Cohere
-from llmproxy.models.llama2 import Llama2
-from llmproxy.models.mistral import Mistral
-from llmproxy.models.openai import OpenAI
-from llmproxy.models.vertexai import VertexAI
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
 from llmproxy.utils.log import logger
+from llmproxy.utils.sorting import MinHeap
 
 from dotenv import load_dotenv
+import heapq
 
 load_dotenv()
 
@@ -21,7 +19,7 @@ class RouteType(str, BaseEnum):
 
 
 def _get_settings_from_yml(
-    path_to_yml="api_configuration.yml",
+    path_to_yml: str = "",
 ) -> Dict[str, Any]:
     """Returns all of the settings in the api_configuration.yml file"""
     try:
@@ -75,29 +73,30 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
                 # Loop through and set up instance of model
                 for model in provider["models"]:
                     # Different setup for vertexai
+                    if model not in available_models[model_name]["models"]:
+                        raise Exception(f"{model} is not available")
+
+                    # Common params among all models
+                    common_parameters = {
+                        "max_output_tokens": provider["max_output_tokens"],
+                        "temperature": provider["temperature"],
+                        "model": model,
+                    }
+
+                    # Different setup for vertexai
                     if model_name == "vertexai":
-                        if model in available_models[model_name]["models"]:
-                            model_instance = available_models[model_name]["class"](
-                                project_id=os.getenv("GOOGLE_PROJECT_ID"),
-                                max_output_tokens=provider["max_output_tokens"],
-                                temperature=provider["temperature"],
-                                model=model,
-                            )
-                            user_models[model] = model_instance
-                        else:
-                            raise Exception(model + " is not a valid model")
+                        common_parameters["project_id"] = os.getenv(
+                            provider["project_id_var"]
+                        )
                     else:
-                        # Same setup for others
-                        if model in available_models[model_name]["models"]:
-                            model_instance = available_models[model_name]["class"](
-                                api_key=os.getenv(provider["api_key_var"]),
-                                max_output_tokens=provider["max_output_tokens"],
-                                temperature=provider["temperature"],
-                                model=model,
-                            )
-                            user_models[model] = model_instance
-                        else:
-                            raise Exception(model + " is not a valid model")
+                        common_parameters["api_key"] = os.getenv(
+                            provider["api_key_var"]
+                        )
+
+                    model_instance = available_models[model_name]["class"](
+                        **common_parameters
+                    )
+                    user_models[model] = model_instance
 
         return user_models
     except Exception as e:
@@ -105,78 +104,73 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
 
 
 class LLMProxy:
-    def __init__(self) -> None:
+    def __init__(self, path_to_configuration: str = "api_configuration.yml") -> None:
         self.user_models = {}
         self.route_type = "cost"
+
         # Read YML and see which models the user wants
-        settings = _get_settings_from_yml()
+        settings = _get_settings_from_yml(path_to_yml=path_to_configuration)
         # Setup available models
         available_models = _setup_available_models(settings=settings)
+
         self.user_models = _setup_user_models(
             settings=settings, available_models=available_models
         )
 
+    # TODO: ROUTE TO ONLY AVAILABLE MODELS (check with adrian about this)
+    # Do you want the model to route to the first available model
+    # or just send back an error?
     def route(
         self, route_type: RouteType = RouteType.COST.value, prompt: str = ""
     ) -> str:
         if route_type not in RouteType:
             return "Sorry routing option available"
 
-        chosen_model = None
-
-        if route_type == "cost":
-            output_model = {"name": "", "cost": float("inf"), "instance": None}
-
+        if (route_type or self.route) == "cost":
+            min_heap = MinHeap()
             for model_name, instance in self.user_models.items():
                 logger.info(msg="========Start Cost Estimation===========")
                 cost = instance.get_estimated_max_cost(prompt=prompt)
                 logger.info(msg="========End Cost Estimation===========\n")
 
-                if cost < output_model["cost"]:
-                    output_model.update(
-                        {"name": model_name, "cost": cost, "instance": instance}
-                    )
+                item = {"name": model_name, "cost": cost, "instance": instance}
+                min_heap.push(cost, item)
 
-            logger.info(f"Final model chosen: {output_model['name']}\n")
-            chosen_model = output_model["instance"]
+            completion_res = None
+            while not completion_res:
+                # Iterate through heap until there are no more options
+                min_val_instance = min_heap.pop_min()
+                if not min_val_instance:
+                    break
+
+                instance_data = min_val_instance["data"]
+                logger.info(f"Making request to model: {instance_data['name']}\n")
+                logger.info("ROUTING...\n")
+
+                # Attempt to make request to model
+                try:
+                    # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
+                    output = instance_data["instance"].get_completion(prompt=prompt)
+                    if output.payload and not output.err:
+                        completion_res = output
+                        logger.info("ROUTING COMPLETE! Call to model successful!\n")
+                    else:
+                        logger.info("Request to model failed!\n")
+                        logger.info(
+                            f"Error when making request to model: '{output.message}'\n"
+                        )
+                except Exception as e:
+                    logger.info("Request to model failed!\n")
+                    logger.info(f"Error when making request to model: {e}\n")
+
+            # If there is no completion_res raise exception
+            if not completion_res:
+                raise Exception(
+                    "Requests to all models failed! Please check your configuration!"
+                )
+
+            return completion_res
 
         elif route_type == "category":
             # Category routing
             pass
-
-        logger.info(f"ROUTING...\n")
-        completion_res = chosen_model.get_completion(prompt=prompt)
-        logger.info(f"ROUTING COMPLETE")
-
-        return completion_res
-
-
-openai_api_key = os.getenv("OPENAI_API_KEY")
-mistral_api_key = os.getenv("MISTRAL_API_KEY")
-llama2_api_key = os.getenv("LLAMA2_API_KEY")
-cohere_api_key = os.getenv("COHERE_API_KEY")
-vertexai_project_id = os.getenv("GOOGLE_PROJECT_ID")
-
-# Test Min Costs
-prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
-
-
-# Test min cost example
-def min_cost_cohere_example():
-    cohere = Cohere(
-        prompt=prompt,
-        api_key=cohere_api_key,
-        model="command",
-        temperature=0,
-    )
-    return cohere.get_estimated_max_cost()
-
-
-# Test completion example
-def get_completion_cohere_example(prompt: str) -> str:
-    cohere = Cohere(prompt=prompt, api_key=cohere_api_key)
-
-    res = cohere.get_completion()
-    if res.err:
-        return res.message
-    return res.payload
