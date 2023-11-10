@@ -48,6 +48,7 @@ def test_setup_user_models() -> None:
 
 
 # TODO: More of an integration test, move later
+# TODO: figure out a way for the tests to be routed to the .env.test
 def test_cost_routing() -> None:
     # Arrange
     prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"

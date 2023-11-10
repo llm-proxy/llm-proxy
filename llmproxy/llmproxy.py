@@ -127,50 +127,53 @@ class LLMProxy:
             return "Sorry routing option available"
 
         if (route_type or self.route) == "cost":
-            min_heap = MinHeap()
-            for model_name, instance in self.user_models.items():
-                logger.info(msg="========Start Cost Estimation===========")
-                cost = instance.get_estimated_max_cost(prompt=prompt)
-                logger.info(msg="========End Cost Estimation===========\n")
-
-                item = {"name": model_name, "cost": cost, "instance": instance}
-                min_heap.push(cost, item)
-
-            completion_res = None
-            while not completion_res:
-                # Iterate through heap until there are no more options
-                min_val_instance = min_heap.pop_min()
-                if not min_val_instance:
-                    break
-
-                instance_data = min_val_instance["data"]
-                logger.info(f"Making request to model: {instance_data['name']}\n")
-                logger.info("ROUTING...\n")
-
-                # Attempt to make request to model
-                try:
-                    # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                    output = instance_data["instance"].get_completion(prompt=prompt)
-                    if output.payload and not output.err:
-                        completion_res = output
-                        logger.info("ROUTING COMPLETE! Call to model successful!\n")
-                    else:
-                        logger.info("Request to model failed!\n")
-                        logger.info(
-                            f"Error when making request to model: '{output.message}'\n"
-                        )
-                except Exception as e:
-                    logger.info("Request to model failed!\n")
-                    logger.info(f"Error when making request to model: {e}\n")
-
-            # If there is no completion_res raise exception
-            if not completion_res:
-                raise Exception(
-                    "Requests to all models failed! Please check your configuration!"
-                )
-
-            return completion_res
+            return self._cost_route(prompt=prompt)
 
         elif route_type == "category":
             # Category routing
             pass
+
+    def _cost_route(self, prompt: str):
+        min_heap = MinHeap()
+        for model_name, instance in self.user_models.items():
+            logger.info(msg="========Start Cost Estimation===========")
+            cost = instance.get_estimated_max_cost(prompt=prompt)
+            logger.info(msg="========End Cost Estimation===========\n")
+
+            item = {"name": model_name, "cost": cost, "instance": instance}
+            min_heap.push(cost, item)
+
+        completion_res = None
+        while not completion_res:
+            # Iterate through heap until there are no more options
+            min_val_instance = min_heap.pop_min()
+            if not min_val_instance:
+                break
+
+            instance_data = min_val_instance["data"]
+            logger.info(f"Making request to model: {instance_data['name']}\n")
+            logger.info("ROUTING...\n")
+
+            # Attempt to make request to model
+            try:
+                # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
+                output = instance_data["instance"].get_completion(prompt=prompt)
+                if output.payload and not output.err:
+                    completion_res = output
+                    logger.info("ROUTING COMPLETE! Call to model successful!\n")
+                else:
+                    logger.info("Request to model failed!\n")
+                    logger.info(
+                        f"Error when making request to model: '{output.message}'\n"
+                    )
+            except Exception as e:
+                logger.info("Request to model failed!\n")
+                logger.info(f"Error when making request to model: {e}\n")
+
+        # If there is no completion_res raise exception
+        if not completion_res:
+            raise Exception(
+                "Requests to all models failed! Please check your configuration!"
+            )
+
+        return completion_res
