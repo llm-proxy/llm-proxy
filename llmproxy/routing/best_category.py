@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from transformers import pipeline
 from llmproxy.models.openai import OpenAI
 from llmproxy.models.cohere import Cohere 
