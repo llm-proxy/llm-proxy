@@ -60,3 +60,20 @@
 #     X_test_tfidf = model.tfidf_vectorizer.transform(model.X_test)
 #     y_pred = model.nb_classifier.predict(X_test_tfidf)
 #     print(classification_report(model.y_test, y_pred))
+
+#OTHER CODE:
+#===========
+# load_dotenv(".env")
+# huggingface_api_key = os.getenv("HUGGINGFACE_API_KEY")
+
+# API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
+# headers = {"Authorization": f"Bearer {huggingface_api_key}"}
+
+# def query(payload):
+# 	response = requests.post(API_URL, headers=headers, json=payload)
+# 	return response.json()
+
+# output = query({
+#     "inputs": "Hi, I recently bought a device from your company but it is not working as advertised and I would like to get reimbursed!",
+#     "parameters": {"candidate_labels": ["refund", "legal", "faq"]},
+# })

@@ -8,22 +8,6 @@ from typing import List, Union
 import os
 import requests
 
-
-# load_dotenv(".env")
-# huggingface_api_key = os.getenv("HUGGINGFACE_API_KEY")
-
-# API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
-# headers = {"Authorization": f"Bearer {huggingface_api_key}"}
-
-# def query(payload):
-# 	response = requests.post(API_URL, headers=headers, json=payload)
-# 	return response.json()
-
-# output = query({
-#     "inputs": "Hi, I recently bought a device from your company but it is not working as advertised and I would like to get reimbursed!",
-#     "parameters": {"candidate_labels": ["refund", "legal", "faq"]},
-# })
-
 def classify_input(prompt:str) -> str:
     candidate_labels = [
         'Code Generation Task',
@@ -50,7 +34,7 @@ def classify_input(prompt:str) -> str:
     return best_category
 
 
-def use_best_category(prompt:str) -> List[Union(OpenAI, Cohere, Llama2, Mistral, VertexAI)]:
+def llm_list(prompt:str) -> List[Union[OpenAI, Cohere, Llama2, Mistral, VertexAI]]:
     category = classify_input(prompt)
     print(category)
     if(category=="Code Generation Task" or category=="Text Generation Task" or category=="Natural Language Processing Task"):
@@ -62,5 +46,5 @@ def use_best_category(prompt:str) -> List[Union(OpenAI, Cohere, Llama2, Mistral,
          return[OpenAI, Llama2, Cohere]
      
 if __name__ == "__main__":
-    model_list = use_best_category('What are the effects marijuana?')
+    model_list = llm_list('What are the effects marijuana?')
     print(model_list)
