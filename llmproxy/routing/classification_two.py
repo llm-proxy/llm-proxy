@@ -21,4 +21,5 @@ def classify_prompt(prompt:str)->str:
             {"role": "user", "content": prompt},
         ]
     )
+    
     return response['choices'][0]['message']['content']
