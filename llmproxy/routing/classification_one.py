@@ -21,14 +21,9 @@ def classify_input(prompt:str) -> str:
         'Financial Task',
         'Content Recommendation Task',
     ]
-
-    #print(f'Prompt = {prompt}')
-    classifier = pipeline(task='zero-shot-classification', model='facebook/bart-large-mnli')
     
+    classifier = pipeline(task='zero-shot-classification', model='facebook/bart-large-mnli')
     results = classifier(prompt, candidate_labels)
-    #print(f'labels = {results["labels"]}')
-    #print(f'scores = {results["scores"]}')
-
     best_category = results['labels'][0]
 
     return best_category
@@ -36,7 +31,7 @@ def classify_input(prompt:str) -> str:
 
 def llm_list(prompt:str) -> List[Union[OpenAI, Cohere, Llama2, Mistral, VertexAI]]:
     category = classify_input(prompt)
-    print(category)
+    
     if(category=="Code Generation Task" or category=="Text Generation Task" or category=="Natural Language Processing Task"):
             return [OpenAI, Cohere, VertexAI, Mistral, Llama2]
     elif(category=="Conversational AI Task" or category=="Educational Applications Task" or category=="Healthcare and Medical Task"
@@ -44,7 +39,3 @@ def llm_list(prompt:str) -> List[Union[OpenAI, Cohere, Llama2, Mistral, VertexAI
          return [OpenAI, Llama2, Cohere, VertexAI]
     elif(category=="Translation and Multilingual Applications Task"):
          return[OpenAI, Llama2, Cohere]
-     
-if __name__ == "__main__":
-    model_list = llm_list('What are the effects marijuana?')
-    print(model_list)
