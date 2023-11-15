@@ -7,40 +7,62 @@ import os
 
 from llmproxy.models.vertexai import VertexAI
 from dotenv import load_dotenv
+import unittest
 
 load_dotenv(".env.test")
 project_id = os.getenv("GOOGLE_PROJECT_ID")
 
 # This test will only work if you have a valid application_default_credentials.json file
+
+
 def test_invalid_project_id() -> None:
-    #Arrange
+    # Arrange
     vertexai = VertexAI(project_id="invalid id")
 
-    #Act
+    # Act
     response = vertexai.get_completion()
 
-    #Assert
+    # Assert
     assert "Permission denied" in response.message
 
-def test_invalid_location() -> None:
-    #Arrange
-    vertexai = VertexAI(project_id=project_id, location="test")
-
-    #Act
-    response = vertexai.get_completion()
-
-    #Assert
-    assert "Unsupported region" in response.message
 
 def test_unsupported_model() -> None:
-    #Arrange
-    vertexai = VertexAI(project_id=project_id,model="test")
+    # Arrange
+    vertexai = VertexAI(project_id=project_id, model="test")
 
-    #Act
+    # Act
     response = vertexai.get_completion()
 
-    #Assert
+    # Assert
     assert "Model not supported" in response.message
+
+
+def test_get_estimated_max_cost():
+    # Arrange
+    vertex = VertexAI(project_id=project_id)
+    expected_cost = 0.000032
+    prompt = "I am a cat in a hat!"
+
+    # Act
+    actual_cost = vertex.get_estimated_max_cost(prompt=prompt)
+
+    # Assert
+    assert actual_cost == expected_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+
+
+class TestVertexAIErrors(unittest.TestCase):
+    def test_invalid_location(self):
+        # Arrange
+        vertexai = VertexAI(project_id=project_id, location="test")
+
+        # Act and Assert
+        with self.assertRaises(Exception):
+            vertexai.get_completion()
+
+
+if __name__ == "__main__":
+    unittest.main()
+
 
 # test not working properly
 # will fix in a different PR
