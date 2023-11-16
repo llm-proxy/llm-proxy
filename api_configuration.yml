@@ -75,7 +75,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
       - name: gpt-3.5-turbo-instruct
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.0000020
@@ -90,7 +89,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
       - name: gpt-4
         cost_per_token_input: 0.00003
         cost_per_token_output: 0.00006
@@ -105,7 +103,6 @@ available_models:
           Legal Task: 2
           Financial Task: 2
           Content Recommendation Task: 1
-        average_rank: 1.1
       - name: gpt-4-32k
         cost_per_token_input: 0.00006
         cost_per_token_output: 0.00012
@@ -120,7 +117,6 @@ available_models:
           Legal Task: 2
           Financial Task: 2
           Content Recommendation Task: 1
-        average_rank: 1.1
 
   - name: Llama2
     class: llmproxy.models.llama2.Llama2
@@ -138,7 +134,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
       - name: Llama-2-13b-chat-hf
         cost_per_hour: 0.06
         categories:
@@ -152,7 +147,6 @@ available_models:
           Legal Task: 2
           Financial Task: 2
           Content Recommendation Task: 1
-        average_rank: 1.1
       - name: Llama-2-70b-chat-hf
         cost_per_hour: 0.06
         categories:
@@ -166,7 +160,6 @@ available_models:
           Legal Task: 1
           Financial Task: 1
           Content Recommendation Task: 1
-        average_rank: 1.0
 
   - name: Mistral
     class: llmproxy.models.mistral.Mistral
@@ -184,7 +177,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
       - name: Mistral-7B-Instruct-v0.1
         cost_per_hour: 0.06
         categories:
@@ -198,7 +190,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
 
   - name: Cohere
     class: llmproxy.models.cohere.Cohere
@@ -217,7 +208,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
       - name: command-light
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
@@ -232,7 +222,6 @@ available_models:
           Legal Task: 4
           Financial Task: 4
           Content Recommendation Task: 3
-        average_rank: 3.0
       - name: command-nightly
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
@@ -247,7 +236,6 @@ available_models:
           Legal Task: 3
           Financial Task: 3
           Content Recommendation Task: 2
-        average_rank: 2.0
       - name: command-light-nightly
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
@@ -262,7 +250,6 @@ available_models:
           Legal Task: 4
           Financial Task: 4
           Content Recommendation Task: 3
-        average_rank: 3.0
 
   - name: Vertexai
     class: llmproxy.models.vertexai.VertexAI
@@ -281,7 +268,6 @@ available_models:
           Legal Task: 2
           Financial Task: 2
           Content Recommendation Task: 1
-        average_rank: 1.4
       # Currently not working
       # - name: chat-bison-32k
       #   cost_per_token_input: 0.000002
