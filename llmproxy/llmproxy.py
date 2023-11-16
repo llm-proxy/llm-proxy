@@ -134,10 +134,7 @@ class LLMProxy:
             return self._cost_route(prompt=prompt)
 
         elif (route_type or self.route) == "category":
-            print(self.user_models)
-            return ""
-            # Category routing
-            pass
+            return self._category_route(prompt=prompt)
 
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
@@ -185,3 +182,6 @@ class LLMProxy:
             )
 
         return completion_res
+    
+    def _category_route(self, prompt:str):
+        pass
