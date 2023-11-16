@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
+import tiktoken
+from llmproxy.utils.log import logger
+
 
 @dataclass
 class CompletionResponse:

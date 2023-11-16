@@ -5,10 +5,21 @@ from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
+from llmproxy.utils import tokenizer
+
+# VERTEX IS PER CHARACTER
+vertexai_price_data = {
+    "max-output-tokens": 50,
+    "model-costs": {
+        "prompt": 0.0005 / 1_000,
+        "completion": 0.0005 / 1_000,
+    },
+}
 
 
 class VertexAIModel(str, BaseEnum):
-    PALM_TEXT = "text-bison@001"
+    # Add other models
+    PALM_TEXT = "text-bison"
     PALM_CHAT = "chat-bison"
 
 
@@ -19,7 +30,7 @@ class VertexAI(BaseModel):
         temperature: float = 0,
         model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
-        location: str | None = "",
+        location: str | None = "us-central1",
         max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
@@ -46,7 +57,7 @@ class VertexAI(BaseModel):
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(prompt if prompt else self.prompt)
+            response = chat_model.predict(prompt or self.prompt, **parameters)
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
@@ -55,14 +66,44 @@ class VertexAI(BaseModel):
         except auth_exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
-        except ValueError as e:
-            logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
-            raise Exception(e)
+            raise Exception(f"Unknown Vertexai Error:{e}")
 
         return CompletionResponse(payload=output, message="OK", err="")
+
+    def get_estimated_max_cost(self, prompt: str = "") -> float:
+        if not self.prompt and not prompt:
+            logger.info("No prompt provided.")
+            raise ValueError("No prompt provided.")
+
+        # Assumption, model exists (check should be done at yml load level)
+
+        logger.info(f"Tokenizing model: {self.model}")
+
+        prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
+        logger.info(f"Prompt Cost per token: {prompt_cost_per_character}")
+
+        completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
+        logger.info(f"Output cost per token: {completion_cost_per_character}")
+
+        tokens = tokenizer.vertexai_encode(prompt or self.prompt)
+
+        logger.info(f"Number of input tokens found: {len(tokens)}")
+
+        logger.info(
+            f"Final calculation using {len(tokens)} input tokens and {vertexai_price_data['max-output-tokens']} output tokens"
+        )
+
+        cost = round(
+            prompt_cost_per_character * len(tokens)
+            + completion_cost_per_character * vertexai_price_data["max-output-tokens"],
+            8,
+        )
+
+        logger.info(f"Calculated Cost: {cost}")
+
+        return cost
 
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)
