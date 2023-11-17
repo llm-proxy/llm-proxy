@@ -6,7 +6,7 @@ from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
-from llmproxy.training.train_category_model import CategoryModel
+from llmproxy.utils.category_model import CategoryModel
 
 from dotenv import load_dotenv
 

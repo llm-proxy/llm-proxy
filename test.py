@@ -10,6 +10,10 @@ def main() -> None:
 
     output = proxy_client.route(route_type="cost", prompt=prompt)
     print(output)
+    
+    output = proxy_client.route(route_type="category", prompt=prompt)
+    print(output)
+    
 
 
 if __name__ == "__main__":
