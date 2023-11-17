@@ -121,6 +121,7 @@ class LLMProxy:
         self.user_models = _setup_user_models(
             settings=settings, available_models=available_models
         )
+        self.available_models = available_models
 
     # TODO: ROUTE TO ONLY AVAILABLE MODELS (check with adrian about this)
     # Do you want the model to route to the first available model
@@ -190,11 +191,7 @@ class LLMProxy:
         best_fit_category = classification_model.categorize_text()
         for model_name, instance, in self.user_models.items():
             logger.info(msg="========Start Category Routing===========\n")
-            logger.info(msg="SORTING MODELS...\n")
-            logger.info(msg=f"Current model: {model_name}\n")
-            category_rank = instance.category[best_fit_category]
-            logger.info(msg=f"Category of prompt: {instance.category[best_fit_category]}\n")
-            logger.info(msg=f"Rank of category: {category_rank}\n")
+            category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
             logger.info(msg="========End Category Routing=============\n")

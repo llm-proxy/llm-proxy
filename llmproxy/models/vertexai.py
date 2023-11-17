@@ -16,6 +16,22 @@ vertexai_price_data = {
     },
 }
 
+vertexai_price_data = {
+    "model-categories": {
+        "text-bison": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1
+        },
+    }
+}
 
 class VertexAIModel(str, BaseEnum):
     # Add other models
@@ -104,6 +120,14 @@ class VertexAI(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
+    
+    def get_category_rank(self, category: str = "") -> str:
+        logger.info(msg="SORTING MODELS...\n")
+        logger.info(msg=f"Current model: {self.model}\n")
+        logger.info(msg=f"Category of prompt: {category}\n")
+        category_rank = vertexai_price_data["model-categories"][self.model][category]
+        logger.info(msg=f"Rank of category: {category_rank}\n")
+        return category_rank
 
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)

@@ -13,6 +13,47 @@ llama2_price_data = {
     },
 }
 
+llama2_category_data = {
+    "model-categories": {
+        "Llama-2-7b-chat-hf": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2
+        },
+        "Llama-2-13b-chat-hf": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1
+        },
+        "Llama-2-70b-chat-hf": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 1,
+            "Financial Task": 1,
+            "Content Recommendation Task": 1   
+        },
+    }
+}
+
 
 class Llama2Model(str, BaseEnum):
     LLAMA_2_7B = "Llama-2-7b-chat-hf"
@@ -116,6 +157,14 @@ class Llama2(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
+
+    def get_category_rank(self, category: str = "") -> str:
+        logger.info(msg="SORTING MODELS...\n")
+        logger.info(msg=f"Current model: {self.model}\n")
+        logger.info(msg=f"Category of prompt: {category}\n")
+        category_rank = llama2_category_data["model-categories"][self.model][category]
+        logger.info(msg=f"Rank of category: {category_rank}\n")
+        return category_rank
 
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)
