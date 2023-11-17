@@ -6,6 +6,7 @@ from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
+from llmproxy.training.train_category_model import CategoryModel
 
 from dotenv import load_dotenv
 
@@ -184,4 +185,50 @@ class LLMProxy:
         return completion_res
     
     def _category_route(self, prompt:str):
-        pass
+        min_heap = MinHeap()
+        classification_model = CategoryModel(prompt=prompt)
+        best_fit_category = classification_model.categorize_text()
+        for model_name, instance, in self.user_models.items():
+            logger.info(msg="========Start Category Routing===========")
+            category_rank = instance.category[best_fit_category]
+            item = {"name": model_name, "rank": category_rank, "category": best_fit_category, "instance": instance}
+            min_heap.push(category_rank, item)
+            logger.info(msg="========End Category Routing=============\n")
+
+        completion_res = None
+        while not completion_res:
+            # Iterate through heap until there are no more options
+            min_val_instance = min_heap.pop_min()
+            if not min_val_instance:
+                break
+
+            instance_data = min_val_instance["data"]
+            logger.info(f"Making request to model: {instance_data['name']}\n")
+            logger.info("ROUTING...\n")
+
+            # Attempt to make request to model
+            try:
+                # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
+                output = instance_data["instance"].get_completion(
+                    prompt=prompt)
+                if output.payload and not output.err:
+                    completion_res = output
+                    logger.info(
+                        "ROUTING COMPLETE! Call to model successful!\n")
+                    break
+                    
+                else:
+                    logger.info("Request to model failed!\n")
+                    logger.info(
+                        f"Error when making request to model: '{output.message}'\n"
+                    )
+            except Exception as e:
+                logger.info("Request to model failed!\n")
+                logger.info(f"Error when making request to model: {e}\n")
+
+        # If there is no completion_res raise exception
+        if not completion_res:
+            raise Exception(
+                "Requests to all models failed! Please check your configuration!"
+            )
+        return completion_res
