@@ -189,9 +189,13 @@ class LLMProxy:
         classification_model = CategoryModel(prompt=prompt)
         best_fit_category = classification_model.categorize_text()
         for model_name, instance, in self.user_models.items():
-            logger.info(msg="========Start Category Routing===========")
+            logger.info(msg="========Start Category Routing===========\n")
+            logger.info(msg="SORTING MODELS...\n")
+            logger.info(msg=f"Current model: {model_name}\n")
             category_rank = instance.category[best_fit_category]
-            item = {"name": model_name, "rank": category_rank, "category": best_fit_category, "instance": instance}
+            logger.info(msg=f"Category of prompt: {instance.category[best_fit_category]}\n")
+            logger.info(msg=f"Rank of category: {category_rank}\n")
+            item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
             logger.info(msg="========End Category Routing=============\n")
 
@@ -213,8 +217,7 @@ class LLMProxy:
                     prompt=prompt)
                 if output.payload and not output.err:
                     completion_res = output
-                    logger.info(
-                        "ROUTING COMPLETE! Call to model successful!\n")
+                    logger.info("ROUTING COMPLETE! Call to model successful!\n")
                     break
                     
                 else:

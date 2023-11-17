@@ -8,8 +8,8 @@ def main() -> None:
     prompt = "What is the square root of i?"
     proxy_client = LLMProxy(path_to_configuration="api_configuration.yml")
 
-    output = proxy_client.route(route_type="cost", prompt=prompt)
-    print(output)
+    #output = proxy_client.route(route_type="cost", prompt=prompt)
+    #print(output)
     
     output = proxy_client.route(route_type="category", prompt=prompt)
     print(output)
