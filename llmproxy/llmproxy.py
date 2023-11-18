@@ -194,6 +194,7 @@ class LLMProxy:
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
+            logger.info(msg="SORTING MODELS...\n")
             logger.info(msg="========End Category Routing=============\n")
 
         completion_res = None

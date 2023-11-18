@@ -122,7 +122,6 @@ class VertexAI(BaseModel):
         return cost
     
     def get_category_rank(self, category: str = "") -> str:
-        logger.info(msg="SORTING MODELS...\n")
         logger.info(msg=f"Current model: {self.model}\n")
         logger.info(msg=f"Category of prompt: {category}\n")
         category_rank = vertexai_price_data["model-categories"][self.model][category]
