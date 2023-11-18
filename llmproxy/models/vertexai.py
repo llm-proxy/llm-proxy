@@ -16,7 +16,7 @@ vertexai_price_data = {
     },
 }
 
-vertexai_price_data = {
+vertexai_category_data = {
     "model-categories": {
         "text-bison": {
             "Code Generation Task": 1,
@@ -124,7 +124,7 @@ class VertexAI(BaseModel):
     def get_category_rank(self, category: str = "") -> str:
         logger.info(msg=f"Current model: {self.model}\n")
         logger.info(msg=f"Category of prompt: {category}\n")
-        category_rank = vertexai_price_data["model-categories"][self.model][category]
+        category_rank = vertexai_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}\n")
         return category_rank
 
