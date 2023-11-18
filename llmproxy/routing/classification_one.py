@@ -27,15 +27,3 @@ def classify_input(prompt:str) -> str:
     best_category = results['labels'][0]
 
     return best_category
-
-
-def llm_list(prompt:str) -> List[Union[OpenAI, Cohere, Llama2, Mistral, VertexAI]]:
-    category = classify_input(prompt)
-    
-    if(category=="Code Generation Task" or category=="Text Generation Task" or category=="Natural Language Processing Task"):
-            return [OpenAI, Cohere, VertexAI, Mistral, Llama2]
-    elif(category=="Conversational AI Task" or category=="Educational Applications Task" or category=="Healthcare and Medical Task"
-          or category=="Legal Task" or category=="Financial Task" or category=="Content Recommendation Task"):
-         return [OpenAI, Llama2, Cohere, VertexAI]
-    elif(category=="Translation and Multilingual Applications Task"):
-         return[OpenAI, Llama2, Cohere]
