@@ -64,132 +64,33 @@ available_models:
       - name: gpt-3.5-turbo-1106
         cost_per_token_input: 0.0000010
         cost_per_token_output: 0.0000020
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
       - name: gpt-3.5-turbo-instruct
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.0000020
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
       - name: gpt-4
         cost_per_token_input: 0.00003
         cost_per_token_output: 0.00006
-        categories:
-          Code Generation Task: 1
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 1
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 1
-          Healthcare and Medical Task: 2
-          Legal Task: 2
-          Financial Task: 2
-          Content Recommendation Task: 1
       - name: gpt-4-32k
         cost_per_token_input: 0.00006
         cost_per_token_output: 0.00012
-        categories:
-          Code Generation Task: 1
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 1
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 1
-          Healthcare and Medical Task: 2
-          Legal Task: 2
-          Financial Task: 2
-          Content Recommendation Task: 1
 
   - name: Llama2
     class: llmproxy.models.llama2.Llama2
     models:
       - name: Llama-2-7b-chat-hf
         cost_per_hour: 0.06
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
       - name: Llama-2-13b-chat-hf
         cost_per_hour: 0.06
-        categories:
-          Code Generation Task: 1
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 1
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 1
-          Healthcare and Medical Task: 2
-          Legal Task: 2
-          Financial Task: 2
-          Content Recommendation Task: 1
       - name: Llama-2-70b-chat-hf
         cost_per_hour: 0.06
-        categories:
-          Code Generation Task: 1
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 1
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 1
-          Healthcare and Medical Task: 1
-          Legal Task: 1
-          Financial Task: 1
-          Content Recommendation Task: 1
 
   - name: Mistral
     class: llmproxy.models.mistral.Mistral
     models:
       - name: Mistral-7B-v0.1
         cost_per_hour: 0.06
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
       - name: Mistral-7B-Instruct-v0.1
         cost_per_hour: 0.06
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
 
   - name: Cohere
     class: llmproxy.models.cohere.Cohere
@@ -197,59 +98,15 @@ available_models:
       - name: command
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
       - name: command-light
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
-        categories:
-          Code Generation Task: 3
-          Text Generation Task: 2
-          Translation and Multilingual Applications Task: 3
-          Natural Language Processing Task: 2
-          Conversational AI Task: 2
-          Educational Applications Task: 3
-          Healthcare and Medical Task: 4
-          Legal Task: 4
-          Financial Task: 4
-          Content Recommendation Task: 3
       - name: command-nightly
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
-        categories:
-          Code Generation Task: 2
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 2
-          Natural Language Processing Task: 1
-          Conversational AI Task: 1
-          Educational Applications Task: 2
-          Healthcare and Medical Task: 3
-          Legal Task: 3
-          Financial Task: 3
-          Content Recommendation Task: 2
       - name: command-light-nightly
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
-        categories:
-          Code Generation Task: 3
-          Text Generation Task: 2
-          Translation and Multilingual Applications Task: 3
-          Natural Language Processing Task: 2
-          Conversational AI Task: 2
-          Educational Applications Task: 3
-          Healthcare and Medical Task: 4
-          Legal Task: 4
-          Financial Task: 4
-          Content Recommendation Task: 3
 
   - name: Vertexai
     class: llmproxy.models.vertexai.VertexAI
@@ -257,17 +114,6 @@ available_models:
       - name: text-bison
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
-        categories:
-          Code Generation Task: 1
-          Text Generation Task: 1
-          Translation and Multilingual Applications Task: 1
-          Natural Language Processing Task: 1
-          Conversational AI Task: 2
-          Educational Applications Task: 1
-          Healthcare and Medical Task: 2
-          Legal Task: 2
-          Financial Task: 2
-          Content Recommendation Task: 1
       # Currently not working
       # - name: chat-bison-32k
       #   cost_per_token_input: 0.000002
