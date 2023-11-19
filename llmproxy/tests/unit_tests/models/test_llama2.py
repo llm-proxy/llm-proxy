@@ -13,7 +13,7 @@ default_model = Llama2Model.LLAMA_2_7B.value
 
 def test_llama2_empty_prompt() -> None:
     llama2_empty_prompt = Llama2(
-        prompt="", system_prompt=default_system_prompt, model=default_model
+        prompt="", system_prompt=default_system_prompt, model=default_model, api_key=default_api_key
     )
     output = llama2_empty_prompt.get_completion()
     assert output.message == "No prompt detected"
@@ -57,3 +57,19 @@ def test_llama2_emp_model() -> None:
     output = test_emp_model.get_completion()
     print(output.message)
     assert output.err == "ValueError"
+
+
+def test_get_estimated_max_cost():
+    # Arrange
+    llama2 = Llama2(
+        api_key=default_api_key,
+        temperature=0,
+    )
+    prompt = "I am a cat in a hat!"
+    estimated_cost = 0.0000988
+
+    # Act
+    actual_cost = llama2.get_estimated_max_cost(prompt=prompt)
+
+    # Assert
+    assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"

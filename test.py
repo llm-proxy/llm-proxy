@@ -1,17 +1,15 @@
-from llmproxy import llmproxy
-from llmproxy.utils.log import logger
+from llmproxy.llmproxy import LLMProxy
+
+"""Temp Test file, will be removed in future in favour of unit/integration tests"""
 
 
 def main() -> None:
-    prompt = "What is 1+1?"
-    #print(llmproxy.get_completion(prompt=prompt))
+    # prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
+    prompt = "What is the square root of i?"
+    proxy_client = LLMProxy(path_to_configuration="api_configuration.yml")
 
-    print(f"OPEN AI: {llmproxy.get_completion(prompt=prompt)}\n")
-    print(f"MISTRAL AI: {llmproxy.get_completion_mistral(prompt=prompt, model='test')}")
-    print(
-        f"COHERE AI: {llmproxy.get_completion_cohere(prompt=prompt, max_token=100, model='sdfsdfs')}\n"
-    )
-    print(f"VERTEX AI: {llmproxy.get_completion_vertexai(prompt=prompt,location='us-central1')}")
+    output = proxy_client.route(route_type="cost", prompt=prompt)
+    print(output)
 
 
 if __name__ == "__main__":

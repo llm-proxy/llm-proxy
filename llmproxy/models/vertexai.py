@@ -1,64 +1,109 @@
 from google.cloud import aiplatform
 from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.models.base import BaseChatbot, CompletionResponse
+from llmproxy.models.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
+from llmproxy.utils import tokenizer
+
+# VERTEX IS PER CHARACTER
+vertexai_price_data = {
+    "max-output-tokens": 50,
+    "model-costs": {
+        "prompt": 0.0005 / 1_000,
+        "completion": 0.0005 / 1_000,
+    },
+}
+
 
 class VertexAIModel(str, BaseEnum):
-    PALM_TEXT = "text-bison@001"
+    # Add other models
+    PALM_TEXT = "text-bison"
     PALM_CHAT = "chat-bison"
 
-class VertexAI(BaseChatbot):
+
+class VertexAI(BaseModel):
     def __init__(
         self,
         prompt: str = "",
         temperature: float = 0,
         model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
-        location: str | None = "",
+        location: str | None = "us-central1",
+        max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.temperature = temperature
         self.model = model
-        self.project_id=project_id
-        self.location=location
+        self.project_id = project_id
+        self.location = location
+        self.max_output_tokens = max_output_tokens
 
-    def get_completion(self) -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in VertexAIModel:
             return self._handle_error(
-                exception = f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
-                error_type = "ValueError"
+                exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
+                error_type="ValueError",
             )
         try:
             aiplatform.init(project=self.project_id, location=self.location)
             # TODO developer - override these parameters as needed:
             parameters = {
-                "temperature": self.temperature,  # Temperature controls the degree of randomness in token selection.
-                "max_output_tokens": 256,  # Token limit determines the maximum amount of text output.
-                "top_p": 0.8,  # Tokens are selected from most probable to least until the sum of their probabilities equals the top_p value.
-                "top_k": 40,  # A top_k of 1 means the selected token is the most probable among all tokens.
+                # Temperature controls the degree of randomness in token selection.
+                "temperature": self.temperature,
+                # Token limit determines the maximum amount of text output.
+                "max_output_tokens": self.max_output_tokens,
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(self.prompt)
+            response = chat_model.predict(prompt or self.prompt, **parameters)
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
-        except auth_exceptions.DefaultCredentialsError as e:
-            logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
-        except ValueError as e:
+        except auth_exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
             return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
-            raise Exception(e)
+            raise Exception(f"Unknown Vertexai Error:{e}")
 
         return CompletionResponse(payload=output, message="OK", err="")
-    
+
+    def get_estimated_max_cost(self, prompt: str = "") -> float:
+        if not self.prompt and not prompt:
+            logger.info("No prompt provided.")
+            raise ValueError("No prompt provided.")
+
+        # Assumption, model exists (check should be done at yml load level)
+
+        logger.info(f"Tokenizing model: {self.model}")
+
+        prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
+        logger.info(f"Prompt Cost per token: {prompt_cost_per_character}")
+
+        completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
+        logger.info(f"Output cost per token: {completion_cost_per_character}")
+
+        tokens = tokenizer.vertexai_encode(prompt or self.prompt)
+
+        logger.info(f"Number of input tokens found: {len(tokens)}")
+
+        logger.info(
+            f"Final calculation using {len(tokens)} input tokens and {vertexai_price_data['max-output-tokens']} output tokens"
+        )
+
+        cost = round(
+            prompt_cost_per_character * len(tokens)
+            + completion_cost_per_character * vertexai_price_data["max-output-tokens"],
+            8,
+        )
+
+        logger.info(f"Calculated Cost: {cost}")
+
+        return cost
+
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)
