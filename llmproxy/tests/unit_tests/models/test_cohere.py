@@ -20,13 +20,6 @@ def test_get_estimated_max_cost():
     actual_cost = cohere.get_estimated_max_cost(prompt=prompt)
     assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
 
-import os
-from llmproxy.models.cohere import Cohere
-from dotenv import load_dotenv
-
-load_dotenv(".env.test")
-
-cohere_api_key = os.getenv("COHERE_API_KEY")
 
 def test_cohere_empty_api_key() -> None:
     # Arrange
