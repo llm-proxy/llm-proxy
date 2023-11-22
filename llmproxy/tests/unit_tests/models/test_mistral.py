@@ -1,6 +1,6 @@
 import os
 
-from llmproxy.models.mistral import Mistral
+from llmproxy.models.mistral import Mistral, MistralException
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")
@@ -25,25 +25,30 @@ def test_mistral_invalid_api_key() -> None:
     mistral = Mistral(api_key="invalid")
 
     # Act
-    check = mistral.get_completion()
-
-    # Assert
-    assert (
-        check.message
-        == "ERROR: Authorization header is correct, but the token seems invalid"
-    )
+    try:
+        mistral.get_completion()
+    except MistralException as e:
+        # Assert
+        assert (
+            str(e)
+            == "Mistral Error: Authorization header is correct, but the token seems invalid, Type: MistralError"
+        )
 
 
 def test_mistral_temperature_over_100() -> None:
     # Arrange
-    mistral = Mistral(api_key=mistral_api_key, temperature=100.1)
+    mistral = Mistral(
+        prompt="What is the meaning of life?", api_key=mistral_api_key, temperature=101
+    )
 
     # Act
-    check = mistral.get_completion()
-
-    print(check.payload)
-    # Assert
-    assert check.message == "ERROR: Input validation error: `inputs` cannot be empty"
+    try:
+        mistral.get_completion()
+    except MistralException as e:
+        # Assert
+        assert (
+            str(e) == "Mistral Error: Temperature cannot be over 100, Type: ValueError"
+        )
 
 
 def test_mistral_temperature_under_0() -> None:
@@ -51,22 +56,26 @@ def test_mistral_temperature_under_0() -> None:
     mistral = Mistral(api_key=mistral_api_key, temperature=-1)
 
     # Act
-    check = mistral.get_completion()
-
-    print(check.payload)
-    # Assert
-    assert (
-        check.message
-        == "ERROR: Input validation error: `temperature` must be strictly positive"
-    )
+    try:
+        mistral.get_completion()
+    except MistralException as e:
+        # Assert
+        assert (
+            str(e)
+            == "Mistral Error: Input validation error: `temperature` must be strictly positive, Type: MistralError"
+        )
 
 
 def test_get_estimated_max_cost():
     # Arrange
-    mistral = Mistral(api_key=mistral_api_key,)
+    mistral = Mistral(
+        api_key=mistral_api_key,
+    )
     prompt = "I am a cat in a hat!"
     estimated_cost = 0.0000954
 
     # Act
     actual_cost = mistral.get_estimated_max_cost(prompt=prompt)
-    assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+    assert (
+        actual_cost == estimated_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

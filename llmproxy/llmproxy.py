@@ -1,6 +1,7 @@
 import os
 import yaml
 import importlib
+
 from llmproxy.models.cohere import Cohere
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
@@ -47,8 +48,7 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
             model_class = getattr(module, class_name)
 
             # return dict with class path and models set, with all of the variations/models of that provider
-            available_models[key] = {
-                "class": model_class, "models": provider_models}
+            available_models[key] = {"class": model_class, "models": provider_models}
 
         return available_models
     except Exception as e:
@@ -163,12 +163,10 @@ class LLMProxy:
             # Attempt to make request to model
             try:
                 # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(
-                    prompt=prompt)
+                output = instance_data["instance"].get_completion(prompt=prompt)
                 if output.payload and not output.err:
                     completion_res = output
-                    logger.info(
-                        "ROUTING COMPLETE! Call to model successful!\n")
+                    logger.info("ROUTING COMPLETE! Call to model successful!\n")
                 else:
                     logger.info("Request to model failed!\n")
                     logger.info(

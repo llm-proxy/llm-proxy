@@ -40,16 +40,14 @@ class Llama2(BaseModel):
     def get_completion(self, prompt: str = "") -> CompletionResponse:
         # If empty api key
         if not self.api_key:
-            return self._handle_error(
-                exception="No API Provided", error_type="InputError"
-            )
+            raise Llama2Exception(exception="No API Provided", error_type="InputError")
 
         if self.prompt == "" and prompt == "":
-            return self._handle_error(
+            raise Llama2Exception(
                 exception="No prompt detected", error_type="InputError"
             )
         if self.model not in Llama2Model:
-            return self._handle_error(
+            raise Llama2Exception(
                 exception=f"Invalid Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
                 error_type="ValueError",
             )
@@ -79,9 +77,7 @@ class Llama2(BaseModel):
             raise Exception("Error Occur for prompting Llama2")
 
         if output["error"]:
-            return self._handle_error(
-                exception=output["error"], error_type="Llama2Error"
-            )
+            raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
         return CompletionResponse(payload=output, message="OK", err="")
 
@@ -117,5 +113,7 @@ class Llama2(BaseModel):
 
         return cost
 
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)
+
+class Llama2Exception(Exception):
+    def __init__(self, exception: str, error_type: str) -> CompletionResponse:
+        super().__init__(f"Llama2 Error: {exception}, Type: {error_type}")

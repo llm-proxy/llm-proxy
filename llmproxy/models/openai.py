@@ -67,10 +67,11 @@ class OpenAI(BaseModel):
 
     def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in OpenAIModel:
-            return self._handle_error(
+            raise OpenAIException(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
-                error_type="ValueError",
+                error_type=ValueError,
             )
+
         try:
             messages = [{"role": "user", "content": prompt or self.prompt}]
             response = openai.ChatCompletion.create(
@@ -81,11 +82,13 @@ class OpenAI(BaseModel):
             )
         except error.OpenAIError as e:
             logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+            raise OpenAIException(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
             # This might need to be changed to a different error
-            raise Exception("Unknown OpenAI Error")
+            raise OpenAIException(
+                exception=e.args[0], error_type="Unknown OpenAI Error"
+            )
 
         return CompletionResponse(
             payload=response.choices[0].message["content"],
@@ -129,5 +132,7 @@ class OpenAI(BaseModel):
 
         return cost
 
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)
+
+class OpenAIException(Exception):
+    def __init__(self, exception: str, error_type: str) -> None:
+        super().__init__(f"OpenAI Error: {exception}, Type: {error_type}")

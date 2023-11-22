@@ -42,7 +42,7 @@ class VertexAI(BaseModel):
 
     def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in VertexAIModel:
-            return self._handle_error(
+            raise VertexAIException(
                 exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
                 error_type="ValueError",
             )
@@ -62,10 +62,10 @@ class VertexAI(BaseModel):
 
         except api_exceptions.GoogleAPIError as e:
             logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+            raise VertexAIException(exception=e.args[0], error_type=type(e).__name__)
         except auth_exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+            return VertexAIException(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
             raise Exception(f"Unknown Vertexai Error:{e}")
@@ -105,5 +105,7 @@ class VertexAI(BaseModel):
 
         return cost
 
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)
+
+class VertexAIException(Exception):
+    def __init__(self, exception: str, error_type: str) -> None:
+        super().__init__(f"VertexAI Error: {exception}, Type: {error_type}")

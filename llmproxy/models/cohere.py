@@ -38,19 +38,16 @@ class Cohere(BaseModel):
         try:
             self.co = cohere.Client(self.api_key)
         except cohere.CohereError as e:
-            self.error_response = CompletionResponse(
-                payload="", message=e, err="ValueError"
-            )
+            raise CohereException(exception=e, error_type=ValueError)
 
     def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in CohereModel:
-            return CompletionResponse(
-                payload="",
-                message=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
-                err="ValueError",
+            raise CohereException(
+                exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
+                error_type=ValueError,
             )
         if self.co is None:
-            return self.error_response
+            raise self.error_response
         try:
             response = self.co.chat(
                 max_tokens=self.max_output_tokens,
@@ -64,7 +61,7 @@ class Cohere(BaseModel):
                 err="",
             )
         except cohere.CohereError as e:
-            return CompletionResponse(payload="", message=e.message, err=e.http_status)
+            return CohereException(exception=e.message, error_type=e.http_status)
         except Exception as e:
             raise Exception("Unknown Cohere error when making API call")
 
@@ -105,5 +102,7 @@ class Cohere(BaseModel):
 
         return cost
 
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)
+
+class CohereException(Exception):
+    def __init__(self, exception: str, error_type: str) -> None:
+        super().__init__(f"Cohere Error: {exception}, Type: {error_type}")

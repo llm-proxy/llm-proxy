@@ -36,9 +36,9 @@ class Mistral(BaseModel):
 
     def get_completion(self, prompt: str = "") -> CompletionResponse:
         if self.model not in MistralModel:
-            return CompletionResponse(
-                message=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
-                err="ValueError",
+            raise MistralException(
+                exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
+                error_type=ValueError,
             )
         try:
             API_URL = (
@@ -59,15 +59,17 @@ class Mistral(BaseModel):
                     },
                 }
             )
+        except requests.RequestException as e:
+            raise MistralException(f"Request error: {e}", error_type="RequestError")
         except Exception as e:
-            raise Exception(e)
+            raise MistralException(f"Unknown error: {e}", error_type="UnknownError")
 
         response = ""
         message = ""
         if isinstance(output, list) and "generated_text" in output[0]:
             response = output[0]["generated_text"]
         elif "error" in output:
-            message = "ERROR: " + output["error"]
+            raise MistralException(f"{output['error']}", error_type="MistralError")
         else:
             raise ValueError("Unknown output format")
 
@@ -108,3 +110,8 @@ class Mistral(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
+
+
+class MistralException(Exception):
+    def __init__(self, exception: str, error_type: str) -> None:
+        super().__init__(f"Mistral Error: {exception}, Type: {error_type}")
