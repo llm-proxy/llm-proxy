@@ -1,5 +1,5 @@
 import requests
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.provider.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer

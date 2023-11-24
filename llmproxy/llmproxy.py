@@ -1,7 +1,7 @@
 import os
 import yaml
 import importlib
-from llmproxy.models.cohere import Cohere
+from llmproxy.provider.cohere.cohere import Cohere
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
 from llmproxy.utils.log import logger
@@ -47,8 +47,7 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
             model_class = getattr(module, class_name)
 
             # return dict with class path and models set, with all of the variations/models of that provider
-            available_models[key] = {
-                "class": model_class, "models": provider_models}
+            available_models[key] = {"class": model_class, "models": provider_models}
 
         return available_models
     except Exception as e:
@@ -104,7 +103,8 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
 class LLMProxy:
     def __init__(
         self,
-        path_to_configuration: str = "api_configuration.yml",
+        path_to_user_configuration: str = "api_configuration.yml",
+        path_to_dev_configuration: str = "developer_configuration.yml",
         path_to_env_vars: str = ".env",
     ) -> None:
         self.user_models = {}
@@ -113,12 +113,13 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML and see which models the user wants
-        settings = _get_settings_from_yml(path_to_yml=path_to_configuration)
-        # Setup available models
-        available_models = _setup_available_models(settings=settings)
+        dev_settings = _get_settings_from_yml(path_to_yml=path_to_dev_configuration)
+        user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
+        # Setup available models
+        available_models = _setup_available_models(settings=dev_settings)
         self.user_models = _setup_user_models(
-            settings=settings, available_models=available_models
+            settings=user_settings, available_models=available_models
         )
 
     # TODO: ROUTE TO ONLY AVAILABLE MODELS (check with adrian about this)
@@ -163,12 +164,10 @@ class LLMProxy:
             # Attempt to make request to model
             try:
                 # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(
-                    prompt=prompt)
+                output = instance_data["instance"].get_completion(prompt=prompt)
                 if output.payload and not output.err:
                     completion_res = output
-                    logger.info(
-                        "ROUTING COMPLETE! Call to model successful!\n")
+                    logger.info("ROUTING COMPLETE! Call to model successful!\n")
                 else:
                     logger.info("Request to model failed!\n")
                     logger.info(
