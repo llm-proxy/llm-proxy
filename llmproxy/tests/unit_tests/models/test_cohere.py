@@ -4,8 +4,7 @@ from llmproxy.models.cohere import Cohere, CohereModel
 
 load_dotenv(".env.test")
 
-#cohere_api_key = os.getenv("COHERE_API_KEY")
-cohere_api_key = "iqAm7dJ9TEOwxFSetAfkurVyPjFLwlyQVo0Xd5oe"
+cohere_api_key = os.getenv("COHERE_API_KEY")
 
 # TODO: May be a FLAKY test; Ensure this is not the case
 def test_get_estimated_max_cost():
