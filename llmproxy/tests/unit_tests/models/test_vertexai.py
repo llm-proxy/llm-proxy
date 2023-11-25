@@ -5,7 +5,7 @@ They are suppressed and will be addressed later
 
 import os
 
-from llmproxy.models.vertexai import VertexAI
+from llmproxy.provider.google.vertexai import VertexAI
 from dotenv import load_dotenv
 import unittest
 

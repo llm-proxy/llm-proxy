@@ -1,7 +1,7 @@
 from google.cloud import aiplatform
 from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.provider.base import BaseModel, CompletionResponse
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
