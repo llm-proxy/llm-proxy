@@ -23,7 +23,7 @@ cohere_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2
+            "Content Recommendation Task": 2,
         },
         "command-light": {
             "Code Generation Task": 3,
@@ -35,7 +35,7 @@ cohere_category_data = {
             "Healthcare and Medical Task": 4,
             "Legal Task": 4,
             "Financial Task": 4,
-            "Content Recommendation Task": 3
+            "Content Recommendation Task": 3,
         },
         "command-nightly": {
             "Code Generation Task": 2,
@@ -47,7 +47,7 @@ cohere_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2
+            "Content Recommendation Task": 2,
         },
         "command-light-nightly": {
             "Code Generation Task": 3,
@@ -59,10 +59,11 @@ cohere_category_data = {
             "Healthcare and Medical Task": 4,
             "Legal Task": 4,
             "Financial Task": 4,
-            "Content Recommendation Task": 3
+            "Content Recommendation Task": 3,
         },
     }
 }
+
 
 # These are the "Models" only for chat/command
 class CohereModel(str, BaseEnum):

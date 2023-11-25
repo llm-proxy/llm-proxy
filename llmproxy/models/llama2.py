@@ -25,7 +25,7 @@ llama2_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2
+            "Content Recommendation Task": 2,
         },
         "Llama-2-13b-chat-hf": {
             "Code Generation Task": 1,
@@ -37,7 +37,7 @@ llama2_category_data = {
             "Healthcare and Medical Task": 2,
             "Legal Task": 2,
             "Financial Task": 2,
-            "Content Recommendation Task": 1
+            "Content Recommendation Task": 1,
         },
         "Llama-2-70b-chat-hf": {
             "Code Generation Task": 1,
@@ -49,7 +49,7 @@ llama2_category_data = {
             "Healthcare and Medical Task": 1,
             "Legal Task": 1,
             "Financial Task": 1,
-            "Content Recommendation Task": 1   
+            "Content Recommendation Task": 1,
         },
     }
 }

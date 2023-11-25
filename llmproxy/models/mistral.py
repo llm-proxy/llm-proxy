@@ -25,7 +25,7 @@ mistral_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2
+            "Content Recommendation Task": 2,
         },
         "Mistral-7B-Instruct-v0.1": {
             "Code Generation Task": 2,
@@ -37,10 +37,11 @@ mistral_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2 
+            "Content Recommendation Task": 2,
         },
     }
 }
+
 
 class MistralModel(str, BaseEnum):
     Mistral_7B = "Mistral-7B-v0.1"
@@ -136,7 +137,7 @@ class Mistral(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
-    
+
     def get_category_rank(self, category: str = "") -> str:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")

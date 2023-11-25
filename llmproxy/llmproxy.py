@@ -181,12 +181,15 @@ class LLMProxy:
             )
 
         return completion_res
-    
-    def _category_route(self, prompt:str):
+
+    def _category_route(self, prompt: str):
         min_heap = MinHeap()
         classification_model = CategoryModel(prompt=prompt)
         best_fit_category = classification_model.categorize_text()
-        for model_name, instance, in self.user_models.items():
+        for (
+            model_name,
+            instance,
+        ) in self.user_models.items():
             logger.info(msg="========Start Category Routing===========")
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
@@ -208,13 +211,12 @@ class LLMProxy:
             # Attempt to make request to model
             try:
                 # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(
-                    prompt=prompt)
+                output = instance_data["instance"].get_completion(prompt=prompt)
                 if output.payload and not output.err:
                     completion_res = output
                     logger.info("ROUTING COMPLETE! Call to model successful!\n")
                     break
-                    
+
                 else:
                     logger.info("Request to model failed!\n")
                     logger.info(

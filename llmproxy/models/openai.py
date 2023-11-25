@@ -51,7 +51,7 @@ open_ai_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2
+            "Content Recommendation Task": 2,
         },
         "gpt-3.5-turbo-instruct": {
             "Code Generation Task": 2,
@@ -63,7 +63,7 @@ open_ai_category_data = {
             "Healthcare and Medical Task": 3,
             "Legal Task": 3,
             "Financial Task": 3,
-            "Content Recommendation Task": 2
+            "Content Recommendation Task": 2,
         },
         "gpt-4": {
             "Code Generation Task": 1,
@@ -75,7 +75,7 @@ open_ai_category_data = {
             "Healthcare and Medical Task": 2,
             "Legal Task": 2,
             "Financial Task": 2,
-            "Content Recommendation Task": 1
+            "Content Recommendation Task": 1,
         },
         "gpt-4-32k": {
             "Code Generation Task": 1,
@@ -87,7 +87,7 @@ open_ai_category_data = {
             "Healthcare and Medical Task": 2,
             "Legal Task": 2,
             "Financial Task": 2,
-            "Content Recommendation Task": 1 
+            "Content Recommendation Task": 1,
         },
     }
 }
@@ -188,6 +188,6 @@ class OpenAI(BaseModel):
         category_rank = open_ai_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-        
+
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)

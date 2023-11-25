@@ -28,10 +28,11 @@ vertexai_category_data = {
             "Healthcare and Medical Task": 2,
             "Legal Task": 2,
             "Financial Task": 2,
-            "Content Recommendation Task": 1
+            "Content Recommendation Task": 1,
         },
     }
 }
+
 
 class VertexAIModel(str, BaseEnum):
     # Add other models
@@ -120,7 +121,7 @@ class VertexAI(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
-    
+
     def get_category_rank(self, category: str = "") -> str:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
