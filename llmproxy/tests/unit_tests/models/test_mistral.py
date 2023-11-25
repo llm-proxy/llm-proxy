@@ -1,6 +1,6 @@
 import os
 
-from llmproxy.models.mistral import Mistral
+from llmproxy.provider.huggingface.mistral import Mistral
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")
@@ -63,10 +63,14 @@ def test_mistral_temperature_under_0() -> None:
 
 def test_get_estimated_max_cost():
     # Arrange
-    mistral = Mistral(api_key=mistral_api_key,)
+    mistral = Mistral(
+        api_key=mistral_api_key,
+    )
     prompt = "I am a cat in a hat!"
     estimated_cost = 0.0000954
 
     # Act
     actual_cost = mistral.get_estimated_max_cost(prompt=prompt)
-    assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+    assert (
+        actual_cost == estimated_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

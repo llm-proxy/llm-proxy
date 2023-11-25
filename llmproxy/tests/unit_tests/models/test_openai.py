@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from llmproxy.models.openai import OpenAI
+from llmproxy.provider.openai.chatgpt import OpenAI
 from openai import error
 from unittest.mock import patch
 
@@ -25,7 +25,7 @@ def test_unsupported_model():
 
 
 def test_generic_exception():
-    with patch('openai.ChatCompletion.create', side_effect=Exception("Random error")):
+    with patch("openai.ChatCompletion.create", side_effect=Exception("Random error")):
         chatbot = OpenAI(api_key=openai_api_key)
         try:
             chatbot.get_completion()
@@ -34,7 +34,10 @@ def test_generic_exception():
 
 
 def test_openai_rate_limit_error():
-    with patch('openai.ChatCompletion.create', side_effect=error.OpenAIError("Rate limit exceeded")):
+    with patch(
+        "openai.ChatCompletion.create",
+        side_effect=error.OpenAIError("Rate limit exceeded"),
+    ):
         chatbot = OpenAI(api_key=openai_api_key)
         response = chatbot.get_completion()
         assert response.err == "OpenAIError"
@@ -51,4 +54,6 @@ def test_get_estimated_max_cost():
     actual_cost = gpt.get_estimated_max_cost(prompt=prompt)
 
     # Assert
-    assert actual_cost == expected_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+    assert (
+        actual_cost == expected_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from llmproxy.models.cohere import Cohere
+from llmproxy.provider.cohere.cohere import Cohere
 
 load_dotenv(".env.test")
 
@@ -18,4 +18,6 @@ def test_get_estimated_max_cost():
 
     prompt = "I am a cat in a hat!"
     actual_cost = cohere.get_estimated_max_cost(prompt=prompt)
-    assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+    assert (
+        actual_cost == estimated_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

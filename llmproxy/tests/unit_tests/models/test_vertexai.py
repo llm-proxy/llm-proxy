@@ -5,7 +5,7 @@ They are suppressed and will be addressed later
 
 import os
 
-from llmproxy.models.vertexai import VertexAI
+from llmproxy.provider.google.vertexai import VertexAI
 from dotenv import load_dotenv
 import unittest
 
@@ -47,7 +47,9 @@ def test_get_estimated_max_cost():
     actual_cost = vertex.get_estimated_max_cost(prompt=prompt)
 
     # Assert
-    assert actual_cost == expected_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+    assert (
+        actual_cost == expected_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"
 
 
 class TestVertexAIErrors(unittest.TestCase):
@@ -66,7 +68,7 @@ if __name__ == "__main__":
 
 # test not working properly
 # will fix in a different PR
-'''
+"""
 def test_invalid_credentials(monkeypatch) -> None:
     #Arrange
     monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "TEST")
@@ -77,4 +79,4 @@ def test_invalid_credentials(monkeypatch) -> None:
 
     #Assert
     assert "was not found" in response.message
-'''
+"""

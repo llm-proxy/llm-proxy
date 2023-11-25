@@ -1,5 +1,5 @@
 import os
-from llmproxy.models.llama2 import Llama2, Llama2Model
+from llmproxy.provider.huggingface.llama2 import Llama2, Llama2Model
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")
@@ -13,7 +13,10 @@ default_model = Llama2Model.LLAMA_2_7B.value
 
 def test_llama2_empty_prompt() -> None:
     llama2_empty_prompt = Llama2(
-        prompt="", system_prompt=default_system_prompt, model=default_model, api_key=default_api_key
+        prompt="",
+        system_prompt=default_system_prompt,
+        model=default_model,
+        api_key=default_api_key,
     )
     output = llama2_empty_prompt.get_completion()
     assert output.message == "No prompt detected"
@@ -72,4 +75,6 @@ def test_get_estimated_max_cost():
     actual_cost = llama2.get_estimated_max_cost(prompt=prompt)
 
     # Assert
-    assert actual_cost == estimated_cost, "NOTE: Flaky test may need to be changed/removed in future based on pricing"
+    assert (
+        actual_cost == estimated_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"
