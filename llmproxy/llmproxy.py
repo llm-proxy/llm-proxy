@@ -190,12 +190,16 @@ class LLMProxy:
             model_name,
             instance,
         ) in self.user_models.items():
-            logger.info(msg="========Start Category Routing===========")
+            logger.info(
+                msg="========Start fetching model for category routing==========="
+            )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            logger.info(msg="SORTING MODELS...")
-            logger.info(msg="========End Category Routing=============\n")
+            logger.info(msg="Sorting fetched models based on proficency...")
+            logger.info(
+                msg="========Finished fetching model for category routing=============\n"
+            )
 
         completion_res = None
         while not completion_res:
