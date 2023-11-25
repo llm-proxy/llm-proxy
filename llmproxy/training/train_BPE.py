@@ -5,8 +5,7 @@ from tokenizers.pre_tokenizers import Whitespace
 
 tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
 
-trainer = BpeTrainer(
-    special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"])
+trainer = BpeTrainer(special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"])
 
 pre_tokenizer = pre_tokenizers.Metaspace(
     special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"]
