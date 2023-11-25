@@ -1,4 +1,5 @@
 from transformers import pipeline
+from llmproxy.utils.log import logger
 
 class CategoryModel:
     def __init__(self, prompt: str = "") -> None:
@@ -18,10 +19,11 @@ class CategoryModel:
             "Financial Task",
             "Content Recommendation Task",
         ]
+        logger.info(msg="Classification model is classifying the user prompt")
         classifier = pipeline(
             task="zero-shot-classification", model=self.model
         )
-
+        logger.info(msg="The prompt has been classified\n")
         results = classifier(self.prompt, candidate_labels)
         best_category = results["labels"][0]
 

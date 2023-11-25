@@ -187,11 +187,11 @@ class LLMProxy:
         classification_model = CategoryModel(prompt=prompt)
         best_fit_category = classification_model.categorize_text()
         for model_name, instance, in self.user_models.items():
-            logger.info(msg="========Start Category Routing===========\n")
+            logger.info(msg="========Start Category Routing===========")
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            logger.info(msg="SORTING MODELS...\n")
+            logger.info(msg="SORTING MODELS...")
             logger.info(msg="========End Category Routing=============\n")
 
         completion_res = None
