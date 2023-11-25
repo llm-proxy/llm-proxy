@@ -34,17 +34,30 @@ def test_invalid_model() -> None:
 
 # TODO: ADD TEST
 def test_get_settings_from_yml() -> None:
-    pass
+    settings = _get_settings_from_yml(
+        path_to_yml=f"{CURRENT_DIRECTORY}/get_setting_test.yml"
+    )
+    assert settings == "This setting is working"
 
 
 # TODO: ADD TEST
 def test_setup_available_models() -> None:
-    pass
+    settings = _get_settings_from_yml(
+        path_to_yml=f"{CURRENT_DIRECTORY}/setup_available_model_test.yml"
+    )
+    available_model = _setup_available_models(settings=settings)
+    print(type(available_model))
+    assert type(available_model) is dict
 
 
 # TODO: ADD TEST
 def test_setup_user_models() -> None:
-    pass
+    settings = _get_settings_from_yml(
+        path_to_yml=f"{CURRENT_DIRECTORY}/setup_user_setting_test.yml"
+    )
+    available_model = _setup_available_models(settings=settings)
+    user_model = _setup_user_models(settings=settings, available_models=available_model)
+    assert type(user_model) is dict
 
 
 # TODO: More of an integration test, move later

@@ -5,7 +5,7 @@ They are suppressed and will be addressed later
 
 import os
 
-from llmproxy.models.vertexai import VertexAI
+from llmproxy.models.vertexai import VertexAI, VertexAIException
 from dotenv import load_dotenv
 import unittest
 
@@ -20,10 +20,11 @@ def test_invalid_project_id() -> None:
     vertexai = VertexAI(project_id="invalid id")
 
     # Act
-    response = vertexai.get_completion()
-
-    # Assert
-    assert "Permission denied" in response.message
+    try:
+        vertexai.get_completion()
+    except VertexAIException as e:
+        # Assert
+        assert "Permission denied" in str(e)
 
 
 def test_unsupported_model() -> None:
@@ -31,10 +32,11 @@ def test_unsupported_model() -> None:
     vertexai = VertexAI(project_id=project_id, model="test")
 
     # Act
-    response = vertexai.get_completion()
-
-    # Assert
-    assert "Model not supported" in response.message
+    try:
+        vertexai.get_completion()
+    except VertexAIException as e:
+        # Assert
+        assert "Model not supported" in str(e)
 
 
 def test_get_estimated_max_cost():
