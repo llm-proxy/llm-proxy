@@ -13,6 +13,35 @@ mistral_price_data = {
     },
 }
 
+mistral_category_data = {
+    "model-categories": {
+        "Mistral-7B-v0.1": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2,
+        },
+        "Mistral-7B-Instruct-v0.1": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2,
+        },
+    }
+}
+
 
 class MistralModel(str, BaseEnum):
     Mistral_7B = "Mistral-7B-v0.1"
@@ -108,3 +137,10 @@ class Mistral(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
+
+    def get_category_rank(self, category: str = "") -> str:
+        logger.info(msg=f"Current model: {self.model}")
+        logger.info(msg=f"Category of prompt: {category}")
+        category_rank = mistral_category_data["model-categories"][self.model][category]
+        logger.info(msg=f"Rank of category: {category_rank}")
+        return category_rank
