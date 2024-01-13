@@ -99,6 +99,7 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
     except Exception as e:
         raise e
 
+
 class LLMProxy:
     def __init__(
         self,

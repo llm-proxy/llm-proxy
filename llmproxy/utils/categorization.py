@@ -1,6 +1,7 @@
 from transformers import pipeline
 from llmproxy.utils.log import logger
 
+
 def categorize_text(prompt: str) -> str:
     model = "facebook/bart-large-mnli"
     candidate_labels = [
