@@ -11,6 +11,59 @@ cohere_price_data_summarize_generate_chat = {
     },
 }
 
+cohere_category_data = {
+    "model-categories": {
+        "command": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2,
+        },
+        "command-light": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 2,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 4,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
+        "command-nightly": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2,
+        },
+        "command-light-nightly": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 2,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 4,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
+    }
+}
+
 
 # These are the "Models" only for chat/command
 class CohereModel(str, BaseEnum):
@@ -104,6 +157,13 @@ class Cohere(BaseModel):
         logger.info(f"Calculated Cost: {cost}")
 
         return cost
+
+    def get_category_rank(self, category: str = "") -> str:
+        logger.info(msg=f"Current model: {self.model}")
+        logger.info(msg=f"Category of prompt: {category}")
+        category_rank = cohere_category_data["model-categories"][self.model][category]
+        logger.info(msg=f"Rank of category: {category_rank}")
+        return category_rank
 
     def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
         return CompletionResponse(message=exception, err=error_type)
