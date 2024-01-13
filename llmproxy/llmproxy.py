@@ -1,12 +1,11 @@
 import os
 import yaml
 import importlib
-from llmproxy.models.cohere import Cohere
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
-from transformers import pipeline
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
+from llmproxy.utils import categorization
 
 from dotenv import load_dotenv
 
@@ -100,29 +99,6 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
     except Exception as e:
         raise e
 
-
-def categorize_text(prompt: str) -> str:
-    model = "facebook/bart-large-mnli"
-    candidate_labels = [
-        "Code Generation Task",
-        "Text Generation Task",
-        "Translation and Multilingual Applications Task",
-        "Natural Language Processing Task",
-        "Conversational AI Task",
-        "Educational Applications Task",
-        "Healthcare and Medical Task",
-        "Legal Task",
-        "Financial Task",
-        "Content Recommendation Task",
-    ]
-    logger.info(msg="Classification model is classifying the user prompt")
-    classifier = pipeline(task="zero-shot-classification", model=model)
-    logger.info(msg="The prompt has been classified\n")
-    results = classifier(prompt, candidate_labels)
-    best_category = results["labels"][0]
-    return best_category
-
-
 class LLMProxy:
     def __init__(
         self,
@@ -206,7 +182,7 @@ class LLMProxy:
 
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
-        best_fit_category = categorize_text(prompt)
+        best_fit_category = categorization.categorize_text(prompt)
         for (
             model_name,
             instance,
