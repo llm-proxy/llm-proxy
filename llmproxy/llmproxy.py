@@ -7,7 +7,6 @@ from typing import Any, Dict
 from transformers import pipeline
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
-from llmproxy.utils.category_model import CategoryModel
 
 from dotenv import load_dotenv
 
