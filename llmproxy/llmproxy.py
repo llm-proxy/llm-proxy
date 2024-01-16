@@ -6,8 +6,16 @@ from typing import Any, Dict
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
 from llmproxy.utils import categorization
+import signal
 
 from dotenv import load_dotenv
+
+
+class TimesUpError(RuntimeError):
+    pass
+
+def handler(signum, frame):
+    raise TimesUpError
 
 
 class RouteType(str, BaseEnum):
@@ -210,6 +218,11 @@ class LLMProxy:
             logger.info(f"Making request to model: {instance_data['name']}\n")
             logger.info("ROUTING...\n")
 
+
+
+            # # Timeout if request takes too long
+            # signal.signal(signal.SIGALRM, handler)
+            # signal.alarm(10)
             # Attempt to make request to model
             try:
                 # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
@@ -224,6 +237,9 @@ class LLMProxy:
                     logger.info(
                         f"Error when making request to model: '{output.message}'\n"
                     )
+            except TimesUpError as e:
+                logger.info("Request timed out, queing next model")
+
             except Exception as e:
                 logger.info("Request to model failed!\n")
                 logger.info(f"Error when making request to model: {e}\n")

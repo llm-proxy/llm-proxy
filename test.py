@@ -9,7 +9,7 @@ def main() -> None:
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
     proxy_client = LLMProxy(path_to_configuration="api_configuration.yml")
-    output = proxy_client.route(route_type="category", prompt=prompt)
+    output = proxy_client.route(route_type="cost", prompt=prompt)
     print(output.payload)
 
 
