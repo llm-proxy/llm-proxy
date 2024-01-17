@@ -100,7 +100,7 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
 class CompletionResponse:
     """
     response: Data on successful response else ""
-    errors: List of all models and exceptions they raised
+    errors: List of all models and exceptions - if raised
     """
 
     response: str = ""
@@ -172,6 +172,7 @@ class LLMProxy:
                 logger.warning(f"Request to model {instance_data['name']}failed!\n")
                 logger.warning(f"Error when making request to model: {e}\n")
 
+        # If all model fails raise an Exception to notify user
         if not completion_res:
             raise Exception(
                 "Requests to all models failed! Please check your configuration!"
