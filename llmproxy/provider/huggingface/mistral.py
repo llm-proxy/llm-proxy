@@ -15,10 +15,10 @@ mistral_price_data = {
             "completion": 0.25 / 1_000_000,
         },
         # priced per second
-        "Mistral-7B-Instruct-v0.1": {
-            "prompt": 0,
-            "completion": 0,
-        },
+        # "Mistral-7B-Instruct-v0.1": {
+        #     "prompt": 0,
+        #     "completion": 0,
+        # },
 
         "Mistral-7B-Instruct-v0.2": {
             "prompt": 0.05 / 1_000_000,
@@ -74,7 +74,7 @@ class Mistral(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
-        model: MistralModel = MistralModel.Mistral_7B_Instruct_V01.value,
+        model: MistralModel = MistralModel.Mistral_7B_V01.value,
         api_key: str = "",
         temperature: float = 1.0,
         max_output_tokens: int = None,
