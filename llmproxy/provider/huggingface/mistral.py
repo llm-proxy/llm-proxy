@@ -137,10 +137,10 @@ class Mistral(BaseProvider):
         # Assumption, model exists (check should be done at yml load level)
         logger.info(f"Tokenizing model: {self.model}")
 
-        prompt_cost_per_token = mistral_price_data["model-costs"]["prompt"]
+        prompt_cost_per_token = mistral_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = mistral_price_data["model-costs"]["completion"]
+        completion_cost_per_token = mistral_price_data["model-costs"][self.model]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
