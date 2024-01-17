@@ -11,23 +11,23 @@ mistral_price_data = {
     "model-costs": {
         # Cost per 1k tokens * 1000
         "Mistral-7B-v0.1": {
-            "prompt": 0,
-            "completion": 0,
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
         },
-
+        # priced per second
         "Mistral-7B-Instruct-v0.1": {
             "prompt": 0,
             "completion": 0,
         },
 
         "Mistral-7B-Instruct-v0.2": {
-            "prompt": 0,
-            "completion": 0,
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
         },
 
         "Mistral-8x7B-Instruct-v0.1": {
-            "prompt": 0,
-            "completion": 0,
+            "prompt": 0.30 / 1_000_000,
+            "completion": 1.0 / 1_000_000,
         },
        
     },
