@@ -1,5 +1,5 @@
 import cohere
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.models.base import BaseModel
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 
@@ -93,7 +93,7 @@ class Cohere(BaseModel):
         except cohere.CohereError as e:
             raise CohereException(exception=e, error_type=ValueError)
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in CohereModel:
             raise CohereException(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
@@ -108,11 +108,7 @@ class Cohere(BaseModel):
                 model=self.model,
                 temperature=self.temperature,
             )
-            return CompletionResponse(
-                payload=response.text,
-                message="OK",
-                err="",
-            )
+            return response.text
         except cohere.CohereError as e:
             return CohereException(exception=e.message, error_type=e.http_status)
         except Exception as e:

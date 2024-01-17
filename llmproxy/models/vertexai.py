@@ -1,7 +1,7 @@
 from google.cloud import aiplatform
 from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.models.base import BaseModel
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
@@ -57,7 +57,7 @@ class VertexAI(BaseModel):
         self.location = location
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in VertexAIModel:
             raise VertexAIException(
                 exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
@@ -82,12 +82,12 @@ class VertexAI(BaseModel):
             raise VertexAIException(exception=e.args[0], error_type=type(e).__name__)
         except auth_exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
-            return VertexAIException(exception=e.args[0], error_type=type(e).__name__)
+            raise VertexAIException(exception=e.args[0], error_type=type(e).__name__)
         except Exception as e:
             logger.error(e.args[0])
             raise Exception(f"Unknown Vertexai Error:{e}")
 
-        return CompletionResponse(payload=output, message="OK", err="")
+        return output
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

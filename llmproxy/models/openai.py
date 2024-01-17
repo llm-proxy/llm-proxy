@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.models.base import BaseModel
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 import openai
@@ -118,7 +118,7 @@ class OpenAI(BaseModel):
         openai.api_key = api_key
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in OpenAIModel:
             raise OpenAIException(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
@@ -143,11 +143,7 @@ class OpenAI(BaseModel):
                 exception=e.args[0], error_type="Unknown OpenAI Error"
             )
 
-        return CompletionResponse(
-            payload=response.choices[0].message["content"],
-            message="OK",
-            err="",
-        )
+        return response.choices[0].message["content"]
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

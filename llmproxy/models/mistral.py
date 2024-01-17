@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.models.base import BaseModel
 from llmproxy.utils.enums import BaseEnum
 import requests
 from llmproxy.utils.log import logger
@@ -63,7 +63,7 @@ class Mistral(BaseModel):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in MistralModel:
             raise MistralException(
                 exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
@@ -102,11 +102,7 @@ class Mistral(BaseModel):
         else:
             raise ValueError("Unknown output format")
 
-        return CompletionResponse(
-            payload=response,
-            message=message,
-            err="",
-        )
+        return response
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

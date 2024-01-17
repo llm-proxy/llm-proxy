@@ -161,14 +161,8 @@ class LLMProxy:
             try:
                 # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
                 output = instance_data["instance"].get_completion(prompt=prompt)
-                if output.payload and not output.err:
-                    completion_res = output
-                    logger.info("ROUTING COMPLETE! Call to model successful!\n")
-                else:
-                    logger.info("Request to model failed!\n")
-                    logger.info(
-                        f"Error when making request to model: '{output.message}'\n"
-                    )
+                completion_res = output
+                logger.info("ROUTING COMPLETE! Call to model successful!\n")
             except Exception as e:
                 logger.info("Request to model failed!\n")
                 logger.info(f"Error when making request to model: {e}\n")
@@ -214,16 +208,8 @@ class LLMProxy:
             try:
                 # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
                 output = instance_data["instance"].get_completion(prompt=prompt)
-                if output.payload and not output.err:
-                    completion_res = output
-                    logger.info("ROUTING COMPLETE! Call to model successful!\n")
-                    break
-
-                else:
-                    logger.info("Request to model failed!\n")
-                    logger.info(
-                        f"Error when making request to model: '{output.message}'\n"
-                    )
+                completion_res = output
+                logger.info("ROUTING COMPLETE! Call to model successful!\n")
             except Exception as e:
                 logger.info("Request to model failed!\n")
                 logger.info(f"Error when making request to model: {e}\n")

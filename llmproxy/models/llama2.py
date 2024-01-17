@@ -1,5 +1,5 @@
 import requests
-from llmproxy.models.base import BaseModel, CompletionResponse
+from llmproxy.models.base import BaseModel
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
@@ -78,7 +78,7 @@ class Llama2(BaseModel):
         self.model = model
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         # If empty api key
         if not self.api_key:
             raise Llama2Exception(exception="No API Provided", error_type="InputError")
@@ -120,7 +120,7 @@ class Llama2(BaseModel):
         if output["error"]:
             raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
-        return CompletionResponse(payload=output, message="OK", err="")
+        return output
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -163,5 +163,5 @@ class Llama2(BaseModel):
 
 
 class Llama2Exception(Exception):
-    def __init__(self, exception: str, error_type: str) -> CompletionResponse:
+    def __init__(self, exception: str, error_type: str) -> None:
         super().__init__(f"Llama2 Error: {exception}, Type: {error_type}")
