@@ -9,8 +9,27 @@ from llmproxy.utils import tokenizer
 mistral_price_data = {
     "max-output-tokens": 50,
     "model-costs": {
-        "prompt": 1.30 / 1_000_000,
-        "completion": 1.70 / 1_000_000,
+        # Cost per 1k tokens * 1000
+        "Mistral-7B-v0.1": {
+            "prompt": 0,
+            "completion": 0,
+        },
+
+        "Mistral-7B-Instruct-v0.1": {
+            "prompt": 0,
+            "completion": 0,
+        },
+
+        "Mistral-7B-v0.1": {
+            "prompt": 0,
+            "completion": 0,
+        },
+
+        "Mistral-7B-v0.1": {
+            "prompt": 0,
+            "completion": 0,
+        },
+       
     },
 }
 
@@ -45,15 +64,17 @@ mistral_category_data = {
 
 
 class MistralModel(str, BaseEnum):
-    Mistral_7B = "Mistral-7B-v0.1"
-    Mistral_7B_Instruct = "Mistral-7B-Instruct-v0.1"
+    Mistral_7B_V01 = "Mistral-7B-v0.1"
+    Mistral_7B_Instruct_V01 = "Mistral-7B-Instruct-v0.1"
+    Mistral_7B_Instruct_V02 = "Mistral-7B-Instruct-v0.2"
+    Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
 
 
 class Mistral(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
-        model: MistralModel = MistralModel.Mistral_7B_Instruct.value,
+        model: MistralModel = MistralModel.Mistral_7B_Instruct_V01.value,
         api_key: str = "",
         temperature: float = 1.0,
         max_output_tokens: int = None,
