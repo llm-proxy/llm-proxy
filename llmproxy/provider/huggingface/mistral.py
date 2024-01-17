@@ -20,12 +20,12 @@ mistral_price_data = {
             "completion": 0,
         },
 
-        "Mistral-7B-v0.1": {
+        "Mistral-7B-Instruct-v0.2": {
             "prompt": 0,
             "completion": 0,
         },
 
-        "Mistral-7B-v0.1": {
+        "Mistral-8x7B-Instruct-v0.1": {
             "prompt": 0,
             "completion": 0,
         },
