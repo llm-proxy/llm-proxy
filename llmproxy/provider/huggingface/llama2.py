@@ -61,19 +61,19 @@ llama2_category_data = {
 
 
 class Llama2Model(str, BaseEnum):
-    #PREVIOUS
+    # PREVIOUS
     LLAMA_2_7B_CHAT_HF = "Llama-2-7b-chat-hf"
     LLAMA_2_7B_CHAT = "Llama-2-7b-chat"
     LLAMA_2_7B_HF = "Llama-2-7b-hf"
     LLAMA_2_7B = "Llama-2-7b"
 
-    #PREVIOUS
+    # PREVIOUS
     LLAMA_2_13B_CHAT_HF = "Llama-2-13b-chat-hf"
     LLAMA_2_13B_CHAT = "Llama-2-13b-chat"
     LLAMA_2_13B_HF = "Llama-2-13b-hf"
     LLAMA_2_13B = "Llama-2-13b"
 
-    #PREVIOUS
+    # PREVIOUS
     LLAMA_2_70B_CHAT_HF = "Llama-2-70b-chat-hf"
     LLAMA_2_70B_CHAT = "Llama-2-70b-chat"
     LLAMA_2_70B_HF = "Llama-2-70b-hf"
