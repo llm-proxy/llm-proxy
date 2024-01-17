@@ -16,7 +16,9 @@ CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 # TODO: FIX
 def test_empty_model() -> None:
     with pytest.raises(Exception, match="No models provided in user_settings"):
-        settings = _get_settings_from_yml(path_to_yml="empty_model_test.yml")
+        settings = _get_settings_from_yml(
+            path_to_yml=f"{CURRENT_DIRECTORY}/empty_model_test.yml"
+        )
         available_model = _setup_available_models(settings=settings)
         user_model = _setup_user_models(
             settings=settings, available_models=available_model
@@ -24,8 +26,10 @@ def test_empty_model() -> None:
 
 
 def test_invalid_model() -> None:
-    with pytest.raises(Exception, match="test is not a valid model"):
-        settings = _get_settings_from_yml(path_to_yml="invalid_model_test.yml")
+    with pytest.raises(Exception, match="test is not available"):
+        settings = _get_settings_from_yml(
+            path_to_yml=f"{CURRENT_DIRECTORY}/invalid_model_test.yml"
+        )
         available_model = _setup_available_models(settings=settings)
         user_model = _setup_user_models(
             settings=settings, available_models=available_model
@@ -73,7 +77,6 @@ def test_cost_routing() -> None:
 
     # Act
     output = proxy_client.route(route_type="cost", prompt=prompt)
-
+    print(output)
     # Assert
-    assert output.payload
-    assert not output.err
+    assert "that is an apple" in output
