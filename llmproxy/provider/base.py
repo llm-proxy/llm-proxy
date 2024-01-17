@@ -18,7 +18,7 @@ class CompletionResponse:
     err: str = ""
 
 
-class BaseModel(ABC):
+class BaseProvider(ABC):
     """Abstract based class used to interface with (Language) Models.
     Current only one: Language.
     Likely more to be introduced if more types of LLMs are introduced (Speech, CNNs, Video...)

@@ -1,7 +1,6 @@
 import os
 import yaml
 import importlib
-from llmproxy.provider.cohere.cohere import Cohere
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict
 from llmproxy.utils.log import logger
@@ -105,7 +104,7 @@ class LLMProxy:
     def __init__(
         self,
         path_to_user_configuration: str = "api_configuration.yml",
-        path_to_dev_configuration: str = "developer_configuration.yml",
+        path_to_dev_configuration: str = "llmproxy/config/internal_configuration.yml",
         path_to_env_vars: str = ".env",
     ) -> None:
         self.user_models = {}
