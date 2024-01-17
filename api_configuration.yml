@@ -47,7 +47,7 @@ user_settings:
     models:
       - Mistral-7B-v0.1
       - Mistral-7B-Instruct-v0.1
-
+      
   - model: VertexAI 
     temperature: 0.1
     project_id_var: GOOGLE_PROJECT_ID 

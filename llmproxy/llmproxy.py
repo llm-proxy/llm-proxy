@@ -1,18 +1,15 @@
+from dataclasses import dataclass, field
 import os
 import yaml
 import importlib
 from llmproxy.utils.enums import BaseEnum
-from typing import Any, Dict
+from typing import Any, Dict, Literal
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
 from llmproxy.utils import categorization
+from typing import List, Any
 
 from dotenv import load_dotenv
-
-
-class RouteType(str, BaseEnum):
-    COST = "cost"
-    CATEGORY = "category"
 
 
 def _get_settings_from_yml(
@@ -99,6 +96,20 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
     except Exception as e:
         raise e
 
+@dataclass
+class CompletionResponse:
+    """
+    response: Data on successful response else ""
+    errors: List of all models and exceptions they raised
+    """
+
+    response: str = ""
+    errors: List = field(default_factory=list)
+    
+class RouteType(str, BaseEnum):
+    COST = "cost"
+    CATEGORY = "category"
+
 
 class LLMProxy:
     def __init__(
@@ -107,34 +118,27 @@ class LLMProxy:
         path_to_env_vars: str = ".env",
     ) -> None:
         self.user_models = {}
-        self.route_type = "cost"
 
         load_dotenv(path_to_env_vars)
 
-        # Read YML and see which models the user wants
         settings = _get_settings_from_yml(path_to_yml=path_to_configuration)
-        # Setup available models
         available_models = _setup_available_models(settings=settings)
-
         self.user_models = _setup_user_models(
             settings=settings, available_models=available_models
         )
         self.available_models = available_models
 
-    # TODO: ROUTE TO ONLY AVAILABLE MODELS (check with adrian about this)
-    # Do you want the model to route to the first available model
-    # or just send back an error?
     def route(
-        self, route_type: RouteType = RouteType.COST.value, prompt: str = ""
-    ) -> str:
-        if route_type not in RouteType:
-            return "Sorry routing option available"
-
-        if (route_type or self.route) == "cost":
-            return self._cost_route(prompt=prompt)
-
-        elif (route_type or self.route) == "category":
-            return self._category_route(prompt=prompt)
+        self, route_type: Literal["cost", "category"], prompt: str = ""
+    ) -> CompletionResponse:
+        
+        match RouteType(route_type.lower()):
+            case RouteType.COST:
+                return self._cost_route(prompt=prompt)
+            case RouteType.CATEGORY:
+                return self._category_route(prompt=prompt)
+            case _:
+                raise ValueError("Invalid route type, please try again")
 
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
@@ -147,6 +151,7 @@ class LLMProxy:
             min_heap.push(cost, item)
 
         completion_res = None
+        errors = []
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -154,26 +159,26 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
+            print(f"HELLO:{instance_data}")
             logger.info(f"Making request to model: {instance_data['name']}\n")
             logger.info("ROUTING...\n")
 
             # Attempt to make request to model
             try:
-                # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(prompt=prompt)
-                completion_res = output
-                logger.info("ROUTING COMPLETE! Call to model successful!\n")
+                completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                logger.info("==========ROUTING COMPLETE! Call to model successful!==========\n")
             except Exception as e:
-                logger.info("Request to model failed!\n")
-                logger.info(f"Error when making request to model: {e}\n")
+                errors.append({"mode_name":instance_data["name"], "error": e})
+                logger.warning(f"Request to model {instance_data['name']}failed!\n")
+                logger.warning(f"Error when making request to model: {e}\n")
 
-        # If there is no completion_res raise exception
         if not completion_res:
             raise Exception(
                 "Requests to all models failed! Please check your configuration!"
             )
 
-        return completion_res
+
+        return CompletionResponse(response=completion_res, errors=errors)
 
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
@@ -194,6 +199,7 @@ class LLMProxy:
             )
 
         completion_res = None
+        errors = []
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -206,17 +212,16 @@ class LLMProxy:
 
             # Attempt to make request to model
             try:
-                # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(prompt=prompt)
-                completion_res = output
+                completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
             except Exception as e:
-                logger.info("Request to model failed!\n")
-                logger.info(f"Error when making request to model: {e}\n")
+                errors.append({"mode_name":instance_data["name"], "error": e})
+                logger.warning("Request to model failed!\n")
+                logger.warning(f"Error when making request to model: {e}\n")
 
-        # If there is no completion_res raise exception
         if not completion_res:
             raise Exception(
                 "Requests to all models failed! Please check your configuration!"
             )
-        return completion_res
+
+        return CompletionResponse(response=completion_res, errors=errors)

@@ -10,7 +10,8 @@ def main() -> None:
     # print(output)
     proxy_client = LLMProxy(path_to_configuration="api_configuration.yml")
     output = proxy_client.route(route_type="cost", prompt=prompt)
-    print(output)
+    print(output.response)
+    print(output.errors)
 
 
 if __name__ == "__main__":
