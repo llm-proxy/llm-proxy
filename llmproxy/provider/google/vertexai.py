@@ -1,7 +1,7 @@
 from google.cloud import aiplatform
 from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.models.base import BaseModel
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
@@ -40,7 +40,7 @@ class VertexAIModel(str, BaseEnum):
     PALM_CHAT = "chat-bison"
 
 
-class VertexAI(BaseModel):
+class VertexAI(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
@@ -79,13 +79,19 @@ class VertexAI(BaseModel):
 
         except api_exceptions.GoogleAPIError as e:
             logger.error(e.args[0])
-            raise VertexAIException(exception=e.args[0], error_type=type(e).__name__)
+            raise VertexAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
         except auth_exceptions.GoogleAuthError as e:
             logger.error(e.args[0])
-            raise VertexAIException(exception=e.args[0], error_type=type(e).__name__)
+            raise VertexAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
         except Exception as e:
             logger.error(e.args[0])
-            raise Exception(f"Unknown Vertexai Error:{e}")
+            raise VertexAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
 
         return output
 

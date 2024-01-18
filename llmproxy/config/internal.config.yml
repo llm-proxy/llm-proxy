@@ -1,19 +1,3 @@
-llm_proxy:
-  name: LLM proxy API
-  version: demo 1.0
-  description: An API that act as a proxy to multiple language models
-
-user_settings:
-  # Example
-  # - routing_mode:
-  #   - cost_routing:
-  #       enable: false
-
-  - model: OpenAI
-    api_key_var: OPENAI_API_KEY # .env name for api key
-    max_output_tokens: 10000
-    temperature: 1.0
-
 available_models:
   - name: OpenAI
     class: llmproxy.provider.openai.chatgpt.OpenAI
@@ -49,3 +33,29 @@ available_models:
       - name: Mistral-7B-Instruct-v0.1
         cost_per_hour: 0.06
 
+  - name: Cohere
+    class: llmproxy.provider.cohere.cohere.Cohere
+    models:
+      - name: command
+        cost_per_token_input: 0.0000015
+        cost_per_token_output: 0.000002
+      - name: command-light
+        cost_per_token_input: 0.0000015
+        cost_per_token_output: 0.000002
+      - name: command-nightly
+        cost_per_token_input: 0.0000015
+        cost_per_token_output: 0.000002
+      - name: command-light-nightly
+        cost_per_token_input: 0.0000015
+        cost_per_token_output: 0.000002
+
+  - name: Vertexai
+    class: llmproxy.provider.google.vertexai.VertexAI
+    models:
+      - name: text-bison
+        cost_per_token_input: 0.0000015
+        cost_per_token_output: 0.000002
+      # Currently not working
+      # - name: chat-bison-32k
+      #   cost_per_token_input: 0.000002
+      #   cost_per_token_output: 0.000002

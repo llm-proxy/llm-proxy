@@ -1,6 +1,10 @@
 import os
 
+<<<<<<< HEAD
 from llmproxy.models.mistral import Mistral, MistralException
+=======
+from llmproxy.provider.huggingface.mistral import Mistral
+>>>>>>> main
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")

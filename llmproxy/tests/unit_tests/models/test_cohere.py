@@ -1,7 +1,11 @@
 import os
 from dotenv import load_dotenv
+<<<<<<< HEAD
 from llmproxy.models.cohere import Cohere, CohereModel
 import pytest
+=======
+from llmproxy.provider.cohere.cohere import Cohere, CohereModel
+>>>>>>> main
 
 load_dotenv(".env.test")
 

@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseModel
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 import requests
 from llmproxy.utils.log import logger
@@ -48,7 +48,7 @@ class MistralModel(str, BaseEnum):
     Mistral_7B_Instruct = "Mistral-7B-Instruct-v0.1"
 
 
-class Mistral(BaseModel):
+class Mistral(BaseProvider):
     def __init__(
         self,
         prompt: str = "",

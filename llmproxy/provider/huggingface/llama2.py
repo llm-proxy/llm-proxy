@@ -1,5 +1,5 @@
 import requests
-from llmproxy.models.base import BaseModel
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
@@ -61,7 +61,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B = "Llama-2-70b-chat-hf"
 
 
-class Llama2(BaseModel):
+class Llama2(BaseProvider):
     def __init__(
         self,
         prompt: str = "",

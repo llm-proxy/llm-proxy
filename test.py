@@ -8,9 +8,17 @@ def main() -> None:
     prompt = "what is 1+1?"
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
+<<<<<<< HEAD
     proxy_client = LLMProxy(path_to_configuration="api_configuration.yml")
     output = proxy_client.route(route_type="cost", prompt=prompt)
     print(output)
+=======
+    proxy_client = LLMProxy(
+        path_to_user_configuration="llmproxy.config.yml",
+    )
+    output = proxy_client.route(route_type="cost", prompt=prompt)
+    print(output.payload)
+>>>>>>> main
 
 
 if __name__ == "__main__":

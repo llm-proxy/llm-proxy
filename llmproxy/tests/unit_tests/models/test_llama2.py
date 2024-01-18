@@ -1,5 +1,9 @@
 import os
+<<<<<<< HEAD
 from llmproxy.models.llama2 import Llama2, Llama2Model, Llama2Exception
+=======
+from llmproxy.provider.huggingface.llama2 import Llama2, Llama2Model
+>>>>>>> main
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")

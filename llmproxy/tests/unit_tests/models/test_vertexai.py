@@ -5,7 +5,11 @@ They are suppressed and will be addressed later
 
 import os
 
+<<<<<<< HEAD
 from llmproxy.models.vertexai import VertexAI, VertexAIException
+=======
+from llmproxy.provider.google.vertexai import VertexAI
+>>>>>>> main
 from dotenv import load_dotenv
 import unittest
 

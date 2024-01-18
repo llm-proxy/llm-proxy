@@ -1,4 +1,4 @@
-from llmproxy.models.base import BaseModel
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.log import logger
 import openai
@@ -102,7 +102,7 @@ class OpenAIModel(str, BaseEnum):
     GPT_3_5_TURBO_INSTRUCT = "gpt-3.5-turbo-instruct"
 
 
-class OpenAI(BaseModel):
+class OpenAI(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
