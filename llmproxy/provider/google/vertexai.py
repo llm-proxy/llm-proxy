@@ -79,17 +79,14 @@ class VertexAI(BaseProvider):
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
-            logger.error(e.args[0])
             raise VertexAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e
         except auth_exceptions.GoogleAuthError as e:
-            logger.error(e.args[0])
             raise VertexAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e
         except Exception as e:
-            logger.error(e.args[0])
             raise VertexAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e

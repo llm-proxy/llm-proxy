@@ -135,12 +135,10 @@ class OpenAI(BaseProvider):
                 max_tokens=self.max_output_tokens,
             )
         except error.OpenAIError as e:
-            logger.error(e.args[0])
             raise OpenAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e
         except Exception as e:
-            logger.error(e.args[0])
             raise OpenAIException(
                 exception=e.args[0], error_type="Unknown OpenAI Error"
             ) from e

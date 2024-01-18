@@ -1,18 +1,15 @@
+from dataclasses import dataclass, field
 import os
 import yaml
 import importlib
 from llmproxy.utils.enums import BaseEnum
-from typing import Any, Dict
+from typing import Any, Dict, List, Literal
+from llmproxy.utils.exceptions.provider import UnsupportedModel
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
 from llmproxy.utils import categorization
 
 from dotenv import load_dotenv
-
-
-class RouteType(str, BaseEnum):
-    COST = "cost"
-    CATEGORY = "category"
 
 
 def _get_settings_from_yml(
@@ -71,7 +68,7 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
             if model_name in available_models:
                 # If the user providers NO variations then raise error
                 if "models" not in provider or provider["models"] is None:
-                    raise LLMproxyConfigError(
+                    raise LLMProxyConfigError(
                         "No models provided in llmproxy.config.yml"
                     )
 
@@ -79,7 +76,7 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
                 for model in provider["models"]:
                     # Different setup for vertexai
                     if model not in available_models[model_name]["models"]:
-                        raise LLMproxyConfigError(f"{model} is not available")
+                        raise UnsupportedModel(f"{model} is not available, yet!")
 
                     # Common params among all models
                     common_parameters = {
@@ -108,6 +105,22 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
         raise e
 
 
+@dataclass
+class CompletionResponse:
+    """
+    response: Data on successful response else ""
+    errors: List of all models and exceptions - if raised
+    """
+
+    response: str = ""
+    errors: List = field(default_factory=list)
+
+
+class RouteType(str, BaseEnum):
+    COST = "cost"
+    CATEGORY = "category"
+
+
 class LLMProxy:
     def __init__(
         self,
@@ -133,16 +146,17 @@ class LLMProxy:
         self.available_models = available_models
 
     def route(
-        self, route_type: RouteType = RouteType.COST.value, prompt: str = ""
+        self,
+        route_type: Literal["cost", "category"] = RouteType.COST.value,
+        prompt: str = "",
     ) -> str:
-        if route_type not in RouteType:
-            return "Sorry routing option available"
-
-        if (route_type or self.route) == "cost":
-            return self._cost_route(prompt=prompt)
-
-        elif (route_type or self.route) == "category":
-            return self._category_route(prompt=prompt)
+        match RouteType(route_type.lower()):
+            case RouteType.COST:
+                return self._cost_route(prompt=prompt)
+            case RouteType.CATEGORY:
+                return self._category_route(prompt=prompt)
+            case _:
+                raise ValueError("Invalid route type, please try again")
 
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
@@ -155,6 +169,7 @@ class LLMProxy:
             min_heap.push(cost, item)
 
         completion_res = None
+        errors = []
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -162,24 +177,28 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
+            print(f"HELLO:{instance_data}")
             logger.info(f"Making request to model: {instance_data['name']}\n")
             logger.info("ROUTING...\n")
 
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
-                logger.info("ROUTING COMPLETE! Call to model successful!\n")
-            except ModelRequestFailed as e:
-                logger.info("Request to model failed!\n")
-                logger.info(f"Error when making request to model: {e}\n")
+                logger.info(
+                    "==========ROUTING COMPLETE! Call to model successful!==========\n"
+                )
+            except Exception as e:
+                errors.append({"model_name": instance_data["name"], "error": e})
+                logger.warning(f"Request to model {instance_data['name']}failed!\n")
+                logger.warning(f"Error when making request to model: {e}\n")
 
-        # If there is no completion_res raise exception
+        # If all model fails raise an Exception to notify user
         if not completion_res:
             raise ModelRequestFailed(
                 "Requests to all models failed! Please check your configuration!"
             )
 
-        return completion_res
+        return CompletionResponse(response=completion_res, errors=errors)
 
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
@@ -194,12 +213,13 @@ class LLMProxy:
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            logger.info(msg="Sorting fetched models based on proficiency...")
+            logger.info(msg="Sorting fetched models based on proficency...")
             logger.info(
                 msg="========Finished fetching model for category routing=============\n"
             )
 
         completion_res = None
+        errors = []
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -207,28 +227,29 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info(f"Making request to model: {instance_data['name']}\n")
-            logger.info("ROUTING...\n")
+            logger.info(f"Making request to model: {instance_data['name']}")
+            logger.info("ROUTING...")
 
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
-            except ModelRequestFailed as e:
-                logger.info("Request to model failed!\n")
-                logger.info(f"Error when making request to model: {e}\n")
+            except Exception as e:
+                errors.append({"model_name": instance_data["name"], "error": e})
+                logger.warning("Request to model failed!")
+                logger.warning(f"Error when making request to model: {e}\n")
 
-        # If there is no completion_res raise exception
         if not completion_res:
-            raise ModelRequestFailed(
+            raise RequestsFailed(
                 "Requests to all models failed! Please check your configuration!"
             )
-        return completion_res
+
+        return CompletionResponse(response=completion_res, errors=errors)
 
 
-class ModelRequestFailed(Exception):
+class RequestsFailed(Exception):
     pass
 
 
-class LLMproxyConfigError(Exception):
+class LLMProxyConfigError(Exception):
     pass

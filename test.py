@@ -13,7 +13,8 @@ def main() -> None:
         path_to_user_configuration="llmproxy.config.yml",
     )
     output = proxy_client.route(route_type="category", prompt=prompt)
-    print(output)
+    print(output.response)
+    print(output.errors)
 
 
 if __name__ == "__main__":

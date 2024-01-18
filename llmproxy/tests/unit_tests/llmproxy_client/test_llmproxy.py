@@ -78,6 +78,5 @@ def test_cost_routing() -> None:
 
     # Act
     output = proxy_client.route(route_type="cost", prompt=prompt)
-    print(output)
     # Assert
-    assert "that is an apple" in output
+    assert "that is an apple" in output.response
