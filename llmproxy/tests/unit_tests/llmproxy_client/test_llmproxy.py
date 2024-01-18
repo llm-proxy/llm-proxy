@@ -53,6 +53,7 @@ def test_cost_routing() -> None:
     # Arrange
     prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
 
+    print(CURRENT_DIRECTORY)
     proxy_client = LLMProxy(
         path_to_dev_configuration=f"{CURRENT_DIRECTORY}/test.yml",
         path_to_env_vars=".env.test",

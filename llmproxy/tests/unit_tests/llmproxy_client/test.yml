@@ -50,7 +50,7 @@ user_settings:
 
 available_models:
   - name: OpenAI
-    class: llmproxy.models.openai.OpenAI
+    class: llmproxy.provider.openai.chatgpt.OpenAI
     models:
       - name: gpt-3.5-turbo-1106
         cost_per_token_input: 0.0000010
@@ -66,7 +66,7 @@ available_models:
         cost_per_token_output: 0.00012
 
   - name: Llama2
-    class: llmproxy.models.llama2.Llama2
+    class: llmproxy.provider.huggingface.llama2.Llama2
     models:
       - name: Llama-2-7b-chat-hf
         cost_per_hour: 0.06
@@ -76,7 +76,7 @@ available_models:
         cost_per_hour: 0.06
 
   - name: Mistral
-    class: llmproxy.models.mistral.Mistral
+    class: llmproxy.provider.huggingface.mistral.Mistral
     models:
       - name: Mistral-7B-v0.1
         cost_per_hour: 0.06
@@ -84,7 +84,7 @@ available_models:
         cost_per_hour: 0.06
 
   - name: Cohere
-    class: llmproxy.models.cohere.Cohere
+    class: llmproxy.provider.cohere.cohere.Cohere
     models:
       - name: command
         cost_per_token_input: 0.0000015
@@ -100,12 +100,12 @@ available_models:
         cost_per_token_output: 0.000002
 
   - name: Vertexai
-    class: llmproxy.models.vertexai.VertexAI
+    class: llmproxy.provider.google.vertexai.VertexAI
     models:
       - name: text-bison
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
       # Currently not working
-      # - name: chat-bison
+      # - name: chat-bison-32k
       #   cost_per_token_input: 0.000002
       #   cost_per_token_output: 0.000002
