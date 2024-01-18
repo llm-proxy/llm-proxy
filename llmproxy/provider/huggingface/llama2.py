@@ -1,6 +1,11 @@
 import requests
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import (
+    EmptyPrompt,
+    Llama2Exception,
+    UnsupportedModel,
+)
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
 
@@ -81,14 +86,13 @@ class Llama2(BaseProvider):
     def get_completion(self, prompt: str = "") -> str:
         # If empty api key
         if not self.api_key:
-            raise Llama2Exception(exception="No API Provided", error_type="InputError")
+            raise Llama2Exception(exception="No API Provided", error_type="ValueError")
 
         if self.prompt == "" and prompt == "":
-            raise Llama2Exception(
-                exception="No prompt detected", error_type="InputError"
-            )
+            raise EmptyPrompt("Empty prompt detected")
+
         if self.model not in Llama2Model:
-            raise Llama2Exception(
+            raise UnsupportedModel(
                 exception=f"Invalid Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
                 error_type="ValueError",
             )
@@ -115,7 +119,7 @@ class Llama2(BaseProvider):
             )
 
         except Exception as e:
-            raise Exception("Error Occur for prompting Llama2")
+            raise Llama2Exception(exception=e.args[0], error_type="Llama2Error") from e
 
         if output["error"]:
             raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
@@ -160,8 +164,3 @@ class Llama2(BaseProvider):
         category_rank = llama2_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-
-class Llama2Exception(Exception):
-    def __init__(self, exception: str, error_type: str) -> None:
-        super().__init__(f"Llama2 Error: {exception}, Type: {error_type}")

@@ -1,6 +1,7 @@
+import requests
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
-import requests
+from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
 
@@ -65,7 +66,7 @@ class Mistral(BaseProvider):
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in MistralModel:
-            raise MistralException(
+            raise UnsupportedModel(
                 exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
                 error_type=ValueError,
             )
@@ -89,12 +90,15 @@ class Mistral(BaseProvider):
                 }
             )
         except requests.RequestException as e:
-            raise MistralException(f"Request error: {e}", error_type="RequestError")
+            raise MistralException(
+                f"Request error: {e}", error_type="RequestError"
+            ) from e
         except Exception as e:
-            raise MistralException(f"Unknown error: {e}", error_type="UnknownError")
+            raise MistralException(
+                f"Unknown error: {e}", error_type="UnknownError"
+            ) from e
 
         response = ""
-        message = ""
         if isinstance(output, list) and "generated_text" in output[0]:
             response = output[0]["generated_text"]
         elif "error" in output:
@@ -142,8 +146,3 @@ class Mistral(BaseProvider):
         category_rank = mistral_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-
-class MistralException(Exception):
-    def __init__(self, exception: str, error_type: str) -> None:
-        super().__init__(f"Mistral Error: {exception}, Type: {error_type}")

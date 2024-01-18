@@ -20,7 +20,7 @@ def _get_settings_from_yml(
 ) -> Dict[str, Any]:
     """Returns all of the data in the yaml file"""
     try:
-        with open(path_to_yml, "r") as file:
+        with open(path_to_yml, "r", encoding="utf-8") as file:
             result = yaml.safe_load(file)
             return result
     except (FileNotFoundError, yaml.YAMLError) as e:
@@ -36,7 +36,7 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
             key = provider["name"].lower()
             import_path = provider["class"]
 
-            # Loop through and aggreate all of the variations of "models" of each provider
+            # Loop through and aggregate all of the variations of "models" of each provider
             provider_models = set()
             for model in provider.get("models"):
                 provider_models.add(model["name"])
@@ -54,8 +54,14 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
+def _setup_user_models(available_models, settings) -> Dict[str, object]:
     """Setup all available models and return dict of {name: instance_of_model}"""
+    # Prevent shared argument bug
+    if available_models is None:
+        available_models = {}
+    if settings is None:
+        settings = {}
+
     try:
         user_models = {}
         # Compare user models with available_models
@@ -65,13 +71,15 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
             if model_name in available_models:
                 # If the user providers NO variations then raise error
                 if "models" not in provider or provider["models"] is None:
-                    raise Exception("No models provided in user_settings")
+                    raise LLMproxyConfigError(
+                        "No models provided in llmproxy.config.yml"
+                    )
 
                 # Loop through and set up instance of model
                 for model in provider["models"]:
                     # Different setup for vertexai
                     if model not in available_models[model_name]["models"]:
-                        raise Exception(f"{model} is not available")
+                        raise LLMproxyConfigError(f"{model} is not available")
 
                     # Common params among all models
                     common_parameters = {
@@ -124,9 +132,6 @@ class LLMProxy:
         )
         self.available_models = available_models
 
-    # TODO: ROUTE TO ONLY AVAILABLE MODELS (check with adrian about this)
-    # Do you want the model to route to the first available model
-    # or just send back an error?
     def route(
         self, route_type: RouteType = RouteType.COST.value, prompt: str = ""
     ) -> str:
@@ -162,17 +167,15 @@ class LLMProxy:
 
             # Attempt to make request to model
             try:
-                # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(prompt=prompt)
-                completion_res = output
+                completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
-            except Exception as e:
+            except ModelRequestFailed as e:
                 logger.info("Request to model failed!\n")
                 logger.info(f"Error when making request to model: {e}\n")
 
         # If there is no completion_res raise exception
         if not completion_res:
-            raise Exception(
+            raise ModelRequestFailed(
                 "Requests to all models failed! Please check your configuration!"
             )
 
@@ -191,7 +194,7 @@ class LLMProxy:
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            logger.info(msg="Sorting fetched models based on proficency...")
+            logger.info(msg="Sorting fetched models based on proficiency...")
             logger.info(
                 msg="========Finished fetching model for category routing=============\n"
             )
@@ -209,17 +212,23 @@ class LLMProxy:
 
             # Attempt to make request to model
             try:
-                # TODO: REMOVE COMPLETION RESPONSE TO SIMPLE raise exceptions to CLEAN UP CODE
-                output = instance_data["instance"].get_completion(prompt=prompt)
-                completion_res = output
+                completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
-            except Exception as e:
+            except ModelRequestFailed as e:
                 logger.info("Request to model failed!\n")
                 logger.info(f"Error when making request to model: {e}\n")
 
         # If there is no completion_res raise exception
         if not completion_res:
-            raise Exception(
+            raise ModelRequestFailed(
                 "Requests to all models failed! Please check your configuration!"
             )
         return completion_res
+
+
+class ModelRequestFailed(Exception):
+    pass
+
+
+class LLMproxyConfigError(Exception):
+    pass

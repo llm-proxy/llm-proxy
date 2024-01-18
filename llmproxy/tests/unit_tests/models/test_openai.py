@@ -1,13 +1,12 @@
 import os
 
-from dotenv import load_dotenv
-<<<<<<< HEAD
-from llmproxy.models.openai import OpenAI, OpenAIException
-=======
-from llmproxy.provider.openai.chatgpt import OpenAI
->>>>>>> main
-from openai import error
 from unittest.mock import patch
+from openai import error
+from dotenv import load_dotenv
+import pytest
+from llmproxy.utils.exceptions.provider import UnsupportedModel
+from llmproxy.provider.openai.chatgpt import OpenAI, OpenAIException
+
 
 load_dotenv(".env.test")
 
@@ -15,22 +14,19 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def test_invalid_api_key():
-    chatbot = OpenAI(api_key="invalid_key")
-    try:
+    # Assert
+    with pytest.raises(OpenAIException):
+        # Arrange
+        chatbot = OpenAI(api_key="invalid_key")
+        # Act
         chatbot.get_completion()
-    except OpenAIException as e:
-        assert (
-            str(e)
-            == "OpenAI Error: Incorrect API key provided: invalid_key. You can find your API key at https://platform.openai.com/account/api-keys., Type: AuthenticationError"
-        )
 
 
 def test_unsupported_model():
     chatbot = OpenAI(api_key=openai_api_key, model="unsupported_model")
-    try:
+
+    with pytest.raises(UnsupportedModel):
         chatbot.get_completion()
-    except OpenAIException as e:
-        assert "Model not supported" in str(e)
 
 
 def test_generic_exception():

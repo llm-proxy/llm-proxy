@@ -5,19 +5,6 @@ from typing import Any
 from llmproxy.utils.log import logger
 
 
-@dataclass
-class CompletionResponse:
-    """
-    payload: Data on successful response else ""
-    message: Error message on unsuccessful response else "OK"
-    err: Error type on unsuccessful response else ""
-    """
-
-    payload: str = ""
-    message: str = ""
-    err: str = ""
-
-
 class BaseProvider(ABC):
     """Abstract based class used to interface with (Language) Models.
     Current only one: Language.
@@ -25,5 +12,5 @@ class BaseProvider(ABC):
     """
 
     @abstractmethod
-    def get_completion(self, **kwargs: Any) -> CompletionResponse:
+    def get_completion(self, **kwargs: Any) -> str:
         pass

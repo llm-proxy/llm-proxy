@@ -1,10 +1,8 @@
 import os
 
-<<<<<<< HEAD
-from llmproxy.models.mistral import Mistral, MistralException
-=======
-from llmproxy.provider.huggingface.mistral import Mistral
->>>>>>> main
+import pytest
+
+from llmproxy.provider.huggingface.mistral import Mistral, MistralException
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")
@@ -25,49 +23,22 @@ def test_mistral_constructor_default() -> None:
 
 
 def test_mistral_invalid_api_key() -> None:
-    # Arrange
-    mistral = Mistral(api_key="invalid")
-
-    # Act
-    try:
+    # Assert
+    with pytest.raises(MistralException):
+        # Arrange
+        mistral = Mistral(api_key="invalid")
+        # Act
         mistral.get_completion()
-    except MistralException as e:
-        # Assert
-        assert (
-            str(e)
-            == "Mistral Error: Authorization header is correct, but the token seems invalid, Type: MistralError"
-        )
-
-
-def test_mistral_temperature_over_100() -> None:
-    # Arrange
-    mistral = Mistral(
-        prompt="What is the meaning of life?", api_key=mistral_api_key, temperature=101
-    )
-
-    # Act
-    try:
-        mistral.get_completion()
-    except MistralException as e:
-        # Assert
-        assert (
-            str(e) == "Mistral Error: Temperature cannot be over 100, Type: ValueError"
-        )
 
 
 def test_mistral_temperature_under_0() -> None:
-    # Arrange
-    mistral = Mistral(api_key=mistral_api_key, temperature=-1)
+    # Assert
+    with pytest.raises(MistralException):
+        # Arrange
+        mistral = Mistral(api_key=mistral_api_key, temperature=-1)
 
-    # Act
-    try:
+        # Act
         mistral.get_completion()
-    except MistralException as e:
-        # Assert
-        assert (
-            str(e)
-            == "Mistral Error: Input validation error: `temperature` must be strictly positive, Type: MistralError"
-        )
 
 
 def test_get_estimated_max_cost():

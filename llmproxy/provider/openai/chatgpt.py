@@ -1,5 +1,6 @@
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
 from llmproxy.utils.log import logger
 import openai
 from openai import error
@@ -120,9 +121,9 @@ class OpenAI(BaseProvider):
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in OpenAIModel:
-            raise OpenAIException(
+            raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
-                error_type=ValueError,
+                error_type="OpenAI Error",
             )
 
         try:
@@ -135,13 +136,14 @@ class OpenAI(BaseProvider):
             )
         except error.OpenAIError as e:
             logger.error(e.args[0])
-            raise OpenAIException(exception=e.args[0], error_type=type(e).__name__)
+            raise OpenAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
         except Exception as e:
             logger.error(e.args[0])
-            # This might need to be changed to a different error
             raise OpenAIException(
                 exception=e.args[0], error_type="Unknown OpenAI Error"
-            )
+            ) from e
 
         return response.choices[0].message["content"]
 
@@ -187,8 +189,3 @@ class OpenAI(BaseProvider):
         category_rank = open_ai_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-
-class OpenAIException(Exception):
-    def __init__(self, exception: str, error_type: str) -> None:
-        super().__init__(f"OpenAI Error: {exception}, Type: {error_type}")

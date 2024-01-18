@@ -3,6 +3,7 @@ from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 from llmproxy.utils.log import logger
 from vertexai.language_models import TextGenerationModel
 from llmproxy.utils import tokenizer
@@ -59,7 +60,7 @@ class VertexAI(BaseProvider):
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in VertexAIModel:
-            raise VertexAIException(
+            raise UnsupportedModel(
                 exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
                 error_type="ValueError",
             )
@@ -134,8 +135,3 @@ class VertexAI(BaseProvider):
         category_rank = vertexai_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-
-class VertexAIException(Exception):
-    def __init__(self, exception: str, error_type: str) -> None:
-        super().__init__(f"VertexAI Error: {exception}, Type: {error_type}")

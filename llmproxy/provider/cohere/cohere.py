@@ -1,6 +1,7 @@
 import cohere
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
 
 cohere_price_data_summarize_generate_chat = {
@@ -95,12 +96,11 @@ class Cohere(BaseProvider):
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in CohereModel:
-            raise CohereException(
+            raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
                 error_type=ValueError,
             )
-        if self.co is None:
-            raise self.error_response
+
         try:
             response = self.co.chat(
                 max_tokens=self.max_output_tokens,
@@ -110,9 +110,9 @@ class Cohere(BaseProvider):
             )
             return response.text
         except cohere.CohereError as e:
-            return CohereException(exception=e.message, error_type=e.http_status)
+            raise CohereException(exception=e.message, error_type=e.http_status) from e
         except Exception as e:
-            raise Exception("Unknown Cohere error when making API call")
+            raise CohereException("Unknown Cohere error when making API call") from e
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -157,8 +157,3 @@ class Cohere(BaseProvider):
         category_rank = cohere_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-
-class CohereException(Exception):
-    def __init__(self, exception: str, error_type: str) -> None:
-        super().__init__(f"Cohere Error: {exception}, Type: {error_type}")
