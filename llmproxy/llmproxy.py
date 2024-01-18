@@ -18,7 +18,7 @@ class RouteType(str, BaseEnum):
 def _get_settings_from_yml(
     path_to_yml: str = "",
 ) -> Dict[str, Any]:
-    """Returns all of the settings in the api_configuration.yml file"""
+    """Returns all of the data in the yaml file"""
     try:
         with open(path_to_yml, "r") as file:
             result = yaml.safe_load(file)
@@ -103,8 +103,7 @@ def _setup_user_models(available_models={}, settings={}) -> Dict[str, object]:
 class LLMProxy:
     def __init__(
         self,
-        path_to_user_configuration: str = "api_configuration.yml",
-        path_to_dev_configuration: str = "llmproxy/config/internal_configuration.yml",
+        path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
     ) -> None:
         self.user_models = {}
@@ -113,7 +112,9 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML and see which models the user wants
-        dev_settings = _get_settings_from_yml(path_to_yml=path_to_dev_configuration)
+        dev_settings = _get_settings_from_yml(
+            path_to_yml="llmproxy/config/internal.config.yml"
+        )
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
         # Setup available models

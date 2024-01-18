@@ -9,10 +9,9 @@ def main() -> None:
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
     proxy_client = LLMProxy(
-        path_to_user_configuration="api_configuration.yml",
-        path_to_dev_configuration="llmproxy/config/internal_configuration.yml",
+        path_to_user_configuration="llmproxy.config.yml",
     )
-    output = proxy_client.route(route_type="category", prompt=prompt)
+    output = proxy_client.route(route_type="cost", prompt=prompt)
     print(output.payload)
 
 

@@ -55,7 +55,7 @@ def test_cost_routing() -> None:
 
     print(CURRENT_DIRECTORY)
     proxy_client = LLMProxy(
-        path_to_dev_configuration=f"{CURRENT_DIRECTORY}/test.yml",
+        path_to_user_configuration=f"{CURRENT_DIRECTORY}/test.yml",
         path_to_env_vars=".env.test",
     )
 
