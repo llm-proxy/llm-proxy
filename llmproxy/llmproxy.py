@@ -76,7 +76,10 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
                 for model in provider["models"]:
                     # Different setup for vertexai
                     if model not in available_models[model_name]["models"]:
-                        raise UnsupportedModel(f"{model} is not available, yet!")
+                        raise UnsupportedModel(
+                            f"{model} is not available, yet!",
+                            error_type="UnsupportedModel",
+                        )
 
                     # Common params among all models
                     common_parameters = {
