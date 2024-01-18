@@ -1,6 +1,6 @@
 import os
 
-from llmproxy.models.mistral import Mistral
+from llmproxy.provider.huggingface.mistral import Mistral
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")

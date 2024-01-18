@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from llmproxy.models.openai import OpenAI
+from llmproxy.provider.openai.chatgpt import OpenAI
 from openai import error
 from unittest.mock import patch
 
