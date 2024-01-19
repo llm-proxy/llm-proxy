@@ -4,10 +4,12 @@ They are suppressed and will be addressed later
 """
 
 import os
-
-from llmproxy.provider.google.vertexai import VertexAI
-from dotenv import load_dotenv
 import unittest
+import pytest
+from dotenv import load_dotenv
+from llmproxy.utils.exceptions.provider import UnsupportedModel
+from llmproxy.provider.google.vertexai import VertexAI, VertexAIException
+
 
 load_dotenv(".env.test")
 project_id = os.getenv("GOOGLE_PROJECT_ID")
@@ -19,22 +21,18 @@ def test_invalid_project_id() -> None:
     # Arrange
     vertexai = VertexAI(project_id="invalid id")
 
-    # Act
-    response = vertexai.get_completion()
-
-    # Assert
-    assert "Permission denied" in response.message
+    # Act + Assert
+    with pytest.raises(VertexAIException):
+        vertexai.get_completion()
 
 
 def test_unsupported_model() -> None:
-    # Arrange
-    vertexai = VertexAI(project_id=project_id, model="test")
-
-    # Act
-    response = vertexai.get_completion()
-
     # Assert
-    assert "Model not supported" in response.message
+    with pytest.raises(UnsupportedModel):
+        # Arrange
+        vertexai = VertexAI(project_id=project_id, model="test")
+        # Act
+        vertexai.get_completion()
 
 
 def test_get_estimated_max_cost():
@@ -52,14 +50,13 @@ def test_get_estimated_max_cost():
     ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"
 
 
-class TestVertexAIErrors(unittest.TestCase):
-    def test_invalid_location(self):
+def test_invalid_location():
+    # Assert
+    with pytest.raises(VertexAIException):
         # Arrange
         vertexai = VertexAI(project_id=project_id, location="test")
-
-        # Act and Assert
-        with self.assertRaises(Exception):
-            vertexai.get_completion()
+        # Act
+        vertexai.get_completion()
 
 
 if __name__ == "__main__":

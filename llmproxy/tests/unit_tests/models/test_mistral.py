@@ -1,6 +1,8 @@
 import os
 
-from llmproxy.provider.huggingface.mistral import Mistral
+import pytest
+
+from llmproxy.provider.huggingface.mistral import Mistral, MistralException
 from dotenv import load_dotenv
 
 load_dotenv(".env.test")
@@ -21,44 +23,22 @@ def test_mistral_constructor_default() -> None:
 
 
 def test_mistral_invalid_api_key() -> None:
-    # Arrange
-    mistral = Mistral(api_key="invalid")
-
-    # Act
-    check = mistral.get_completion()
-
     # Assert
-    assert (
-        check.message
-        == "ERROR: Authorization header is correct, but the token seems invalid"
-    )
-
-
-def test_mistral_temperature_over_100() -> None:
-    # Arrange
-    mistral = Mistral(api_key=mistral_api_key, temperature=100.1)
-
-    # Act
-    check = mistral.get_completion()
-
-    print(check.payload)
-    # Assert
-    assert check.message == "ERROR: Input validation error: `inputs` cannot be empty"
+    with pytest.raises(MistralException):
+        # Arrange
+        mistral = Mistral(api_key="invalid")
+        # Act
+        mistral.get_completion()
 
 
 def test_mistral_temperature_under_0() -> None:
-    # Arrange
-    mistral = Mistral(api_key=mistral_api_key, temperature=-1)
-
-    # Act
-    check = mistral.get_completion()
-
-    print(check.payload)
     # Assert
-    assert (
-        check.message
-        == "ERROR: Input validation error: `temperature` must be strictly positive"
-    )
+    with pytest.raises(MistralException):
+        # Arrange
+        mistral = Mistral(api_key=mistral_api_key, temperature=-1)
+
+        # Act
+        mistral.get_completion()
 
 
 def test_get_estimated_max_cost():

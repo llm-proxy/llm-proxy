@@ -1,6 +1,7 @@
 import cohere
-from llmproxy.provider.base import BaseProvider, CompletionResponse
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
 
 cohere_price_data_summarize_generate_chat = {
@@ -91,19 +92,15 @@ class Cohere(BaseProvider):
         try:
             self.co = cohere.Client(self.api_key)
         except cohere.CohereError as e:
-            self.error_response = CompletionResponse(
-                payload="", message=e, err="ValueError"
+            raise CohereException(exception=e, error_type=ValueError)
+
+    def get_completion(self, prompt: str = "") -> str:
+        if self.model not in CohereModel:
+            raise UnsupportedModel(
+                exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
+                error_type=ValueError,
             )
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
-        if self.model not in CohereModel:
-            return CompletionResponse(
-                payload="",
-                message=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
-                err="ValueError",
-            )
-        if self.co is None:
-            return self.error_response
         try:
             response = self.co.chat(
                 max_tokens=self.max_output_tokens,
@@ -111,15 +108,11 @@ class Cohere(BaseProvider):
                 model=self.model,
                 temperature=self.temperature,
             )
-            return CompletionResponse(
-                payload=response.text,
-                message="OK",
-                err="",
-            )
+            return response.text
         except cohere.CohereError as e:
-            return CompletionResponse(payload="", message=e.message, err=e.http_status)
+            raise CohereException(exception=e.message, error_type=e.http_status) from e
         except Exception as e:
-            raise Exception("Unknown Cohere error when making API call")
+            raise CohereException("Unknown Cohere error when making API call") from e
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -164,6 +157,3 @@ class Cohere(BaseProvider):
         category_rank = cohere_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)

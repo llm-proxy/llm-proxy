@@ -1,6 +1,10 @@
 import os
-from llmproxy.provider.huggingface.llama2 import Llama2, Llama2Model
+
+import pytest
+from llmproxy.provider.huggingface.llama2 import Llama2, Llama2Model, Llama2Exception
 from dotenv import load_dotenv
+
+from llmproxy.utils.exceptions.provider import EmptyPrompt, UnsupportedModel
 
 load_dotenv(".env.test")
 """This test assumes a free version access token from huggingface"""
@@ -18,8 +22,9 @@ def test_llama2_empty_prompt() -> None:
         model=default_model,
         api_key=default_api_key,
     )
-    output = llama2_empty_prompt.get_completion()
-    assert output.message == "No prompt detected"
+
+    with pytest.raises(EmptyPrompt):
+        llama2_empty_prompt.get_completion()
 
 
 def test_llama2_invalid_api_key() -> None:
@@ -29,11 +34,9 @@ def test_llama2_invalid_api_key() -> None:
         api_key="LMAO-key",
         model=default_model,
     )
-    output = test_api_key.get_completion()
-    print(output.message)
-    assert (
-        output.message == "Authorization header is correct, but the token seems invalid"
-    )
+
+    with pytest.raises(Llama2Exception):
+        test_api_key.get_completion()
 
 
 def test_llama2_free_subscription_api_key() -> None:
@@ -44,10 +47,8 @@ def test_llama2_free_subscription_api_key() -> None:
         model=Llama2Model.LLAMA_2_7B.value,
     )
 
-    output1 = test_model.get_completion()
-    response = "Model requires a Pro subscription; check out hf.co/pricing to learn more. Make sure to include your HF token in your query."
-    print(output1.err)
-    assert output1.err == "Llama2Error"
+    with pytest.raises(Llama2Exception):
+        test_model.get_completion()
 
 
 def test_llama2_emp_model() -> None:
@@ -57,9 +58,9 @@ def test_llama2_emp_model() -> None:
         api_key=default_api_key,
         model="",
     )
-    output = test_emp_model.get_completion()
-    print(output.message)
-    assert output.err == "ValueError"
+
+    with pytest.raises(UnsupportedModel):
+        test_emp_model.get_completion()
 
 
 def test_get_estimated_max_cost():

@@ -1,6 +1,7 @@
-from llmproxy.provider.base import BaseProvider, CompletionResponse
-from llmproxy.utils.enums import BaseEnum
 import requests
+from llmproxy.provider.base import BaseProvider
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
 
@@ -63,11 +64,11 @@ class Mistral(BaseProvider):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in MistralModel:
-            return CompletionResponse(
-                message=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
-                err="ValueError",
+            raise UnsupportedModel(
+                exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
+                error_type=ValueError,
             )
         try:
             API_URL = (
@@ -88,23 +89,24 @@ class Mistral(BaseProvider):
                     },
                 }
             )
+        except requests.RequestException as e:
+            raise MistralException(
+                f"Request error: {e}", error_type="RequestError"
+            ) from e
         except Exception as e:
-            raise Exception(e)
+            raise MistralException(
+                f"Unknown error: {e}", error_type="UnknownError"
+            ) from e
 
         response = ""
-        message = ""
         if isinstance(output, list) and "generated_text" in output[0]:
             response = output[0]["generated_text"]
         elif "error" in output:
-            message = "ERROR: " + output["error"]
+            raise MistralException(f"{output['error']}", error_type="MistralError")
         else:
             raise ValueError("Unknown output format")
 
-        return CompletionResponse(
-            payload=response,
-            message=message,
-            err="",
-        )
+        return response
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

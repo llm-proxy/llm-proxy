@@ -1,9 +1,12 @@
 import os
 
-from dotenv import load_dotenv
-from llmproxy.provider.openai.chatgpt import OpenAI
-from openai import error
 from unittest.mock import patch
+from openai import error
+from dotenv import load_dotenv
+import pytest
+from llmproxy.utils.exceptions.provider import UnsupportedModel
+from llmproxy.provider.openai.chatgpt import OpenAI, OpenAIException
+
 
 load_dotenv(".env.test")
 
@@ -11,17 +14,19 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def test_invalid_api_key():
-    chatbot = OpenAI(api_key="invalid_key")
-    response = chatbot.get_completion()
-    assert isinstance(response.err, str)
-    assert "incorrect api key provided" in response.message.lower()
+    # Assert
+    with pytest.raises(OpenAIException):
+        # Arrange
+        chatbot = OpenAI(api_key="invalid_key")
+        # Act
+        chatbot.get_completion()
 
 
 def test_unsupported_model():
     chatbot = OpenAI(api_key=openai_api_key, model="unsupported_model")
-    response = chatbot.get_completion()
-    assert "ValueError" == response.err
-    assert "Model not supported" in response.message
+
+    with pytest.raises(UnsupportedModel):
+        chatbot.get_completion()
 
 
 def test_generic_exception():
@@ -30,7 +35,7 @@ def test_generic_exception():
         try:
             chatbot.get_completion()
         except Exception as e:
-            assert str(e) == "Unknown OpenAI Error"
+            assert str(e) == "OpenAI Error: Random error, Type: Unknown OpenAI Error"
 
 
 def test_openai_rate_limit_error():
@@ -39,9 +44,10 @@ def test_openai_rate_limit_error():
         side_effect=error.OpenAIError("Rate limit exceeded"),
     ):
         chatbot = OpenAI(api_key=openai_api_key)
-        response = chatbot.get_completion()
-        assert response.err == "OpenAIError"
-        assert "rate limit exceeded" in response.message.lower()
+        try:
+            chatbot.get_completion()
+        except OpenAIException as e:
+            assert str(e) == "OpenAI Error: Rate limit exceeded, Type: OpenAIError"
 
 
 def test_get_estimated_max_cost():
