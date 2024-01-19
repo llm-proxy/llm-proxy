@@ -40,6 +40,7 @@ def test_mistral_temperature_under_0() -> None:
         # Act
         mistral.get_completion()
 
+
 # test no longer works due to updated pricing, will update in the future
 # def test_get_estimated_max_cost():
 #     # Arrange
