@@ -10,7 +10,7 @@ user_settings:
   #       enable: false
     
   - model: OpenAI
-    api_key_var: OPENAI_API_KEY # .env name for api key 
+    api_key_var: OPENAI_API_KEY # .env name for api key
     max_output_tokens: 256 
     temperature: 0.1 
     models: # input names of models you want to you (see below for all models provided)
@@ -32,7 +32,7 @@ user_settings:
 
   - model: Cohere 
     temperature: 0.1
-    api_key_var: COHERE_API_KEY 
+    api_key_var: COHERE_API_KEY
     max_output_tokens: 256
     models:
       - command
