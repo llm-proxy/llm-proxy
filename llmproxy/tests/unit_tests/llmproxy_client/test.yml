@@ -19,6 +19,15 @@ user_settings:
       - Llama-2-7b-chat-hf
       - Llama-2-13b-chat-hf
       - Llama-2-70b-chat-hf
+      - Llama-2-7b
+      - Llama-2-13b-chat-hf
+      - Llama-2-13b-chat
+      - Llama-2-13b-hf
+      - Llama-2-13b
+      - Llama-2-70b-chat-hf
+      - Llama-2-70b-chat
+      - Llama-2-70b-hf
+      - Llama-2-70b
 
   - model: Cohere 
     temperature: 0.1
@@ -36,7 +45,8 @@ user_settings:
     max_output_tokens: 256
     models:
       - Mistral-7B-v0.1
-      - Mistral-7B-Instruct-v0.1
+      - Mistral-7B-Instruct-v0.2
+      - Mistral-8x7B-Instruct-v0.1
 
 # DONT USE FOR TESTING FOR NOW TO AVOID CHARGES
   # - model: VertexAI 
