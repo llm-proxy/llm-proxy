@@ -14,11 +14,7 @@ mistral_price_data = {
             "prompt": 0.05 / 1_000_000,
             "completion": 0.25 / 1_000_000,
         },
-        # priced per second
-        # "Mistral-7B-Instruct-v0.1": {
-        #     "prompt": 0,
-        #     "completion": 0,
-        # },
+
 
         "Mistral-7B-Instruct-v0.2": {
             "prompt": 0.05 / 1_000_000,
@@ -65,7 +61,6 @@ mistral_category_data = {
 
 class MistralModel(str, BaseEnum):
     Mistral_7B_V01 = "Mistral-7B-v0.1"
-    Mistral_7B_Instruct_V01 = "Mistral-7B-Instruct-v0.1"
     Mistral_7B_Instruct_V02 = "Mistral-7B-Instruct-v0.2"
     Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
 
