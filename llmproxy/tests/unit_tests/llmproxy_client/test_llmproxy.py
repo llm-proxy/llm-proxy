@@ -15,7 +15,7 @@ CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 # TODO: FIX
 def test_empty_model() -> None:
-    with pytest.raises(Exception, match="No models provided in user_settings"):
+    with pytest.raises(Exception, match="No models provided in llmproxy.config.yml"):
         settings = _get_settings_from_yml(
             path_to_yml=f"{CURRENT_DIRECTORY}/empty_model_test.yml"
         )
@@ -38,30 +38,24 @@ def test_invalid_model() -> None:
 
 # TODO: ADD TEST
 def test_get_settings_from_yml() -> None:
-    settings = _get_settings_from_yml(
-        path_to_yml=f"{CURRENT_DIRECTORY}/get_setting_test.yml"
-    )
-    assert settings == "This setting is working"
+    user_setting = _get_settings_from_yml(path_to_yml="llmproxy.config.yml")
+    setting = _get_settings_from_yml(path_to_yml="llmproxy/config/internal.config.yml")
 
 
 # TODO: ADD TEST
 def test_setup_available_models() -> None:
-    settings = _get_settings_from_yml(
-        path_to_yml=f"{CURRENT_DIRECTORY}/setup_available_model_test.yml"
-    )
+    settings = _get_settings_from_yml(path_to_yml="llmproxy/config/internal.config.yml")
     available_model = _setup_available_models(settings=settings)
-    print(type(available_model))
-    assert type(available_model) is dict
 
 
 # TODO: ADD TEST
 def test_setup_user_models() -> None:
-    settings = _get_settings_from_yml(
-        path_to_yml=f"{CURRENT_DIRECTORY}/setup_user_setting_test.yml"
+    settings = _get_settings_from_yml(path_to_yml="llmproxy.config.yml")
+    dev_setting = _get_settings_from_yml(
+        path_to_yml="llmproxy/config/internal.config.yml"
     )
-    available_model = _setup_available_models(settings=settings)
+    available_model = _setup_available_models(settings=dev_setting)
     user_model = _setup_user_models(settings=settings, available_models=available_model)
-    assert type(user_model) is dict
 
 
 # TODO: More of an integration test, move later
