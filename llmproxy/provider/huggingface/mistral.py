@@ -5,7 +5,7 @@ from llmproxy.utils.exceptions.provider import MistralException, UnsupportedMode
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
 
-# prices not accurate
+
 mistral_price_data = {
     "max-output-tokens": 50,
     "model-costs": {
