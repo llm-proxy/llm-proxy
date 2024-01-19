@@ -62,7 +62,6 @@ llama2_price_data = {
             "prompt": 0.65 / 1_000_000,
             "completion": 2.75 / 1_000_000,
         },
-
     },
 }
 
@@ -121,6 +120,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B_CHAT = "Llama-2-70b-chat"
     LLAMA_2_70B_HF = "Llama-2-70b-hf"
     LLAMA_2_70B = "Llama-2-70b"
+
 
 class Llama2(BaseProvider):
     def __init__(
@@ -193,7 +193,9 @@ class Llama2(BaseProvider):
         prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = llama2_price_data["model-costs"][self.model]["completion"]
+        completion_cost_per_token = llama2_price_data["model-costs"][self.model][
+            "completion"
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)

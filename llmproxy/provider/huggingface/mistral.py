@@ -14,18 +14,14 @@ mistral_price_data = {
             "prompt": 0.05 / 1_000_000,
             "completion": 0.25 / 1_000_000,
         },
-
-
         "Mistral-7B-Instruct-v0.2": {
             "prompt": 0.05 / 1_000_000,
             "completion": 0.25 / 1_000_000,
         },
-
         "Mistral-8x7B-Instruct-v0.1": {
             "prompt": 0.30 / 1_000_000,
             "completion": 1.0 / 1_000_000,
         },
-       
     },
 }
 
@@ -135,7 +131,9 @@ class Mistral(BaseProvider):
         prompt_cost_per_token = mistral_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = mistral_price_data["model-costs"][self.model]["completion"]
+        completion_cost_per_token = mistral_price_data["model-costs"][self.model][
+            "completion"
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
