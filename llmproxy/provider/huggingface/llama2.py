@@ -129,7 +129,7 @@ class Llama2(BaseProvider):
         system_prompt: str = "Answer politely",
         api_key: str = "",
         temperature: float = 1.0,
-        model: Llama2Model = Llama2Model.LLAMA_2_7B.value,
+        model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
         max_output_tokens: int = None,
     ) -> None:
         self.system_prompt = system_prompt
