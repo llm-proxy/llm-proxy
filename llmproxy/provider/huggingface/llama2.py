@@ -9,12 +9,59 @@ from llmproxy.utils.exceptions.provider import (
 from llmproxy.utils.log import logger
 from llmproxy.utils import tokenizer
 
-# This is not accurate data
+
 llama2_price_data = {
     "max-output-tokens": 50,
     "model-costs": {
-        "prompt": 1.10 / 1_000_000,
-        "completion": 1.80 / 1_000_000,
+        # Cost per 1k tokens * 1000
+        "Llama-2-7b-chat-hf": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-7b-chat": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-7b-hf": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-7b": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-13b-chat-hf": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-13b-chat": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-13b-hf": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-13b": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-70b-chat-hf": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
+        "Llama-2-70b-chat": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
+        "Llama-2-70b-hf": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
+        "Llama-2-70b": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
     },
 }
 
@@ -61,9 +108,18 @@ llama2_category_data = {
 
 
 class Llama2Model(str, BaseEnum):
-    LLAMA_2_7B = "Llama-2-7b-chat-hf"
-    LLAMA_2_13B = "Llama-2-13b-chat-hf"
-    LLAMA_2_70B = "Llama-2-70b-chat-hf"
+    LLAMA_2_7B_CHAT_HF = "Llama-2-7b-chat-hf"
+    LLAMA_2_7B_CHAT = "Llama-2-7b-chat"
+    LLAMA_2_7B_HF = "Llama-2-7b-hf"
+    LLAMA_2_7B = "Llama-2-7b"
+    LLAMA_2_13B_CHAT_HF = "Llama-2-13b-chat-hf"
+    LLAMA_2_13B_CHAT = "Llama-2-13b-chat"
+    LLAMA_2_13B_HF = "Llama-2-13b-hf"
+    LLAMA_2_13B = "Llama-2-13b"
+    LLAMA_2_70B_CHAT_HF = "Llama-2-70b-chat-hf"
+    LLAMA_2_70B_CHAT = "Llama-2-70b-chat"
+    LLAMA_2_70B_HF = "Llama-2-70b-hf"
+    LLAMA_2_70B = "Llama-2-70b"
 
 
 class Llama2(BaseProvider):
@@ -73,7 +129,7 @@ class Llama2(BaseProvider):
         system_prompt: str = "Answer politely",
         api_key: str = "",
         temperature: float = 1.0,
-        model: Llama2Model = Llama2Model.LLAMA_2_7B.value,
+        model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
         max_output_tokens: int = None,
     ) -> None:
         self.system_prompt = system_prompt
@@ -134,10 +190,12 @@ class Llama2(BaseProvider):
         # Assumption, model exists (check should be done at yml load level)
         logger.info(f"Tokenizing model: {self.model}")
 
-        prompt_cost_per_token = llama2_price_data["model-costs"]["prompt"]
+        prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = llama2_price_data["model-costs"]["completion"]
+        completion_cost_per_token = llama2_price_data["model-costs"][self.model][
+            "completion"
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
