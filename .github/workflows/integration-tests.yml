@@ -49,4 +49,4 @@ jobs:
           service_account: 'github-actions@poised-elf-400922.iam.gserviceaccount.com'
 
       - name: Run integration tests
-        run: python3 test.py
+        run: poetry run python3 test.py
