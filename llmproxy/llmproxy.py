@@ -5,6 +5,12 @@ import importlib
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict, List, Literal
 from llmproxy.utils.exceptions.provider import UnsupportedModel
+from llmproxy.utils.exceptions.llmproxy_client import (
+    RequestsFailed,
+    UserConfigError,
+    ModelRequestFailed,
+    LLMProxyConfigError,
+)
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
 from llmproxy.utils import categorization
@@ -51,13 +57,20 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(available_models, settings) -> Dict[str, object]:
+def _setup_user_models(available_models=None, settings=None) -> Dict[str, object]:
     """Setup all available models and return dict of {name: instance_of_model}"""
-    # Prevent shared argument bug
-    if available_models is None:
-        available_models = {}
-    if settings is None:
-        settings = {}
+    if not available_models:
+        raise UserConfigError(
+            "Available models not found, please ensure you have the latest version of LLM Proxy."
+        )
+    if not settings:
+        raise UserConfigError(
+            "Configuration not found, please ensure that you the correct path and format of configuration file"
+        )
+    if not settings["user_settings"]:
+        raise UserConfigError(
+            "No models found in user settings. Please ensure the format of the configuration file is correct."
+        )
 
     try:
         user_models = {}
@@ -65,11 +78,12 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
         for provider in settings["user_settings"]:
             model_name = provider["model"].lower().strip()
             # Check if user model in available models
+
             if model_name in available_models:
                 # If the user providers NO variations then raise error
                 if "models" not in provider or provider["models"] is None:
                     raise LLMProxyConfigError(
-                        "No models provided in llmproxy.config.yml"
+                        f"No models provided in llmproxy.config.yml for the following model: {model_name}"
                     )
 
                 # Loop through and set up instance of model
@@ -104,8 +118,10 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
                     user_models[model] = model_instance
 
         return user_models
-    except Exception as e:
+    except UnsupportedModel as e:
         raise e
+    except Exception as e:
+        raise UserConfigError(f"Unknown error occured during llmproxy.config setup:{e}")
 
 
 @dataclass
@@ -152,7 +168,7 @@ class LLMProxy:
         self,
         route_type: Literal["cost", "category"] = RouteType.COST.value,
         prompt: str = "",
-    ) -> str:
+    ) -> CompletionResponse:
         match RouteType(route_type.lower()):
             case RouteType.COST:
                 return self._cost_route(prompt=prompt)
@@ -180,7 +196,6 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            print(f"HELLO:{instance_data}")
             logger.info(f"Making request to model: {instance_data['name']}\n")
             logger.info("ROUTING...\n")
 
@@ -192,7 +207,7 @@ class LLMProxy:
                 )
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning(f"Request to model {instance_data['name']}failed!\n")
+                logger.warning(f"Request to model {instance_data['name']} failed!\n")
                 logger.warning(f"Error when making request to model: {e}\n")
 
         # If all model fails raise an Exception to notify user
@@ -239,7 +254,7 @@ class LLMProxy:
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning("Request to model failed!")
+                logger.warning(f"Request to model {instance_data['name']} failed!\n")
                 logger.warning(f"Error when making request to model: {e}\n")
 
         if not completion_res:
@@ -248,11 +263,3 @@ class LLMProxy:
             )
 
         return CompletionResponse(response=completion_res, errors=errors)
-
-
-class RequestsFailed(Exception):
-    pass
-
-
-class LLMProxyConfigError(Exception):
-    pass

@@ -22,18 +22,27 @@ user_settings:
     # context: "Answer politely"
 
   - model: Llama2
-    temperature: 0.1
     api_key_var: LLAMA2_API_KEY
     max_output_tokens: 256
+    temperature: 0.1
     models:
       - Llama-2-7b-chat-hf
+      - Llama-2-7b-chat
+      - Llama-2-7b-hf
+      - Llama-2-7b
       - Llama-2-13b-chat-hf
+      - Llama-2-13b-chat
+      - Llama-2-13b-hf
+      - Llama-2-13b
       - Llama-2-70b-chat-hf
+      - Llama-2-70b-chat
+      - Llama-2-70b-hf
+      - Llama-2-70b
 
   - model: Cohere 
-    temperature: 0.1
     api_key_var: COHERE_API_KEY
     max_output_tokens: 256
+    temperature: 0.1
     models:
       - command
       - command-light
@@ -41,12 +50,13 @@ user_settings:
       - command-light-nightly
 
   - model: Mistral
-    temperature: 0.1
     api_key_var: MISTRAL_API_KEY
     max_output_tokens: 256
+    temperature: 0.1
     models:
       - Mistral-7B-v0.1
-      - Mistral-7B-Instruct-v0.1
+      - Mistral-7B-Instruct-v0.2
+      - Mistral-8x7B-Instruct-v0.1
 
   - model: VertexAI 
     temperature: 0.1
