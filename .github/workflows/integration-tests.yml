@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: poetry lock --no-update && poetry install
 
-      - name: Create .env.test file
+      - name: Create .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_DEBUG: false
