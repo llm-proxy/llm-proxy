@@ -30,9 +30,11 @@ def cost_routing() -> None:
     print(output.response)
     print(output.errors)
 
+
 def main() -> None:
     cost_routing()
     category_routing()
+
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,12 @@ import importlib
 from llmproxy.utils.enums import BaseEnum
 from typing import Any, Dict, List, Literal
 from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.utils.exceptions.llmproxy_client import RequestsFailed, UserConfigError, ModelRequestFailed, LLMProxyConfigError
+from llmproxy.utils.exceptions.llmproxy_client import (
+    RequestsFailed,
+    UserConfigError,
+    ModelRequestFailed,
+    LLMProxyConfigError,
+)
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
 from llmproxy.utils import categorization
@@ -55,11 +60,17 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
 def _setup_user_models(available_models=None, settings=None) -> Dict[str, object]:
     """Setup all available models and return dict of {name: instance_of_model}"""
     if not available_models:
-        raise UserConfigError("Available models not found, please ensure you have the latest version of LLM Proxy.")
+        raise UserConfigError(
+            "Available models not found, please ensure you have the latest version of LLM Proxy."
+        )
     if not settings:
-        raise UserConfigError("Configuration not found, please ensure that you the correct path and format of configuration file")
+        raise UserConfigError(
+            "Configuration not found, please ensure that you the correct path and format of configuration file"
+        )
     if not settings["user_settings"]:
-        raise UserConfigError("No models found in user settings. Please ensure the format of the configuration file is correct.")
+        raise UserConfigError(
+            "No models found in user settings. Please ensure the format of the configuration file is correct."
+        )
 
     try:
         user_models = {}
@@ -252,5 +263,3 @@ class LLMProxy:
             )
 
         return CompletionResponse(response=completion_res, errors=errors)
-
-
