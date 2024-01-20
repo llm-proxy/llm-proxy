@@ -38,7 +38,7 @@ jobs:
           envkey_MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           envkey_LLAMA2_API_KEY: ${{ secrets.LLAMA2_API_KEY }}
           #directory: <directory_name> # optional
-          file_name: .env.test # optional (default: .env)
+          file_name: .env # optional (default: .env)
           fail_on_empty: false # optional (default: false)
 
       - id: auth
