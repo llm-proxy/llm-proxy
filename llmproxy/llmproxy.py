@@ -11,6 +11,8 @@ from llmproxy.utils import categorization
 
 from dotenv import load_dotenv
 
+load_dotenv(".env")
+
 
 def _get_settings_from_yml(
     path_to_yml: str = "",
