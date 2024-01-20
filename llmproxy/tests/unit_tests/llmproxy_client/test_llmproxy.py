@@ -12,6 +12,8 @@ from llmproxy.llmproxy import LLMProxy
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
+llmproxy = LLMProxy()
+
 
 # TODO: FIX
 def test_empty_model() -> None:
