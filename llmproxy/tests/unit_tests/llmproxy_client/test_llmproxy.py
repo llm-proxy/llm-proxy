@@ -264,29 +264,30 @@ def test_setup_user_models_empty_user_settings():
         )
 
 
-def test_setup_user_models_no_variations():
+def test_setup_user_models_no_variation() -> None:
+    text = "Unknown error occured during llmproxy.config setup:No models provided in llmproxy.config.yml for the following model: openai"
     with pytest.raises(
-        LLMProxyConfigError,
-        match=r"No models provided in llmproxy\.config\.yml for the following model: OpenAI",
+        UserConfigError,
+        match=text,
     ):
-        _setup_user_models(
-            available_models={
-                "available_models": [
+        test_setting = _get_settings_from_yml(
+            path_to_yml="llmproxy/config/internal.config.yml"
+        )
+        test_available_model = _setup_available_models(settings=test_setting)
+
+        result = _setup_user_models(
+            available_models=test_available_model,
+            settings={
+                "user_settings": [
                     {
-                        "name": "OpenAI",
-                        "class": "llmproxy.provider.openai.chatgpt.OpenAI",
-                        "models": [
-                            {
-                                "name": "gpt-3.5-turbo-1106",
-                            },
-                            {
-                                "name": "gpt-3.5-turbo-instruct",
-                            },
-                        ],
+                        "model": "OpenAI",
+                        "api_key_var": "OPENAI_API_KEY",
+                        "max_output_tokens": 256,
+                        "temperature": 0.1,
+                        "models": None,
                     }
                 ]
             },
-            settings={"user_settings": [{"model": "OpenAI", "models": None}]},
         )
 
 
