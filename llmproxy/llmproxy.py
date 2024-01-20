@@ -51,13 +51,14 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(available_models, settings) -> Dict[str, object]:
+def _setup_user_models(available_models=None, settings=None) -> Dict[str, object]:
     """Setup all available models and return dict of {name: instance_of_model}"""
-    # Prevent shared argument bug
-    if available_models is None:
-        available_models = {}
-    if settings is None:
-        settings = {}
+    if not available_models:
+        raise UserConfigError("Available models not found, please ensure you have the latest version of LLM Proxy.")
+    if not settings:
+        raise UserConfigError("Configuration not found, please ensure that you the correct path and format of configuration file")
+    if not settings["user_settings"]:
+        raise UserConfigError("No models found in user settings. Please ensure the format of the configuration file is correct.")
 
     try:
         user_models = {}
@@ -65,11 +66,12 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
         for provider in settings["user_settings"]:
             model_name = provider["model"].lower().strip()
             # Check if user model in available models
+
             if model_name in available_models:
                 # If the user providers NO variations then raise error
                 if "models" not in provider or provider["models"] is None:
                     raise LLMProxyConfigError(
-                        "No models provided in llmproxy.config.yml"
+                        f"No models provided in llmproxy.config.yml for the following model: {model_name}"
                     )
 
                 # Loop through and set up instance of model
@@ -105,7 +107,7 @@ def _setup_user_models(available_models, settings) -> Dict[str, object]:
 
         return user_models
     except Exception as e:
-        raise e
+        raise SetupUserModelsError(f"Unknown error occured during llmproxy.config setup:{e}")
 
 
 @dataclass
@@ -255,4 +257,7 @@ class RequestsFailed(Exception):
 
 
 class LLMProxyConfigError(Exception):
+    pass
+
+class UserConfigError(Exception):
     pass
