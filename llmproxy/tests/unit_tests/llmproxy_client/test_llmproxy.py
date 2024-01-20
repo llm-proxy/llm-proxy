@@ -11,20 +11,32 @@ from llmproxy.llmproxy import LLMProxy
 
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
-llmproxy = LLMProxy()
+path_to_env_test = ".env.test"
 
 
 # TODO: FIX
 def test_empty_model() -> None:
+    # This need to be the specific exception that it would raise
+    # You need to merge main for the updated exceptions
     with pytest.raises(Exception, match="No models provided in llmproxy.config.yml"):
-        settings = _get_settings_from_yml(
-            path_to_yml=f"{CURRENT_DIRECTORY}/empty_model_test.yml"
+        # You need to use this
+        LLMProxy(
+            path_to_user_configuration=f"{CURRENT_DIRECTORY}/empty_model_test.yml",
+            path_to_env_vars=".env.test"
         )
-        available_model = _setup_available_models(settings=settings)
-        user_model = _setup_user_models(
-            settings=settings, available_models=available_model
-        )
+
+
+        # NOTE: These are technically class functions; You should not be using them directly like this
+        # You can do this for specfic tests for these functions, but not for a general LLM Proxy test;
+        # For that you need to initalize the LLMProxy, because that is where the logic lies
+
+        # settings = _get_settings_from_yml(
+        #     path_to_yml=f"{CURRENT_DIRECTORY}/empty_model_test.yml"
+        # )
+        # available_model = _setup_available_models(settings=settings)
+        # user_model = _setup_user_models(
+        #     settings=settings, available_models=available_model
+        # )
 
 
 def test_invalid_model() -> None:
@@ -75,4 +87,5 @@ def test_cost_routing() -> None:
     # Act
     output = proxy_client.route(route_type="cost", prompt=prompt)
     # Assert
+    # NOTE: You can't do this test; It is not a unit test, it is an integration test
     assert "that is an apple" in output.response
