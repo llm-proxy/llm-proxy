@@ -12,7 +12,9 @@ from llmproxy.llmproxy import LLMProxy
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
-llmproxy = LLMProxy()
+proxy_client = LLMProxy(
+    path_to_user_configuration="llmproxy.config.yml",
+)
 
 
 # TODO: FIX
