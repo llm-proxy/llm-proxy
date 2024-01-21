@@ -35,7 +35,7 @@ jobs:
           envkey_DEBUG: false
           envkey_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_TEST }}
           envkey_COHERE_API_KEY: ${{ secrets.COHERE_API_KEY_TEST }}
-          envkey_MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY_TEST }}
+          envkey_HUGGING_FACE_API_KEY: ${{ secrets.HUGGING_FACE_API_KEY_TEST }}
           envkey_LLAMA2_API_KEY: ${{ secrets.LLAMA2_API_KEY_TEST }}
           #directory: <directory_name> # optional
           file_name: .env.test # optional (default: .env)
