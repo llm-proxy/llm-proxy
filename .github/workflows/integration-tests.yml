@@ -49,3 +49,8 @@ jobs:
 
       - name: Run integration tests
         run: poetry run python3 test.py
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: testing
+          actual: 2
+      
