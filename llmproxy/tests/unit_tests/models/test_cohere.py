@@ -1,9 +1,11 @@
 import os
-from dotenv import load_dotenv
-from llmproxy.provider.cohere.cohere import Cohere, CohereModel
-import pytest
 
-from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
+import pytest
+from dotenv import load_dotenv
+
+from llmproxy.provider.cohere.cohere import Cohere, CohereModel
+from llmproxy.utils.exceptions.provider import (CohereException,
+                                                UnsupportedModel)
 
 load_dotenv(".env.test")
 

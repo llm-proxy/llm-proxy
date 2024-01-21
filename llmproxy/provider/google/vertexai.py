@@ -1,12 +1,14 @@
-from google.cloud import aiplatform
-from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.provider.base import BaseProvider
-from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
-from llmproxy.utils.log import logger
+from google.auth import exceptions as auth_exceptions
+from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
+
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import (UnsupportedModel,
+                                                VertexAIException)
+from llmproxy.utils.log import logger
 
 # VERTEX IS PER CHARACTER
 vertexai_price_data = {

@@ -1,21 +1,20 @@
-from dataclasses import dataclass, field
-import os
-import yaml
 import importlib
-from llmproxy.utils.enums import BaseEnum
+import os
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal
+
+import yaml
+from dotenv import load_dotenv
+
+from llmproxy.utils import categorization
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.llmproxy_client import (LLMProxyConfigError,
+                                                       ModelRequestFailed,
+                                                       RequestsFailed,
+                                                       UserConfigError)
 from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.utils.exceptions.llmproxy_client import (
-    RequestsFailed,
-    UserConfigError,
-    ModelRequestFailed,
-    LLMProxyConfigError,
-)
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
-from llmproxy.utils import categorization
-
-from dotenv import load_dotenv
 
 
 def _get_settings_from_yml(
