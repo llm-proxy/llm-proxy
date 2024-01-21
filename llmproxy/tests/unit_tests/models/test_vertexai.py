@@ -62,19 +62,3 @@ def test_invalid_location():
 
 if __name__ == "__main__":
     unittest.main()
-
-
-# test not working properly
-# will fix in a different PR
-"""
-def test_invalid_credentials(monkeypatch) -> None:
-    #Arrange
-    monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "TEST")
-    vertexai = VertexAI(prompt="What is 1+1?",project_id=project_id)
-
-    #Act
-    response = vertexai.get_completion()
-
-    #Assert
-    assert "was not found" in response.message
-"""
