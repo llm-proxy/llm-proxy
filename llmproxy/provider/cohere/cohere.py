@@ -1,4 +1,5 @@
 import cohere
+
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
@@ -80,7 +81,7 @@ class Cohere(BaseProvider):
         prompt: str = "",
         model: CohereModel = CohereModel.COMMAND.value,
         temperature: float = 0.0,
-        api_key: str = "",
+        api_key: str | None = "",
         max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
