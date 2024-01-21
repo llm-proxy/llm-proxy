@@ -1,7 +1,7 @@
 from tokenizers import Tokenizer, pre_tokenizers
 from tokenizers.models import BPE
-from tokenizers.trainers import BpeTrainer
 from tokenizers.pre_tokenizers import Whitespace
+from tokenizers.trainers import BpeTrainer
 
 tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
 

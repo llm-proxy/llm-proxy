@@ -6,8 +6,7 @@ from vertexai.language_models import TextGenerationModel
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.exceptions.provider import (UnsupportedModel,
-                                                VertexAIException)
+from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 from llmproxy.utils.log import logger
 
 # VERTEX IS PER CHARACTER

@@ -1,12 +1,12 @@
 import os
-
 from unittest.mock import patch
-from openai import error
-from dotenv import load_dotenv
-import pytest
-from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.provider.openai.chatgpt import OpenAI, OpenAIException
 
+import pytest
+from dotenv import load_dotenv
+from openai import error
+
+from llmproxy.provider.openai.chatgpt import OpenAI, OpenAIException
+from llmproxy.utils.exceptions.provider import UnsupportedModel
 
 load_dotenv(".env.test")
 
