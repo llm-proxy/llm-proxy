@@ -7,7 +7,7 @@ from llmproxy.provider.huggingface.mistral import Mistral, MistralException
 
 load_dotenv(".env.test")
 
-mistral_api_key = os.getenv("MISTRAL_API_KEY")
+mistral_api_key = os.getenv("HUGGING_FACE_API_KEY")
 
 
 def test_mistral_constructor_default() -> None:

@@ -66,7 +66,7 @@ class Mistral(BaseProvider):
         self,
         prompt: str = "",
         model: MistralModel = MistralModel.Mistral_7B_V01.value,
-        api_key: str = "",
+        api_key: str | None = "",
         temperature: float = 1.0,
         max_output_tokens: int = None,
     ) -> None:
