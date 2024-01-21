@@ -5,5 +5,5 @@ all: format test
 test:
 	PYTHONPATH=. pytest
 format:
-	poetry run black .
 	poetry run isort .
+	poetry run black .

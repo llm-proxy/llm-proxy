@@ -4,8 +4,7 @@ from openai import error
 
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.exceptions.provider import (OpenAIException,
-                                                UnsupportedModel)
+from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
 from llmproxy.utils.log import logger
 
 # This should be available later from the yaml file

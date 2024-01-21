@@ -8,10 +8,12 @@ from dotenv import load_dotenv
 
 from llmproxy.utils import categorization
 from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.exceptions.llmproxy_client import (LLMProxyConfigError,
-                                                       ModelRequestFailed,
-                                                       RequestsFailed,
-                                                       UserConfigError)
+from llmproxy.utils.exceptions.llmproxy_client import (
+    LLMProxyConfigError,
+    ModelRequestFailed,
+    RequestsFailed,
+    UserConfigError,
+)
 from llmproxy.utils.exceptions.provider import UnsupportedModel
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap

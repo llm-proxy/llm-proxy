@@ -2,8 +2,7 @@ import cohere
 
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.exceptions.provider import (CohereException,
-                                                UnsupportedModel)
+from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
 
 cohere_price_data_summarize_generate_chat = {

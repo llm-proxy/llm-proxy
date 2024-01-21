@@ -3,8 +3,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from llmproxy.provider.huggingface.llama2 import (Llama2, Llama2Exception,
-                                                  Llama2Model)
+from llmproxy.provider.huggingface.llama2 import Llama2, Llama2Exception, Llama2Model
 from llmproxy.utils.exceptions.provider import EmptyPrompt, UnsupportedModel
 
 load_dotenv(".env.test")
