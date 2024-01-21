@@ -33,10 +33,10 @@ jobs:
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_DEBUG: false
-          envkey_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          envkey_COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
-          envkey_MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-          envkey_LLAMA2_API_KEY: ${{ secrets.LLAMA2_API_KEY }}
+          envkey_OPENAI_API_KEY_TEST: ${{ secrets.OPENAI_API_KEY }}
+          envkey_COHERE_API_KEY_TEST: ${{ secrets.COHERE_API_KEY }}
+          envkey_MISTRAL_API_KEY_TEST: ${{ secrets.MISTRAL_API_KEY }}
+          envkey_LLAMA2_API_KEY_TEST: ${{ secrets.LLAMA2_API_KEY }}
           #directory: <directory_name> # optional
           file_name: .env.test # optional (default: .env)
           fail_on_empty: false # optional (default: false)
