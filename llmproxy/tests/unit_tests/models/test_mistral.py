@@ -1,9 +1,9 @@
 import os
 
 import pytest
+from dotenv import load_dotenv
 
 from llmproxy.provider.huggingface.mistral import Mistral, MistralException
-from dotenv import load_dotenv
 
 load_dotenv(".env.test")
 

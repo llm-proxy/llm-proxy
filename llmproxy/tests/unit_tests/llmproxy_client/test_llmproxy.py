@@ -1,14 +1,13 @@
+import os
+
+import pytest
+
 from llmproxy.llmproxy import (
+    LLMProxy,
     _get_settings_from_yml,
     _setup_available_models,
     _setup_user_models,
 )
-import pytest
-
-import os
-
-from llmproxy.llmproxy import LLMProxy
-
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 

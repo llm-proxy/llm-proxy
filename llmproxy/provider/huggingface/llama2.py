@@ -1,5 +1,7 @@
 import requests
+
 from llmproxy.provider.base import BaseProvider
+from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import (
     EmptyPrompt,
@@ -7,8 +9,6 @@ from llmproxy.utils.exceptions.provider import (
     UnsupportedModel,
 )
 from llmproxy.utils.log import logger
-from llmproxy.utils import tokenizer
-
 
 llama2_price_data = {
     "max-output-tokens": 50,
