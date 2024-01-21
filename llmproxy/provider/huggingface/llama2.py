@@ -127,7 +127,7 @@ class Llama2(BaseProvider):
         self,
         prompt: str = "",
         system_prompt: str = "Answer politely",
-        api_key: str = "",
+        api_key: str | None = "",
         temperature: float = 1.0,
         model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
         max_output_tokens: int = None,

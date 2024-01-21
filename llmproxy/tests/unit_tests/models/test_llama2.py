@@ -8,7 +8,7 @@ from llmproxy.utils.exceptions.provider import EmptyPrompt, UnsupportedModel
 
 load_dotenv(".env.test")
 """This test assumes a free version access token from huggingface"""
-default_api_key = os.getenv("LLAMA2_API_KEY")
+default_api_key = os.getenv("HUGGING_FACE_API_KEY")
 
 default_prompt = "What's 1+1?"
 default_system_prompt = "Answer correctly"

@@ -1,6 +1,7 @@
 import importlib
 import os
 from dataclasses import dataclass, field
+from logging import exception
 from typing import Any, Dict, List, Literal
 
 import yaml
@@ -181,12 +182,15 @@ class LLMProxy:
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
-            logger.info(msg="========Start Cost Estimation===========")
-            cost = instance.get_estimated_max_cost(prompt=prompt)
-            logger.info(msg="========End Cost Estimation===========\n")
+            try:
+                logger.info(msg="========Start Cost Estimation===========")
+                cost = instance.get_estimated_max_cost(prompt=prompt)
+                logger.info(msg="========End Cost Estimation===========\n")
 
-            item = {"name": model_name, "cost": cost, "instance": instance}
-            min_heap.push(cost, item)
+                item = {"name": model_name, "cost": cost, "instance": instance}
+                min_heap.push(cost, item)
+            except Exception as e:
+                logger.error(msg=e)
 
         completion_res = None
         errors = []
