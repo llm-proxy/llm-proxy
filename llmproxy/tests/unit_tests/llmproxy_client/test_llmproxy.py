@@ -1,20 +1,17 @@
+import os
+
+import pytest
+import yaml
+
 from llmproxy.llmproxy import (
+    LLMProxy,
+    LLMProxyConfigError,
+    UnsupportedModel,
+    UserConfigError,
     _get_settings_from_yml,
     _setup_available_models,
     _setup_user_models,
 )
-import pytest
-import yaml
-
-import os
-
-from llmproxy.llmproxy import (
-    LLMProxy,
-    UnsupportedModel,
-    UserConfigError,
-    LLMProxyConfigError,
-)
-
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 path_to_env_test = ".env.test"
