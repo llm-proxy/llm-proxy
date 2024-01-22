@@ -33,7 +33,8 @@ def cost_routing() -> None:
 
 def main() -> None:
     cost_routing()
-    category_routing()
+    # category routing is currently not working
+    # category_routing()
 
 
 if __name__ == "__main__":
