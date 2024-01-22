@@ -226,20 +226,20 @@ class LLMProxy:
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
         best_fit_category = categorization.categorize_text(prompt)
-        for (
-            model_name,
-            instance,
-        ) in self.user_models.items():
-            logger.info(
-                msg="========Start fetching model for category routing==========="
-            )
-            category_rank = instance.get_category_rank(best_fit_category)
-            item = {"name": model_name, "rank": category_rank, "instance": instance}
-            min_heap.push(category_rank, item)
-            logger.info(msg="Sorting fetched models based on proficency...")
-            logger.info(
-                msg="========Finished fetching model for category routing=============\n"
-            )
+        for model_name, instance in self.user_models.items():
+            try:
+                logger.info(
+                    msg="========Start fetching model for category routing==========="
+                )
+                category_rank = instance.get_category_rank(best_fit_category)
+                item = {"name": model_name, "rank": category_rank, "instance": instance}
+                min_heap.push(category_rank, item)
+                logger.info(msg="Sorting fetched models based on proficency...")
+                logger.info(
+                    msg="========Finished fetching model for category routing=============\n"
+                )
+            except Exception as e:
+                logger.error(msg=e)
 
         completion_res = None
         errors = []
