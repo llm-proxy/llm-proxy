@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "llm-proxy"
+name = "llmproxy"
 version = "0.1.0"
 description = "LLM Proxy to reduce cost and complexity of using multiple LLMs"
 authors = ["laxitshahi"]
@@ -34,5 +34,5 @@ pytest-cov = "^4.1.0"
 pythonpath = ["."]
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "setuptools>=49.6.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
