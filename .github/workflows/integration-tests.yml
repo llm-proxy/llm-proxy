@@ -2,9 +2,6 @@ name: Integration Tests
 
 on: push
 
-env:
-  GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
-
 jobs:
 
   run-integration-tests:
@@ -49,10 +46,5 @@ jobs:
 
       - name: Run integration tests
         run: poetry run python3 test.py
-        
-      - name: assert output
-        uses: nick-fields/assert-action@v1
-        with:
-          expected: testing
-          actual: 2
+
       
