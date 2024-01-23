@@ -21,6 +21,7 @@ pyyaml = "^6.0.1"
 datasets = "^2.14.7"
 evaluate = "^0.4.1"
 isort = "^5.13.2"
+wheel = "^0.42.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
