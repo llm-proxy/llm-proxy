@@ -16,8 +16,11 @@ from llmproxy.utils.exceptions.llmproxy_client import (
     UserConfigError,
 )
 from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.utils.log import logger
+from llmproxy.utils.log import logger, CustomLogger
 from llmproxy.utils.sorting import MinHeap
+import sys
+import time
+
 
 
 def _get_settings_from_yml(
@@ -184,6 +187,8 @@ class LLMProxy:
         for model_name, instance in self.user_models.items():
             try:
                 logger.info(msg="========Start Cost Estimation===========")
+
+                CustomLogger.loading_animation()
                 cost = instance.get_estimated_max_cost(prompt=prompt)
                 logger.info(msg="========End Cost Estimation===========\n")
 
@@ -233,6 +238,7 @@ class LLMProxy:
             logger.info(
                 msg="========Start fetching model for category routing==========="
             )
+
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
