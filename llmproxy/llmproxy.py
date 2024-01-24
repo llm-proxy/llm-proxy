@@ -187,7 +187,7 @@ class LLMProxy:
         for model_name, instance in self.user_models.items():
             try:
                 logger.info(msg="========Start Cost Estimation===========")
-                CustomLogger.loading_animation()
+                CustomLogger.loading_animation_sucess()
                 cost = instance.get_estimated_max_cost(prompt=prompt)
                 logger.info(msg="========End Cost Estimation===========\n")
 
@@ -205,19 +205,23 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info(f"Making request to model: {instance_data['name']}\n")
-            logger.info("ROUTING...\n")
+            logger.info(msg="========START ROUTING===========")
+            logger.info(f"Making request to model: {instance_data['name']}")
+            logger.info("ROUTING...")
 
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                CustomLogger.loading_animation_sucess()
                 logger.info(
                     "==========ROUTING COMPLETE! Call to model successful!==========\n"
                 )
             except Exception as e:
+                CustomLogger.loading_animation_failure()
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning(f"Request to model {instance_data['name']} failed!\n")
-                logger.warning(f"Error when making request to model: {e}\n")
+                logger.warning(f"Request to model {instance_data['name']} failed!")
+                logger.warning(f"Error when making request to model: {e}")
+                logger.info(msg="========ROUTING FAILED!===========\n")
 
         # If all model fails raise an Exception to notify user
         if not completion_res:
