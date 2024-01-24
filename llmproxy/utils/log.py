@@ -85,14 +85,14 @@ class CustomLogger:
     @classmethod
     def loading_animation(cls):
         print("LOADING...")
-        animation = ["[■■□□□□□□□□□□□□□□□□□□]", "[■■■■□□□□□□□□□□□□□□□□]", "[■■■■■■□□□□□□□□□□□□□□]",
-                     "[■■■■■■■■□□□□□□□□□□□□]",
-                     "[■■■■■■■■■■□□□□□□□□□□]", "[■■■■■■■■■■■■□□□□□□□□]", "[■■■■■■■■■■■■■■□□□□□□]",
-                     "[■■■■■■■■■■■■■■■■□□□□]",
+        animation = ["[■■□□□□□□□□□□□□□□□□□□]", "[■■■■□□□□□□□□□□□□□□□□]",
+                     "[■■■■■■□□□□□□□□□□□□□□]", "[■■■■■■■■□□□□□□□□□□□□]",
+                     "[■■■■■■■■■■□□□□□□□□□□]", "[■■■■■■■■■■■■□□□□□□□□]",
+                     "[■■■■■■■■■■■■■■□□□□□□]", "[■■■■■■■■■■■■■■■■□□□□]",
                      "[■■■■■■■■■■■■■■■■■■□□]", "[■■■■■■■■■■■■■■■■■■■■]"]
 
         for i in range(len(animation)):
-            time.sleep(0.005)
+            time.sleep(0.05)
             sys.stdout.write(
                 "\r" + cls.CustomFormatter.green + animation[i % len(animation)] + cls.CustomFormatter.reset)
             sys.stdout.flush()
@@ -100,5 +100,4 @@ class CustomLogger:
 
 
 # Toggle
-logger = CustomLogger.get_logger("LOG", show_details=False)
-# test
+logger = CustomLogger.get_logger("LOG", show_details = False)

@@ -187,7 +187,6 @@ class LLMProxy:
         for model_name, instance in self.user_models.items():
             try:
                 logger.info(msg="========Start Cost Estimation===========")
-
                 CustomLogger.loading_animation()
                 cost = instance.get_estimated_max_cost(prompt=prompt)
                 logger.info(msg="========End Cost Estimation===========\n")
