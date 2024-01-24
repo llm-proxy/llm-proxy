@@ -101,4 +101,4 @@ class CustomLogger:
 
 # Toggle
 logger = CustomLogger.get_logger("LOG", show_details=False)
-
+# test
