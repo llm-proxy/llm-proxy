@@ -37,7 +37,8 @@ class CustomLogger:
         def format(self, record):
             log_fmt = self.FORMATS.get(record.levelno)
             if not CustomLogger._show_details:
-                log_fmt = " %(name)s: %(asctime)s [%(levelname)s] >> %(message)s"
+                #log_fmt = " %(name)s: %(asctime)s [%(levelname)s] >> %(message)s"
+                log_fmt = ">> %(message)s"
             formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
             return formatter.format(record)
 
