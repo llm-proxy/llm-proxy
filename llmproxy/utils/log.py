@@ -84,13 +84,27 @@ class CustomLogger:
         logger.addHandler(file_handler)
 
     @classmethod
-    def loading_animation(cls):
+    def loading_animation_sucess(cls):
         print("LOADING...")
         animation = ["[■■□□□□□□□□□□□□□□□□□□]", "[■■■■□□□□□□□□□□□□□□□□]",
                      "[■■■■■■□□□□□□□□□□□□□□]", "[■■■■■■■■□□□□□□□□□□□□]",
                      "[■■■■■■■■■■□□□□□□□□□□]", "[■■■■■■■■■■■■□□□□□□□□]",
                      "[■■■■■■■■■■■■■■□□□□□□]", "[■■■■■■■■■■■■■■■■□□□□]",
                      "[■■■■■■■■■■■■■■■■■■□□]", "[■■■■■■■■■■■■■■■■■■■■]"]
+
+        for i in range(len(animation)):
+            time.sleep(0.05)
+            sys.stdout.write(
+                "\r" + cls.CustomFormatter.green + animation[i % len(animation)] + cls.CustomFormatter.reset)
+            sys.stdout.flush()
+        print("\n")
+
+    @classmethod
+    def loading_animation_failure(cls):
+        print("LOADING...")
+        animation = ["[■■□□□□□□□□□□□□□□□□□□]", "[■■■■□□□□□□□□□□□□□□□□]",
+                     "[■■■■■■□□□□□□□□□□□□□□]", "[■■■■■■■■□□□□□□□□□□□□]",
+                     cls.CustomFormatter.red + "[■■■■■■■■■■□□□□□□□□□□]"]
 
         for i in range(len(animation)):
             time.sleep(0.05)
