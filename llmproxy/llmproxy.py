@@ -1,7 +1,6 @@
 import importlib
 import os
 from dataclasses import dataclass, field
-from logging import exception
 from typing import Any, Dict, List, Literal
 
 import yaml
@@ -253,10 +252,6 @@ class LLMProxy:
             logger.info(f"Making request to model: {instance_data['name']}")
             logger.info("ROUTING...")
 
-            # # Timeout if request takes too long
-            # signal.signal(signal.SIGALRM, handler)
-            # signal.alarm(10)
-            # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
