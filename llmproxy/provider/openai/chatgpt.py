@@ -1,10 +1,11 @@
-from llmproxy.models.base import BaseModel, CompletionResponse
-from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.log import logger
 import openai
-from openai import error
 import tiktoken
+from openai import error
 
+from llmproxy.provider.base import BaseProvider
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
+from llmproxy.utils.log import logger
 
 # This should be available later from the yaml file
 # Cost is converted into whole numbers to avoid inconsistent floats
@@ -102,7 +103,7 @@ class OpenAIModel(str, BaseEnum):
     GPT_3_5_TURBO_INSTRUCT = "gpt-3.5-turbo-instruct"
 
 
-class OpenAI(BaseModel):
+class OpenAI(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
@@ -118,12 +119,13 @@ class OpenAI(BaseModel):
         openai.api_key = api_key
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in OpenAIModel:
-            return self._handle_error(
+            raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
-                error_type="ValueError",
+                error_type="OpenAI Error",
             )
+
         try:
             messages = [{"role": "user", "content": prompt or self.prompt}]
             response = openai.ChatCompletion.create(
@@ -133,18 +135,15 @@ class OpenAI(BaseModel):
                 max_tokens=self.max_output_tokens,
             )
         except error.OpenAIError as e:
-            logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+            raise OpenAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
         except Exception as e:
-            logger.error(e.args[0])
-            # This might need to be changed to a different error
-            raise Exception("Unknown OpenAI Error")
+            raise OpenAIException(
+                exception=e.args[0], error_type="Unknown OpenAI Error"
+            ) from e
 
-        return CompletionResponse(
-            payload=response.choices[0].message["content"],
-            message="OK",
-            err="",
-        )
+        return response.choices[0].message["content"]
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -188,6 +187,3 @@ class OpenAI(BaseModel):
         category_rank = open_ai_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)

@@ -1,16 +1,16 @@
-import logging
 import datetime as dt
-
-"""Logging Levels
-1. Debug: Used when diagnosing problems
-2. Info: Confirm that things are working as expected
-3. Warning: Indication that something unexpected happened, or something that may lead to a bigger issue
-4. Error: A serious problem; the software wasn't able to do something
-5. Critical: A serious error; program may be unable to continue running
-"""
+import logging
 
 
 class CustomFormatter(logging.Formatter):
+    """Logging Levels
+    1. Debug: Used when diagnosing problems
+    2. Info: Confirm that things are working as expected
+    3. Warning: Indication that something unexpected happened, or something that may lead to a bigger issue
+    4. Error: A serious problem; the software wasn't able to do something
+    5. Critical: A serious error; program may be unable to continue running
+    """
+
     grey = "\x1b[38;20m"
     yellow = "\x1b[33;20m"
     red = "\x1b[31;20m"

@@ -1,15 +1,27 @@
-from llmproxy.models.base import BaseModel, CompletionResponse
-from llmproxy.utils.enums import BaseEnum
 import requests
-from llmproxy.utils.log import logger
-from llmproxy.utils import tokenizer
 
-# prices not accurate
+from llmproxy.provider.base import BaseProvider
+from llmproxy.utils import tokenizer
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
+from llmproxy.utils.log import logger
+
 mistral_price_data = {
     "max-output-tokens": 50,
     "model-costs": {
-        "prompt": 1.30 / 1_000_000,
-        "completion": 1.70 / 1_000_000,
+        # Cost per 1k tokens * 1000
+        "Mistral-7B-v0.1": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Mistral-7B-Instruct-v0.2": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Mistral-8x7B-Instruct-v0.1": {
+            "prompt": 0.30 / 1_000_000,
+            "completion": 1.0 / 1_000_000,
+        },
     },
 }
 
@@ -44,16 +56,17 @@ mistral_category_data = {
 
 
 class MistralModel(str, BaseEnum):
-    Mistral_7B = "Mistral-7B-v0.1"
-    Mistral_7B_Instruct = "Mistral-7B-Instruct-v0.1"
+    Mistral_7B_V01 = "Mistral-7B-v0.1"
+    Mistral_7B_Instruct_V02 = "Mistral-7B-Instruct-v0.2"
+    Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
 
 
-class Mistral(BaseModel):
+class Mistral(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
-        model: MistralModel = MistralModel.Mistral_7B_Instruct.value,
-        api_key: str = "",
+        model: MistralModel = MistralModel.Mistral_7B_V01.value,
+        api_key: str | None = "",
         temperature: float = 1.0,
         max_output_tokens: int = None,
     ) -> None:
@@ -63,11 +76,11 @@ class Mistral(BaseModel):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in MistralModel:
-            return CompletionResponse(
-                message=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
-                err="ValueError",
+            raise UnsupportedModel(
+                exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
+                error_type=ValueError,
             )
         try:
             API_URL = (
@@ -88,23 +101,24 @@ class Mistral(BaseModel):
                     },
                 }
             )
+        except requests.RequestException as e:
+            raise MistralException(
+                f"Request error: {e}", error_type="RequestError"
+            ) from e
         except Exception as e:
-            raise Exception(e)
+            raise MistralException(
+                f"Unknown error: {e}", error_type="UnknownError"
+            ) from e
 
         response = ""
-        message = ""
         if isinstance(output, list) and "generated_text" in output[0]:
             response = output[0]["generated_text"]
         elif "error" in output:
-            message = "ERROR: " + output["error"]
+            raise MistralException(f"{output['error']}", error_type="MistralError")
         else:
             raise ValueError("Unknown output format")
 
-        return CompletionResponse(
-            payload=response,
-            message=message,
-            err="",
-        )
+        return response
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -114,10 +128,12 @@ class Mistral(BaseModel):
         # Assumption, model exists (check should be done at yml load level)
         logger.info(f"Tokenizing model: {self.model}")
 
-        prompt_cost_per_token = mistral_price_data["model-costs"]["prompt"]
+        prompt_cost_per_token = mistral_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = mistral_price_data["model-costs"]["completion"]
+        completion_cost_per_token = mistral_price_data["model-costs"][self.model][
+            "completion"
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)

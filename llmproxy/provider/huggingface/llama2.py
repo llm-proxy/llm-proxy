@@ -1,15 +1,67 @@
 import requests
-from llmproxy.models.base import BaseModel, CompletionResponse
-from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.log import logger
-from llmproxy.utils import tokenizer
 
-# This is not accurate data
+from llmproxy.provider.base import BaseProvider
+from llmproxy.utils import tokenizer
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import (
+    EmptyPrompt,
+    Llama2Exception,
+    UnsupportedModel,
+)
+from llmproxy.utils.log import logger
+
 llama2_price_data = {
     "max-output-tokens": 50,
     "model-costs": {
-        "prompt": 1.10 / 1_000_000,
-        "completion": 1.80 / 1_000_000,
+        # Cost per 1k tokens * 1000
+        "Llama-2-7b-chat-hf": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-7b-chat": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-7b-hf": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-7b": {
+            "prompt": 0.05 / 1_000_000,
+            "completion": 0.25 / 1_000_000,
+        },
+        "Llama-2-13b-chat-hf": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-13b-chat": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-13b-hf": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-13b": {
+            "prompt": 0.10 / 1_000_000,
+            "completion": 0.50 / 1_000_000,
+        },
+        "Llama-2-70b-chat-hf": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
+        "Llama-2-70b-chat": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
+        "Llama-2-70b-hf": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
+        "Llama-2-70b": {
+            "prompt": 0.65 / 1_000_000,
+            "completion": 2.75 / 1_000_000,
+        },
     },
 }
 
@@ -56,19 +108,28 @@ llama2_category_data = {
 
 
 class Llama2Model(str, BaseEnum):
-    LLAMA_2_7B = "Llama-2-7b-chat-hf"
-    LLAMA_2_13B = "Llama-2-13b-chat-hf"
-    LLAMA_2_70B = "Llama-2-70b-chat-hf"
+    LLAMA_2_7B_CHAT_HF = "Llama-2-7b-chat-hf"
+    LLAMA_2_7B_CHAT = "Llama-2-7b-chat"
+    LLAMA_2_7B_HF = "Llama-2-7b-hf"
+    LLAMA_2_7B = "Llama-2-7b"
+    LLAMA_2_13B_CHAT_HF = "Llama-2-13b-chat-hf"
+    LLAMA_2_13B_CHAT = "Llama-2-13b-chat"
+    LLAMA_2_13B_HF = "Llama-2-13b-hf"
+    LLAMA_2_13B = "Llama-2-13b"
+    LLAMA_2_70B_CHAT_HF = "Llama-2-70b-chat-hf"
+    LLAMA_2_70B_CHAT = "Llama-2-70b-chat"
+    LLAMA_2_70B_HF = "Llama-2-70b-hf"
+    LLAMA_2_70B = "Llama-2-70b"
 
 
-class Llama2(BaseModel):
+class Llama2(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
         system_prompt: str = "Answer politely",
-        api_key: str = "",
+        api_key: str | None = "",
         temperature: float = 1.0,
-        model: Llama2Model = Llama2Model.LLAMA_2_7B.value,
+        model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
         max_output_tokens: int = None,
     ) -> None:
         self.system_prompt = system_prompt
@@ -78,19 +139,16 @@ class Llama2(BaseModel):
         self.model = model
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         # If empty api key
         if not self.api_key:
-            return self._handle_error(
-                exception="No API Provided", error_type="InputError"
-            )
+            raise Llama2Exception(exception="No API Provided", error_type="ValueError")
 
         if self.prompt == "" and prompt == "":
-            return self._handle_error(
-                exception="No prompt detected", error_type="InputError"
-            )
+            raise EmptyPrompt("Empty prompt detected")
+
         if self.model not in Llama2Model:
-            return self._handle_error(
+            raise UnsupportedModel(
                 exception=f"Invalid Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
                 error_type="ValueError",
             )
@@ -117,14 +175,12 @@ class Llama2(BaseModel):
             )
 
         except Exception as e:
-            raise Exception("Error Occur for prompting Llama2")
+            raise Llama2Exception(exception=e.args[0], error_type="Llama2Error") from e
 
         if output["error"]:
-            return self._handle_error(
-                exception=output["error"], error_type="Llama2Error"
-            )
+            raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
-        return CompletionResponse(payload=output, message="OK", err="")
+        return output
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -134,10 +190,12 @@ class Llama2(BaseModel):
         # Assumption, model exists (check should be done at yml load level)
         logger.info(f"Tokenizing model: {self.model}")
 
-        prompt_cost_per_token = llama2_price_data["model-costs"]["prompt"]
+        prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
-        completion_cost_per_token = llama2_price_data["model-costs"]["completion"]
+        completion_cost_per_token = llama2_price_data["model-costs"][self.model][
+            "completion"
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
@@ -164,6 +222,3 @@ class Llama2(BaseModel):
         category_rank = llama2_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)

@@ -1,11 +1,13 @@
-from google.cloud import aiplatform
-from google.auth import exceptions as auth_exceptions
 from google.api_core import exceptions as api_exceptions
-from llmproxy.models.base import BaseModel, CompletionResponse
-from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.log import logger
+from google.auth import exceptions as auth_exceptions
+from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
+
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
+from llmproxy.utils.enums import BaseEnum
+from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
+from llmproxy.utils.log import logger
 
 # VERTEX IS PER CHARACTER
 vertexai_price_data = {
@@ -40,7 +42,7 @@ class VertexAIModel(str, BaseEnum):
     PALM_CHAT = "chat-bison"
 
 
-class VertexAI(BaseModel):
+class VertexAI(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
@@ -57,9 +59,9 @@ class VertexAI(BaseModel):
         self.location = location
         self.max_output_tokens = max_output_tokens
 
-    def get_completion(self, prompt: str = "") -> CompletionResponse:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in VertexAIModel:
-            return self._handle_error(
+            raise UnsupportedModel(
                 exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
                 error_type="ValueError",
             )
@@ -78,16 +80,19 @@ class VertexAI(BaseModel):
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
-            logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+            raise VertexAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
         except auth_exceptions.GoogleAuthError as e:
-            logger.error(e.args[0])
-            return self._handle_error(exception=e.args[0], error_type=type(e).__name__)
+            raise VertexAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
         except Exception as e:
-            logger.error(e.args[0])
-            raise Exception(f"Unknown Vertexai Error:{e}")
+            raise VertexAIException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
 
-        return CompletionResponse(payload=output, message="OK", err="")
+        return output
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -128,6 +133,3 @@ class VertexAI(BaseModel):
         category_rank = vertexai_category_data["model-categories"][self.model][category]
         logger.info(msg=f"Rank of category: {category_rank}")
         return category_rank
-
-    def _handle_error(self, exception: str, error_type: str) -> CompletionResponse:
-        return CompletionResponse(message=exception, err=error_type)
