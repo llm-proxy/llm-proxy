@@ -1,6 +1,7 @@
 available_models:
   - name: OpenAI
     class: llmproxy.provider.openai.chatgpt.OpenAI
+    max-output-tokens: 50
     models:
       - name: gpt-3.5-turbo-1106
         cost_per_token_input: 0.0000010
@@ -17,6 +18,7 @@ available_models:
 
   - name: Llama2
     class: llmproxy.provider.huggingface.llama2.Llama2
+    max-output-tokens: 50
     models:
       - name: Llama-2-7b-chat-hf
         cost_per_token_input: 0.00000005
@@ -57,6 +59,7 @@ available_models:
 
   - name: Mistral
     class: llmproxy.provider.huggingface.mistral.Mistral
+    max-output-tokens: 50
     models:
       - name: Mistral-7B-v0.1
         cost_per_token_input: 0.00000005
@@ -70,6 +73,7 @@ available_models:
 
   - name: Cohere
     class: llmproxy.provider.cohere.cohere.Cohere
+    max-output-tokens: 50
     models:
       - name: command
         cost_per_token_input: 0.0000015
@@ -86,6 +90,7 @@ available_models:
 
   - name: Vertexai
     class: llmproxy.provider.google.vertexai.VertexAI
+    max-output-tokens: 50
     models:
       - name: text-bison
         cost_per_token_input: 0.0000015

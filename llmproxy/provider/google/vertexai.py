@@ -3,6 +3,7 @@ from google.auth import exceptions as auth_exceptions
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
+from llmproxy.llmproxy import load_model_costs
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
@@ -10,13 +11,9 @@ from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIExcepti
 from llmproxy.utils.log import logger
 
 # VERTEX IS PER CHARACTER
-vertexai_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        "prompt": 0.0005 / 1_000,
-        "completion": 0.0005 / 1_000,
-    },
-}
+vertexai_price_data = load_model_costs(
+    "llmproxy/config/internal.config.yml", "Vertexai"
+)
 
 vertexai_category_data = {
     "model-categories": {
@@ -103,10 +100,14 @@ class VertexAI(BaseProvider):
 
         logger.info(f"Tokenizing model: {self.model}")
 
-        prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
+        prompt_cost_per_character = vertexai_price_data["model-costs"][self.model][
+            "prompt"
+        ]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_character}")
 
-        completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
+        completion_cost_per_character = vertexai_price_data["model-costs"][self.model][
+            "completion"
+        ]
         logger.info(f"Output cost per token: {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)

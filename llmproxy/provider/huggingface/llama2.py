@@ -1,5 +1,6 @@
 import requests
 
+from llmproxy.llmproxy import load_model_costs
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
@@ -10,60 +11,7 @@ from llmproxy.utils.exceptions.provider import (
 )
 from llmproxy.utils.log import logger
 
-llama2_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "Llama-2-7b-chat-hf": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b-chat": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b-hf": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-13b-chat-hf": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b-chat": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b-hf": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-70b-chat-hf": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b-chat": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b-hf": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-    },
-}
+llama2_price_data = load_model_costs("llmproxy/config/internal.config.yml", "Llama2")
 
 llama2_category_data = {
     "model-categories": {

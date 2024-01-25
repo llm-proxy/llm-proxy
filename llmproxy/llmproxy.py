@@ -126,6 +126,33 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, object
         raise UserConfigError(f"Unknown error occured during llmproxy.config setup:{e}")
 
 
+def load_model_costs(path_to_yml: str, provider_name: str) -> dict:
+    config = _get_settings_from_yml(path_to_yml)
+    models = next(
+        (
+            provider
+            for provider in config["available_models"]
+            if provider["name"] == provider_name
+        ),
+        None,
+    )
+
+    if models:
+        max_output_tokens = models.get("max-output-tokens", 50)
+        return {
+            "max-output-tokens": max_output_tokens,
+            "model-costs": {
+                model["name"]: {
+                    "prompt": model["cost_per_token_input"],
+                    "completion": model["cost_per_token_output"],
+                }
+                for model in models["models"]
+            },
+        }
+    else:
+        raise ValueError("Models not found in the config file")
+
+
 @dataclass
 class CompletionResponse:
     """

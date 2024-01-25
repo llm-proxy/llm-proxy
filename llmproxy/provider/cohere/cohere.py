@@ -1,17 +1,14 @@
 import cohere
 
+from llmproxy.llmproxy import load_model_costs
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
 
-cohere_price_data_summarize_generate_chat = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        "prompt": 1.50 / 1_000_000,
-        "completion": 2.00 / 1_000_000,
-    },
-}
+cohere_price_data_summarize_generate_chat = load_model_costs(
+    "llmproxy/config/internal.config.yml", "Cohere"
+)
 
 cohere_category_data = {
     "model-categories": {
@@ -125,12 +122,12 @@ class Cohere(BaseProvider):
 
         prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
-        ]["prompt"]
+        ][self.model]["prompt"]
         logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
 
         completion_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
-        ]["completion"]
+        ][self.model]["completion"]
         logger.info(f"Output cost per token: {completion_cost_per_token}")
 
         tokens = self.co.tokenize(text=prompt or self.prompt).tokens

@@ -1,29 +1,13 @@
 import requests
 
+from llmproxy.llmproxy import load_model_costs
 from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
 from llmproxy.utils.log import logger
 
-mistral_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "Mistral-7B-v0.1": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Mistral-7B-Instruct-v0.2": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Mistral-8x7B-Instruct-v0.1": {
-            "prompt": 0.30 / 1_000_000,
-            "completion": 1.0 / 1_000_000,
-        },
-    },
-}
+mistral_price_data = load_model_costs("llmproxy/config/internal.config.yml", "Mistral")
 
 mistral_category_data = {
     "model-categories": {
