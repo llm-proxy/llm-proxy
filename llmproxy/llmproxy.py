@@ -123,7 +123,9 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, object
     except UnsupportedModel as e:
         raise e
     except Exception as e:
-        raise UserConfigError(f"Unknown error occured during llmproxy.config setup:{e}")
+        raise UserConfigError(
+            f"Unknown error occured during llmproxy.config setup:{e}"
+        ) from e
 
 
 @dataclass
