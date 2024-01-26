@@ -203,7 +203,7 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info(f"Making request to model: {instance_data['name']}\n")
+            logger.info("Making request to model: %s\n", instance_data["name"])
             logger.info("ROUTING...\n")
 
             # Attempt to make request to model
@@ -214,8 +214,8 @@ class LLMProxy:
                 )
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning(f"Request to model {instance_data['name']} failed!\n")
-                logger.warning(f"Error when making request to model: {e}\n")
+                logger.warning("Request to model %s failed!\n", instance_data["name"])
+                logger.warning("Error when making request to model: %s\n", e)
 
         # If all model fails raise an Exception to notify user
         if not completion_res:
@@ -252,7 +252,7 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info(f"Making request to model: {instance_data['name']}")
+            logger.info("Making request to model: %s", instance_data["name"])
             logger.info("ROUTING...")
 
             # Attempt to make request to model
@@ -261,8 +261,8 @@ class LLMProxy:
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning(f"Request to model {instance_data['name']} failed!\n")
-                logger.warning(f"Error when making request to model: {e}\n")
+                logger.warning("Request to model %s failed!\n", instance_data["name"])
+                logger.warning("Error when making request to model: %s\n", e)
 
         if not completion_res:
             raise RequestsFailed(
