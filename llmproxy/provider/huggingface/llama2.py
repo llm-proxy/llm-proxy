@@ -188,22 +188,22 @@ class Llama2(BaseProvider):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-        logger.info(f"Tokenizing model: {self.model}")
+        logger.info(f"MODEL: {self.model}")
 
         prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
-        logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
+        logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
         completion_cost_per_token = llama2_price_data["model-costs"][self.model][
             "completion"
         ]
-        logger.info(f"Output cost per token: {completion_cost_per_token}")
+        logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
-        logger.info(f"Number of input tokens found: {len(tokens)}")
+        logger.info(f"INPUT TOKENS: {len(tokens)}")
 
         logger.info(
-            f"Final calculation using {len(tokens)} input tokens and {llama2_price_data['max-output-tokens']} output tokens"
+            f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}"
         )
 
         cost = round(
@@ -212,7 +212,7 @@ class Llama2(BaseProvider):
             8,
         )
 
-        logger.info(f"Calculated Cost: {cost}")
+        logger.info(f"COST: {cost}")
 
         return cost
 
