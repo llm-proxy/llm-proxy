@@ -9,5 +9,5 @@ class BaseProvider(ABC):
     """
 
     @abstractmethod
-    def get_completion(self, **kwargs: Any) -> str:
+    def get_completion(self, prompt: str = "") -> str:
         pass
