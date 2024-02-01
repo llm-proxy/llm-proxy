@@ -7,3 +7,6 @@ test:
 format:
 	poetry run isort .
 	poetry run black .
+
+check:
+	pre-commit run --all-files
