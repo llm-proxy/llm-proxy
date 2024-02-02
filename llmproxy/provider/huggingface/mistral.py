@@ -51,6 +51,18 @@ mistral_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
+        "Mistral-7B-Instruct-v0.2": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
     }
 }
 
