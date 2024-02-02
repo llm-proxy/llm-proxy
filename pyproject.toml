@@ -6,8 +6,8 @@ authors = ["laxitshahi"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-openai = "^0.28.1"
+python = ">=3.10,<4.0"
+openai = "^1.0"
 python-dotenv = ">=0.21.0"
 pytest = "^7.4.2"
 pytest-cov = "^4.1.0"

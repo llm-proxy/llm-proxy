@@ -153,9 +153,10 @@ class LLMProxy:
 
         load_dotenv(path_to_env_vars)
 
+        CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
         # Read YML and see which models the user wants
         dev_settings = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
+            path_to_yml=f"{CURRENT_DIRECTORY}\config\internal.config.yml"
         )
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
