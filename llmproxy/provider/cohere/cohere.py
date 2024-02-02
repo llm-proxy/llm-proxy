@@ -121,24 +121,26 @@ class Cohere(BaseProvider):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-        logger.info(f"Tokenizing model: {self.model}")
+        logger.info("Tokenizing model: %s", self.model)
 
         prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
         ]["prompt"]
-        logger.info(f"Prompt Cost per token: {prompt_cost_per_token}")
+        logger.info("Prompt Cost per token: %s", prompt_cost_per_token)
 
         completion_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
         ]["completion"]
-        logger.info(f"Output cost per token: {completion_cost_per_token}")
+        logger.info("Output cost per token: %s", completion_cost_per_token)
 
         tokens = self.co.tokenize(text=prompt or self.prompt).tokens
 
-        logger.info(f"Number of input tokens found: {len(tokens)}")
+        logger.info("Number of input tokens found: %d", len(tokens))
 
         logger.info(
-            f"Final calculation using {len(tokens)} input tokens and {cohere_price_data_summarize_generate_chat['max-output-tokens']} output tokens"
+            "Final calculation using %d input tokens and %d output tokens",
+            len(tokens),
+            cohere_price_data_summarize_generate_chat["max-output-tokens"],
         )
 
         cost = round(
@@ -148,7 +150,7 @@ class Cohere(BaseProvider):
             8,
         )
 
-        logger.info(f"Calculated Cost: {cost}")
+        logger.info("Calculated Cost: %s", cost)
 
         return cost
 
