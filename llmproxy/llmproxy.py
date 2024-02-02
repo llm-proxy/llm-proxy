@@ -20,7 +20,7 @@ from llmproxy.utils.log import logger, CustomLogger
 from llmproxy.utils.sorting import MinHeap
 import sys
 import time
-
+from tqdm import tqdm
 
 
 def _get_settings_from_yml(
@@ -155,6 +155,7 @@ class LLMProxy:
         self.route_type = "cost"
 
         load_dotenv(path_to_env_vars)
+        # CustomLogger.loading_animation_sucess()
 
         # Read YML and see which models the user wants
         dev_settings = _get_settings_from_yml(
@@ -187,7 +188,8 @@ class LLMProxy:
         for model_name, instance in self.user_models.items():
             try:
                 logger.info(msg="========Start Cost Estimation===========")
-                CustomLogger.loading_animation_sucess()
+                # CustomLogger.loading_animation_sucess()
+
                 cost = instance.get_estimated_max_cost(prompt=prompt)
                 logger.info(msg="========End Cost Estimation===========\n")
 
@@ -206,13 +208,14 @@ class LLMProxy:
 
             instance_data = min_val_instance["data"]
             logger.info(msg="========START ROUTING===========")
-            logger.info(f"Making request to model: {instance_data['name']}")
+            logger.info(f"Making request to model:{instance_data['name']}")
             logger.info("ROUTING...")
+            # CustomLogger.loading_animation_sucess()
 
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
-                CustomLogger.loading_animation_sucess()
+                # CustomLogger.loading_animation_sucess()
                 logger.info(
                     "==========ROUTING COMPLETE! Call to model successful!==========\n"
                 )
@@ -260,7 +263,6 @@ class LLMProxy:
 
             instance_data = min_val_instance["data"]
             logger.info(f"Making request to model: {instance_data['name']}")
-            logger.info("ROUTING...")
 
             # Attempt to make request to model
             try:
