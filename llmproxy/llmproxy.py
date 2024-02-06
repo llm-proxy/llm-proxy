@@ -179,7 +179,7 @@ class LLMProxy:
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
             case _:
-                raise ValueError("Invalid route type, please try again.        ")
+                raise ValueError("Invalid route type, please try again")
 
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
