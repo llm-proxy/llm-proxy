@@ -9,12 +9,10 @@ from dotenv import load_dotenv
 
 from llmproxy.utils import categorization
 from llmproxy.utils.enums import BaseEnum
-from llmproxy.utils.exceptions.llmproxy_client import (
-    LLMProxyConfigError,
-    ModelRequestFailed,
-    RequestsFailed,
-    UserConfigError,
-)
+from llmproxy.utils.exceptions.llmproxy_client import (LLMProxyConfigError,
+                                                       ModelRequestFailed,
+                                                       RequestsFailed,
+                                                       UserConfigError)
 from llmproxy.utils.exceptions.provider import UnsupportedModel
 from llmproxy.utils.log import logger
 from llmproxy.utils.sorting import MinHeap
@@ -179,7 +177,7 @@ class LLMProxy:
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
             case _:
-                raise ValueError("Invalid route type, please try again")
+                raise ValueError("Invalid route type, please try again.")
 
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
