@@ -1,6 +1,6 @@
 import requests
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import (
@@ -230,7 +230,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B = "Llama-2-70b"
 
 
-class Llama2(BaseProvider):
+class Llama2Adapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",

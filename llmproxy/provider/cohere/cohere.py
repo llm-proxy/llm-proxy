@@ -1,6 +1,7 @@
 import cohere
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
+from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
@@ -75,7 +76,7 @@ class CohereModel(str, BaseEnum):
     COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
 
 
-class Cohere(BaseProvider):
+class CohereAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
@@ -133,7 +134,9 @@ class Cohere(BaseProvider):
         ]["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_token)
 
-        tokens = self.co.tokenize(text=prompt or self.prompt).tokens
+        # Note: Avoiding costs for now
+        # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
+        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
         logger.info("Number of input tokens found: %d", len(tokens))
 

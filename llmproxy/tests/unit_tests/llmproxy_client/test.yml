@@ -1,5 +1,5 @@
 user_settings:
-  - model: OpenAI
+  - provider: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key
     max_output_tokens: 256
     temperature: 0.1
@@ -11,7 +11,7 @@ user_settings:
       - gpt-4-32k
     # context: "Answer politely"
   #
-  - model: Llama2
+  - provider: Llama2
     temperature: 0.1
     api_key_var: HUGGING_FACE_API_KEY
     max_output_tokens: 256
@@ -29,7 +29,7 @@ user_settings:
       - Llama-2-70b-hf
       - Llama-2-70b
 
-  - model: Cohere
+  - provider: Cohere
     temperature: 0.1
     api_key_var: COHERE_API_KEY
     max_output_tokens: 256
@@ -39,7 +39,7 @@ user_settings:
       - command-nightly
       - command-light-nightly
 
-  - model: Mistral
+  - provider: Mistral
     temperature: 0.1
     api_key_var: HUGGING_FACE_API_KEY
     max_output_tokens: 256
@@ -49,7 +49,7 @@ user_settings:
       - Mistral-8x7B-Instruct-v0.1
 
 # DONT USE FOR TESTING FOR NOW TO AVOID CHARGES
-# - model: VertexAI
+# - provider: VertexAI
 #   temperature: 0.1
 #   api_key_var: GOOGLE_PROJECT_ID
 #   max_output_tokens: 256
@@ -59,8 +59,8 @@ user_settings:
 # - chat-bison
 
 available_models:
-  - name: OpenAI
-    class: llmproxy.provider.openai.chatgpt.OpenAI
+  - provider: OpenAI
+    adapter_path: llmproxy.provider.openai.chatgpt.OpenAIAdapter
     models:
       - name: gpt-3.5-turbo-1106
         cost_per_token_input: 0.0000010
@@ -75,26 +75,61 @@ available_models:
         cost_per_token_input: 0.00006
         cost_per_token_output: 0.00012
 
-  - name: Llama2
-    class: llmproxy.provider.huggingface.llama2.Llama2
+  - provider: Llama2
+    adapter_path: llmproxy.provider.huggingface.llama2.Llama2Adapter
     models:
       - name: Llama-2-7b-chat-hf
-        cost_per_hour: 0.06
+        cost_per_token_input: 0.00000005
+        cost_per_token_output: 0.00000025
+      - name: Llama-2-7b-chat
+        cost_per_token_input: 0.00000005
+        cost_per_token_output: 0.00000025
+      - name: Llama-2-7b-hf
+        cost_per_token_input: 0.00000005
+        cost_per_token_output: 0.00000025
+      - name: Llama-2-7b
+        cost_per_token_input: 0.00000005
+        cost_per_token_output: 0.00000025
       - name: Llama-2-13b-chat-hf
-        cost_per_hour: 0.06
+        cost_per_token_input: 0.0000001
+        cost_per_token_output: 0.0000005
+      - name: Llama-2-13b-chat
+        cost_per_token_input: 0.0000001
+        cost_per_token_output: 0.0000005
+      - name: Llama-2-13b-hf
+        cost_per_token_input: 0.0000001
+        cost_per_token_output: 0.0000005
+      - name: Llama-2-13b
+        cost_per_token_input: 0.0000001
+        cost_per_token_output: 0.0000005
       - name: Llama-2-70b-chat-hf
-        cost_per_hour: 0.06
+        cost_per_token_input: 0.00000065
+        cost_per_token_output: 0.00000275
+      - name: Llama-2-70b-chat
+        cost_per_token_input: 0.00000065
+        cost_per_token_output: 0.00000275
+      - name: Llama-2-70b-hf
+        cost_per_token_input: 0.00000065
+        cost_per_token_output: 0.00000275
+      - name: Llama-2-70b
+        cost_per_token_input: 0.00000065
+        cost_per_token_output: 0.00000275
 
-  - name: Mistral
-    class: llmproxy.provider.huggingface.mistral.Mistral
+  - provider: Mistral
+    adapter_path: llmproxy.provider.huggingface.mistral.MistralAdapter
     models:
       - name: Mistral-7B-v0.1
-        cost_per_hour: 0.06
-      - name: Mistral-7B-Instruct-v0.1
-        cost_per_hour: 0.06
+        cost_per_token_input: 0.00000005
+        cost_per_token_output: 0.00000025
+      - name: Mistral-7B-Instruct-v0.2
+        cost_per_token_input: 0.00000005
+        cost_per_token_output: 0.00000025
+      - name: Mistral-8x7B-Instruct-v0.1
+        cost_per_token_input: 0.0000003
+        cost_per_token_output: 0.000001
 
-  - name: Cohere
-    class: llmproxy.provider.cohere.cohere.Cohere
+  - provider: Cohere
+    adapter_path: llmproxy.provider.cohere.cohere.CohereAdapter
     models:
       - name: command
         cost_per_token_input: 0.0000015
@@ -109,8 +144,8 @@ available_models:
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
 
-  - name: Vertexai
-    class: llmproxy.provider.google.vertexai.VertexAI
+  - provider: Vertexai
+    adapter_path: llmproxy.provider.google.vertexai.VertexAIAdapter
     models:
       - name: text-bison
         cost_per_token_input: 0.0000015
