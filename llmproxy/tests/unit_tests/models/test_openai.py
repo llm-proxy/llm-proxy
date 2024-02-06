@@ -1,9 +1,7 @@
 import os
-from unittest.mock import patch
 
 import pytest
 from dotenv import load_dotenv
-from openai import OpenAIError
 
 from llmproxy.provider.openai.chatgpt import OpenAIAdapter, OpenAIException
 from llmproxy.utils.exceptions.provider import UnsupportedModel
@@ -11,6 +9,15 @@ from llmproxy.utils.exceptions.provider import UnsupportedModel
 load_dotenv(".env.test")
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
+
+
+def test_empty_api_key():
+    # Assert
+    with pytest.raises(OpenAIException):
+        # Arrange
+        chatbot = OpenAIAdapter(api_key="")
+        # Act
+        chatbot.get_completion()
 
 
 def test_invalid_api_key():
