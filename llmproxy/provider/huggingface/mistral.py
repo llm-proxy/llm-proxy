@@ -1,6 +1,6 @@
 import requests
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
@@ -73,7 +73,7 @@ class MistralModel(str, BaseEnum):
     Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
 
 
-class Mistral(BaseProvider):
+class MistralAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",

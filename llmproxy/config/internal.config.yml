@@ -1,6 +1,6 @@
 available_models:
-  - name: OpenAI
-    class: llmproxy.provider.openai.chatgpt.OpenAI
+  - provider: OpenAI
+    adapter_path: llmproxy.provider.openai.chatgpt.OpenAIAdapter
     models:
       - name: gpt-3.5-turbo-1106
         cost_per_token_input: 0.0000010
@@ -15,8 +15,8 @@ available_models:
         cost_per_token_input: 0.00006
         cost_per_token_output: 0.00012
 
-  - name: Llama2
-    class: llmproxy.provider.huggingface.llama2.Llama2
+  - provider: Llama2
+    adapter_path: llmproxy.provider.huggingface.llama2.Llama2Adapter
     models:
       - name: Llama-2-7b-chat-hf
         cost_per_token_input: 0.00000005
@@ -55,8 +55,8 @@ available_models:
         cost_per_token_input: 0.00000065
         cost_per_token_output: 0.00000275
 
-  - name: Mistral
-    class: llmproxy.provider.huggingface.mistral.Mistral
+  - provider: Mistral
+    adapter_path: llmproxy.provider.huggingface.mistral.MistralAdapter
     models:
       - name: Mistral-7B-v0.1
         cost_per_token_input: 0.00000005
@@ -68,8 +68,8 @@ available_models:
         cost_per_token_input: 0.0000003
         cost_per_token_output: 0.000001
 
-  - name: Cohere
-    class: llmproxy.provider.cohere.cohere.Cohere
+  - provider: Cohere
+    adapter_path: llmproxy.provider.cohere.cohere.CohereAdapter
     models:
       - name: command
         cost_per_token_input: 0.0000015
@@ -84,8 +84,8 @@ available_models:
         cost_per_token_input: 0.0000015
         cost_per_token_output: 0.000002
 
-  - name: Vertexai
-    class: llmproxy.provider.google.vertexai.VertexAI
+  - provider: Vertexai
+    adapter_path: llmproxy.provider.google.vertexai.VertexAIAdapter
     models:
       - name: text-bison
         cost_per_token_input: 0.0000015

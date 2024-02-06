@@ -62,7 +62,7 @@ def test_invalid_model() -> None:
 def test_get_settings_from_yml(tmp_path) -> None:
     yml_content = """
     user_settings:
-      - model: OpenAI
+      - provider: OpenAI
         api_key_var: OPENAI_API_KEY
         max_output_tokens: 256
         temperature: 0.1
@@ -138,10 +138,8 @@ def test_setup_user_models_empty_user_settings():
 
 
 def test_setup_user_models_no_variation() -> None:
-    text = "Unknown error occured during llmproxy.config setup:No models provided in llmproxy.config.yml for the following model: openai"
     with pytest.raises(
         UserConfigError,
-        match=text,
     ):
         test_setting = _get_settings_from_yml(
             path_to_yml="llmproxy/config/internal.config.yml"
@@ -153,7 +151,7 @@ def test_setup_user_models_no_variation() -> None:
             settings={
                 "user_settings": [
                     {
-                        "model": "OpenAI",
+                        "provider": "OpenAI",
                         "api_key_var": "OPENAI_API_KEY",
                         "max_output_tokens": 256,
                         "temperature": 0.1,

@@ -5,33 +5,16 @@ llm_proxy:
   description: An API that act as a proxy to multiple language models
 
 user_settings:
-  - model: OpenAI
+  - provider: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key
     max_output_tokens: 10000
     temperature: 1.0
     models:
-      - gpt-3.5-turbo-instruct
       - test
-      - gpt-4
+      - gpt-3.5-turbo-instruct
       - gpt-4-32k
-available_models:
-  - name: OpenAI
-    class: llmproxy.provider.openai.chatgpt.OpenAI
-    models:
-      - name: gpt-3.5-turbo-1106
-        cost_per_token_input: 0.0000010
-        cost_per_token_output: 0.0000020
-      - name: gpt-3.5-turbo-instruct
-        cost_per_token_input: 0.0000015
-        cost_per_token_output: 0.0000020
-      - name: gpt-4
-        cost_per_token_input: 0.00003
-        cost_per_token_output: 0.00006
-      - name: gpt-4-32k
-        cost_per_token_input: 0.00006
-        cost_per_token_output: 0.00012
 
-  - name: Llama2
+  - provider: Llama2
     class: llmproxy.provider.huggingface.llama2.Llama2
     models:
       - name: Llama-2-7b-chat-hf
@@ -41,11 +24,10 @@ available_models:
       - name: Llama-2-70b-chat-hf
         cost_per_hour: 0.06
 
-  - name: Mistral
+  - provider: Mistral
     class: llmproxy.provider.huggingface.mistral.Mistral
     models:
       - name: Mistral-7B-v0.1
         cost_per_hour: 0.06
       - name: Mistral-7B-Instruct-v0.1
         cost_per_hour: 0.06
-
