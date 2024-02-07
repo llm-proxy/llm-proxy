@@ -1,6 +1,7 @@
 import cohere
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
+from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
@@ -75,7 +76,7 @@ class CohereModel(str, BaseEnum):
     COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
 
 
-class Cohere(BaseProvider):
+class CohereAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
@@ -121,6 +122,7 @@ class Cohere(BaseProvider):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
+
         logger.info(f"MODEL: {self.model}")
 
         prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
@@ -133,11 +135,15 @@ class Cohere(BaseProvider):
         ]["completion"]
         logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
-        tokens = self.co.tokenize(text=prompt or self.prompt).tokens
+        # Note: Avoiding costs for now
+        # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
+        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
         logger.info(f"INPUT TOKENS: {len(tokens)}")
 
-        logger.info(f"COMPLETION TOKENS: {cohere_price_data_summarize_generate_chat['max-output-tokens']}")
+        logger.info(
+            f"COMPLETION TOKENS: {cohere_price_data_summarize_generate_chat['max-output-tokens']}"
+        )
 
         cost = round(
             prompt_cost_per_token * len(tokens)

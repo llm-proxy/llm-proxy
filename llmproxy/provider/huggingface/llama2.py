@@ -1,6 +1,6 @@
 import requests
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import (
@@ -103,6 +103,114 @@ llama2_category_data = {
             "Financial Task": 1,
             "Content Recommendation Task": 1,
         },
+        "Llama-2-7b-chat": {
+            "Code Generation Task": 4,
+            "Text Generation Task": 5,
+            "Translation and Multilingual Applications Task": 4,
+            "Natural Language Processing Task": 5,
+            "Conversational AI Task": 5,
+            "Educational Applications Task": 4,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 4,
+        },
+        "Llama-2-7b-hf": {
+            "Code Generation Task": 4,
+            "Text Generation Task": 5,
+            "Translation and Multilingual Applications Task": 4,
+            "Natural Language Processing Task": 5,
+            "Conversational AI Task": 5,
+            "Educational Applications Task": 4,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 4,
+        },
+        "Llama-2-7b": {
+            "Code Generation Task": 4,
+            "Text Generation Task": 5,
+            "Translation and Multilingual Applications Task": 4,
+            "Natural Language Processing Task": 5,
+            "Conversational AI Task": 5,
+            "Educational Applications Task": 4,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 4,
+        },
+        "Llama-2-13b-chat": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
+        "Llama-2-13b-hf": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
+        "Llama-2-13b": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
+        "Llama-2-70b-chat": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
+        "Llama-2-70b-hf": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
+        "Llama-2-70b": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
     }
 }
 
@@ -122,7 +230,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B = "Llama-2-70b"
 
 
-class Llama2(BaseProvider):
+class Llama2Adapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
@@ -202,9 +310,7 @@ class Llama2(BaseProvider):
 
         logger.info(f"INPUT TOKENS: {len(tokens)}")
 
-        logger.info(
-            f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}"
-        )
+        logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)

@@ -1,7 +1,7 @@
 import datetime as dt
 import logging
-import time
 import sys
+import time
 
 
 class CustomLogger:
@@ -37,7 +37,7 @@ class CustomLogger:
         def format(self, record):
             log_fmt = self.FORMATS.get(record.levelno)
             if not CustomLogger._show_details:
-                #log_fmt = " %(name)s: %(asctime)s [%(levelname)s] >> %(message)s"
+                # log_fmt = " %(name)s: %(asctime)s [%(levelname)s] >> %(message)s"
                 log_fmt = ">> %(message)s"
             formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
             return formatter.format(record)
@@ -86,33 +86,52 @@ class CustomLogger:
     @classmethod
     def loading_animation_sucess(cls):
         print("LOADING...")
-        animation = ["[■■□□□□□□□□□□□□□□□□□□]", "[■■■■□□□□□□□□□□□□□□□□]",
-                     "[■■■■■■□□□□□□□□□□□□□□]", "[■■■■■■■■□□□□□□□□□□□□]",
-                     "[■■■■■■■■■■□□□□□□□□□□]", "[■■■■■■■■■■■■□□□□□□□□]",
-                     "[■■■■■■■■■■■■■■□□□□□□]", "[■■■■■■■■■■■■■■■■□□□□]",
-                     "[■■■■■■■■■■■■■■■■■■□□]", "[■■■■■■■■■■■■■■■■■■■■]"]
+        animation = [
+            "[■■□□□□□□□□□□□□□□□□□□]",
+            "[■■■■□□□□□□□□□□□□□□□□]",
+            "[■■■■■■□□□□□□□□□□□□□□]",
+            "[■■■■■■■■□□□□□□□□□□□□]",
+            "[■■■■■■■■■■□□□□□□□□□□]",
+            "[■■■■■■■■■■■■□□□□□□□□]",
+            "[■■■■■■■■■■■■■■□□□□□□]",
+            "[■■■■■■■■■■■■■■■■□□□□]",
+            "[■■■■■■■■■■■■■■■■■■□□]",
+            "[■■■■■■■■■■■■■■■■■■■■]",
+        ]
 
         for i in range(len(animation)):
             time.sleep(0.05)
             sys.stdout.write(
-                "\r" + cls.CustomFormatter.green + animation[i % len(animation)] + cls.CustomFormatter.reset)
+                "\r"
+                + cls.CustomFormatter.green
+                + animation[i % len(animation)]
+                + cls.CustomFormatter.reset
+            )
             sys.stdout.flush()
         print("\n")
 
     @classmethod
     def loading_animation_failure(cls):
         print("LOADING...")
-        animation = ["[■■□□□□□□□□□□□□□□□□□□]", "[■■■■□□□□□□□□□□□□□□□□]",
-                     "[■■■■■■□□□□□□□□□□□□□□]", "[■■■■■■■■□□□□□□□□□□□□]",
-                     cls.CustomFormatter.red + "[■■■■■■■■■■□□□□□□□□□□]"]
+        animation = [
+            "[■■□□□□□□□□□□□□□□□□□□]",
+            "[■■■■□□□□□□□□□□□□□□□□]",
+            "[■■■■■■□□□□□□□□□□□□□□]",
+            "[■■■■■■■■□□□□□□□□□□□□]",
+            cls.CustomFormatter.red + "[■■■■■■■■■■□□□□□□□□□□]",
+        ]
 
         for i in range(len(animation)):
             time.sleep(0.05)
             sys.stdout.write(
-                "\r" + cls.CustomFormatter.green + animation[i % len(animation)] + cls.CustomFormatter.reset)
+                "\r"
+                + cls.CustomFormatter.green
+                + animation[i % len(animation)]
+                + cls.CustomFormatter.reset
+            )
             sys.stdout.flush()
         print("\n")
 
 
 # Toggle
-logger = CustomLogger.get_logger("LOG", show_details = False)
+logger = CustomLogger.get_logger("LOG", show_details=False)

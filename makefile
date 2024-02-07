@@ -3,7 +3,7 @@
 all: format test
 
 test:
-	PYTHONPATH=. pytest
+	poetry run pytest
 format:
 	poetry run isort .
 	poetry run black .

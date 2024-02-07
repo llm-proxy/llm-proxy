@@ -1,10 +1,10 @@
 import requests
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
-from llmproxy.utils.log import logger, CustomLogger
+from llmproxy.utils.log import CustomLogger, logger
 
 mistral_price_data = {
     "max-output-tokens": 50,
@@ -39,7 +39,7 @@ mistral_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
-        "Mistral-7B-Instruct-v0.1": {
+        "Mistral-8x7B-Instruct-v0.1": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
@@ -51,6 +51,18 @@ mistral_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
+        "Mistral-7B-Instruct-v0.2": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
     }
 }
 
@@ -61,7 +73,7 @@ class MistralModel(str, BaseEnum):
     Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
 
 
-class Mistral(BaseProvider):
+class MistralAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
