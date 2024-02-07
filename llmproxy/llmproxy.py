@@ -168,11 +168,10 @@ class LLMProxy:
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
         # Setup available models
-        available_models = _setup_available_models(settings=dev_settings)
+        self.available_models = _setup_available_models(settings=dev_settings)
         self.user_models = _setup_user_models(
-            settings=user_settings, available_models=available_models
+            settings=user_settings, available_models=self.available_models
         )
-        self.available_models = available_models
 
     def route(
         self,
