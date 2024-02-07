@@ -3,6 +3,7 @@ import os
 import pytest
 import yaml
 
+from llmproxy.config.internal_config import internal_config
 from llmproxy.llmproxy import (
     LLMProxy,
     UserConfigError,
@@ -89,8 +90,7 @@ def test_get_settings_from_invalid_yml() -> None:
 
 
 def test_setup_available_models() -> None:
-    setting = _get_settings_from_yml("llmproxy/config/internal.config.yml")
-    _setup_available_models(settings=setting)
+    _setup_available_models(settings=internal_config)
 
 
 # TODO: ADD TEST
@@ -116,10 +116,7 @@ def test_setup_user_models_no_setting_UserConfigError():
         UserConfigError,
         match="Configuration not found, please ensure that you the correct path and format of configuration file",
     ):
-        test_setting = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
-        test_available_model = _setup_available_models(settings=test_setting)
+        test_available_model = _setup_available_models(settings=internal_config)
         _setup_user_models(available_models=test_available_model, settings=None)
 
 
@@ -128,10 +125,7 @@ def test_setup_user_models_empty_user_settings():
         UserConfigError,
         match="No models found in user settings. Please ensure the format of the configuration file is correct.",
     ):
-        test_setting = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
-        test_available_model = _setup_available_models(settings=test_setting)
+        test_available_model = _setup_available_models(settings=internal_config)
         _setup_user_models(
             available_models=test_available_model, settings={"user_settings": []}
         )
@@ -141,10 +135,7 @@ def test_setup_user_models_no_variation() -> None:
     with pytest.raises(
         UserConfigError,
     ):
-        test_setting = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
-        test_available_model = _setup_available_models(settings=test_setting)
+        test_available_model = _setup_available_models(settings=internal_config)
 
         _setup_user_models(
             available_models=test_available_model,
