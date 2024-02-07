@@ -29,7 +29,7 @@ def _get_settings_from_yml(
     except ImportError:
         from yaml import SafeLoader
     try:
-        with open(path_to_yml, 'r', encoding='utf-8') as file:
+        with open(path_to_yml, "r", encoding="utf-8") as file:
             return yaml.load(file, Loader=SafeLoader)
     except (FileNotFoundError, yaml.YAMLError) as e:
         raise e
