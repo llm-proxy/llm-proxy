@@ -25,9 +25,12 @@ def _get_settings_from_yml(
 ) -> Dict[str, Any]:
     """Returns all of the data in the yaml file"""
     try:
-        with open(path_to_yml, "r", encoding="utf-8") as file:
-            result = yaml.safe_load(file)
-            return result
+        from yaml import CSafeLoader as SafeLoader
+    except ImportError:
+        from yaml import SafeLoader
+    try:
+        with open(path_to_yml, 'r', encoding='utf-8') as file:
+            return yaml.load(file, Loader=SafeLoader)
     except (FileNotFoundError, yaml.YAMLError) as e:
         raise e
 
