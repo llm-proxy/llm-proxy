@@ -9,7 +9,7 @@ import unittest
 import pytest
 from dotenv import load_dotenv
 
-from llmproxy.provider.google.vertexai import VertexAI, VertexAIException
+from llmproxy.provider.google.vertexai import VertexAIAdapter, VertexAIException
 from llmproxy.utils.exceptions.provider import UnsupportedModel
 
 load_dotenv(".env.test")
@@ -20,7 +20,7 @@ project_id = os.getenv("GOOGLE_PROJECT_ID")
 
 def test_invalid_project_id() -> None:
     # Arrange
-    vertexai = VertexAI(project_id="invalid id")
+    vertexai = VertexAIAdapter(project_id="invalid id")
 
     # Act + Assert
     with pytest.raises(VertexAIException):
@@ -31,14 +31,14 @@ def test_unsupported_model() -> None:
     # Assert
     with pytest.raises(UnsupportedModel):
         # Arrange
-        vertexai = VertexAI(project_id=project_id, model="test")
+        vertexai = VertexAIAdapter(project_id=project_id, model="test")
         # Act
         vertexai.get_completion()
 
 
 def test_get_estimated_max_cost():
     # Arrange
-    vertex = VertexAI(project_id=project_id)
+    vertex = VertexAIAdapter(project_id=project_id)
     expected_cost = 0.000032
     prompt = "I am a cat in a hat!"
 
@@ -55,7 +55,7 @@ def test_invalid_location():
     # Assert
     with pytest.raises(VertexAIException):
         # Arrange
-        vertexai = VertexAI(project_id=project_id, location="test")
+        vertexai = VertexAIAdapter(project_id=project_id, location="test")
         # Act
         vertexai.get_completion()
 

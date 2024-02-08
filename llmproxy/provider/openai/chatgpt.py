@@ -1,8 +1,8 @@
-import openai
 import tiktoken
-from openai import error
+from openai import OpenAI, OpenAIError
+from openai.types import model
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
 from llmproxy.utils.log import logger
@@ -103,7 +103,7 @@ class OpenAIModel(str, BaseEnum):
     GPT_3_5_TURBO_INSTRUCT = "gpt-3.5-turbo-instruct"
 
 
-class OpenAI(BaseProvider):
+class OpenAIAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
@@ -115,9 +115,8 @@ class OpenAI(BaseProvider):
         self.prompt = prompt
         self.model = model
         self.temperature = temperature
-        # We may have to pull this directly from .env and use different .env file/names for testing
-        openai.api_key = api_key
         self.max_output_tokens = max_output_tokens
+        self.api_key = api_key
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in OpenAIModel:
@@ -127,14 +126,15 @@ class OpenAI(BaseProvider):
             )
 
         try:
-            messages = [{"role": "user", "content": prompt or self.prompt}]
-            response = openai.ChatCompletion.create(
+            client = OpenAI(api_key=self.api_key)
+            response = client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt or self.prompt}],
                 model=self.model,
-                messages=messages,
-                temperature=self.temperature,
                 max_tokens=self.max_output_tokens,
+                temperature=self.temperature,
             )
-        except error.OpenAIError as e:
+
+        except OpenAIError as e:
             raise OpenAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e
@@ -143,7 +143,7 @@ class OpenAI(BaseProvider):
                 exception=e.args[0], error_type="Unknown OpenAI Error"
             ) from e
 
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

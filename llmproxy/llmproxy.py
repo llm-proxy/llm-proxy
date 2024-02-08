@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Literal
 import yaml
 from dotenv import load_dotenv
 
+from llmproxy.config.internal_config import internal_config
 from llmproxy.utils import categorization
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.llmproxy_client import (
@@ -31,18 +32,18 @@ def _get_settings_from_yml(
         raise e
 
 
-def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
+def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Returns classname with list of available_models for provider"""
     try:
         available_models = {}
-        # Loop through each "provider": provide means file name of model
-        for provider in settings["available_models"]:
-            key = provider["name"].lower()
-            import_path = provider["class"]
+        # Loop through each provider
+        for provider in settings:
+            key = provider["provider"].lower()
+            import_path = provider["adapter_path"]
 
             # Loop through and aggregate all of the variations of "models" of each provider
             provider_models = set()
-            for model in provider.get("models"):
+            for model in provider.get("models", []):
                 provider_models.add(model["name"])
 
             module_name, class_name = import_path.rsplit(".", 1)
@@ -51,7 +52,10 @@ def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
             model_class = getattr(module, class_name)
 
             # return dict with class path and models set, with all of the variations/models of that provider
-            available_models[key] = {"class": model_class, "models": provider_models}
+            available_models[key] = {
+                "adapter_instance": model_class,
+                "models": provider_models,
+            }
 
         return available_models
     except Exception as e:
@@ -77,7 +81,7 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, object
         user_models = {}
         # Compare user models with available_models
         for provider in settings["user_settings"]:
-            model_name = provider["model"].lower().strip()
+            model_name = provider["provider"].lower().strip()
             # Check if user model in available models
 
             if model_name in available_models:
@@ -113,7 +117,7 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, object
                             provider["api_key_var"]
                         )
 
-                    model_instance = available_models[model_name]["class"](
+                    model_instance = available_models[model_name]["adapter_instance"](
                         **common_parameters
                     )
                     user_models[model] = model_instance
@@ -155,16 +159,16 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML and see which models the user wants
-        dev_settings = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
         # Setup available models
-        available_models = _setup_available_models(settings=dev_settings)
+        available_models = _setup_available_models(settings=internal_config)
+
+        # Setup user models
         self.user_models = _setup_user_models(
             settings=user_settings, available_models=available_models
         )
+
         self.available_models = available_models
 
     def route(

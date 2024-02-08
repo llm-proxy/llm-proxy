@@ -3,7 +3,7 @@ from google.auth import exceptions as auth_exceptions
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
-from llmproxy.provider.base import BaseProvider
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
@@ -42,7 +42,7 @@ class VertexAIModel(str, BaseEnum):
     PALM_CHAT = "chat-bison"
 
 
-class VertexAI(BaseProvider):
+class VertexAIAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
