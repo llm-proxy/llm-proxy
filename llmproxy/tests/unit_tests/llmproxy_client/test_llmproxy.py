@@ -13,7 +13,7 @@ from llmproxy.llmproxy import (
 )
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-path_to_env_test = ".env.test"
+PATH_TO_ENV_TEST = ".env.test"
 
 
 def test_empty_model() -> None:
@@ -36,7 +36,7 @@ def test_no_user_setting(tmp_path) -> None:
     with pytest.raises(UserConfigError, match=text):
         LLMProxy(
             path_to_user_configuration=yml_path,
-            path_to_env_vars=path_to_env_test,
+            path_to_env_vars=PATH_TO_ENV_TEST,
         )
 
 
@@ -49,7 +49,7 @@ def test_no_model_in_user_setting(tmp_path) -> None:
         file.write(yml_content)
     text = "No models found in user settings. Please ensure the format of the configuration file is correct."
     with pytest.raises(UserConfigError, match=text):
-        LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=path_to_env_test)
+        LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=PATH_TO_ENV_TEST)
 
 
 def test_invalid_model() -> None:
@@ -77,7 +77,7 @@ def test_get_settings_from_yml(tmp_path) -> None:
     with open(yml_path, "w", encoding="utf-8") as file:
         file.write(yml_content)
 
-    LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=path_to_env_test)
+    LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=PATH_TO_ENV_TEST)
 
 
 def test_get_settings_from_invalid_yml() -> None:
@@ -85,7 +85,7 @@ def test_get_settings_from_invalid_yml() -> None:
     with pytest.raises((FileNotFoundError, yaml.YAMLError)):
         LLMProxy(
             path_to_user_configuration=invalid_yml_path,
-            path_to_env_vars=path_to_env_test,
+            path_to_env_vars=PATH_TO_ENV_TEST,
         )
 
 
@@ -98,7 +98,7 @@ def test_setup_user_models() -> None:
     path_to_user_configuration_test = f"{CURRENT_DIRECTORY}/test.yml"
     LLMProxy(
         path_to_user_configuration=path_to_user_configuration_test,
-        path_to_env_vars=path_to_env_test,
+        path_to_env_vars=PATH_TO_ENV_TEST,
     )
 
 
