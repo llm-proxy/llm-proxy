@@ -187,7 +187,6 @@ class LLMProxy:
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
-            print(dir(instance))
             try:
                 logger.info(msg="========Start Cost Estimation===========")
                 cost = instance.get_estimated_max_cost(prompt=prompt)
