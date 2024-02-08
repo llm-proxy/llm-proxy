@@ -8,7 +8,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 python-dotenv = "^1.0.0"
-pytest = "^7.4.2"
 cohere = "^4.27"
 tiktoken = "^0.5.1"
 tokenizers = "^0.14.1"
@@ -22,9 +21,11 @@ openai = "^1.11.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
+isort = "^5.13.2"
+
+[tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"
 coverage = "^7.3.2"
-isort = "^5.13.2"
 
 [tool.pytest.ini_options]
 # filterwarnings = ["ignore::DeprecationWarning"]
