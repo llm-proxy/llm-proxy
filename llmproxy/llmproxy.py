@@ -1,12 +1,12 @@
 import importlib
 import os
 from dataclasses import dataclass, field
-from logging import exception
 from typing import Any, Dict, List, Literal
 
 import yaml
 from dotenv import load_dotenv
 
+from llmproxy.config.internal_config import internal_config
 from llmproxy.utils import categorization
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.llmproxy_client import (
@@ -32,18 +32,18 @@ def _get_settings_from_yml(
         raise e
 
 
-def _setup_available_models(settings: Dict[str, Any]) -> Dict[str, Any]:
+def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Returns classname with list of available_models for provider"""
     try:
         available_models = {}
-        # Loop through each "provider": provide means file name of model
-        for provider in settings["available_models"]:
+        # Loop through each provider
+        for provider in settings:
             key = provider["provider"].lower()
             import_path = provider["adapter_path"]
 
             # Loop through and aggregate all of the variations of "models" of each provider
             provider_models = set()
-            for model in provider.get("models"):
+            for model in provider.get("models", []):
                 provider_models.add(model["name"])
 
             module_name, class_name = import_path.rsplit(".", 1)
@@ -159,16 +159,16 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML and see which models the user wants
-        dev_settings = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
         # Setup available models
-        available_models = _setup_available_models(settings=dev_settings)
+        available_models = _setup_available_models(settings=internal_config)
+
+        # Setup user models
         self.user_models = _setup_user_models(
             settings=user_settings, available_models=available_models
         )
+
         self.available_models = available_models
 
     def route(
