@@ -3,12 +3,7 @@ llm_proxy:
   version: demo 1.0
   description: An API that act as a proxy to multiple language models
 
-user_settings:
-  # Example
-  # - routing_mode:
-  #   - cost_routing:
-  #       enable: false
-
+provider_settings:
   - provider: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key
     max_output_tokens: 256

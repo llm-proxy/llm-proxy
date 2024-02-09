@@ -126,6 +126,13 @@ class OpenAIAdapter(BaseAdapter):
                 error_type="UnsupportedModel",
             )
 
+        # Prevent API Connection Error with empty API KEY
+        if self.api_key == "":
+            raise OpenAIException(
+                exception="EMPTY API KEY: API key not provided",
+                error_type="No API Key Provided",
+            )
+
         try:
             client = openai.OpenAI(api_key=self.api_key)
             response = client.chat.completions.create(

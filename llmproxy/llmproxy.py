@@ -80,7 +80,7 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
         )
 
     try:
-        optional_config = settings["optional_configuration"]
+        optional_config = settings.get("optional_configuration", {})
         user_models = {}
         # Compare user models with available_models
         for provider in settings["provider_settings"]:
@@ -108,7 +108,7 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
                         "max_output_tokens": provider["max_output_tokens"],
                         "temperature": provider["temperature"],
                         "model": model,
-                        "timeout": optional_config.get("timeout"),
+                        "timeout": optional_config.get("timeout", None),
                     }
 
                     # Different setup for vertexai
@@ -118,7 +118,9 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
                                 # Project ID required for VertexAI
                                 "project_id": os.getenv(provider["project_id_var"]),
                                 # No internal timeout flag provided
-                                "force_timeout": optional_config.get("force_timeout"),
+                                "force_timeout": optional_config.get(
+                                    "force_timeout", False
+                                ),
                             }
                         )
                     else:

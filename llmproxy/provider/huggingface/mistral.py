@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-from typing import List
-
 import requests
 
 from llmproxy.provider.base import BaseAdapter
@@ -99,6 +96,10 @@ class MistralAdapter(BaseAdapter):
                 exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
                 error_type="UnsupportedModel",
             )
+
+        if not self.api_key:
+            raise ValueError("No Hugging Face API Key Provided")
+
         try:
             api_url = (
                 f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
@@ -129,6 +130,11 @@ class MistralAdapter(BaseAdapter):
                 f"Unknown error: {e}", error_type=" Unknown Mistral Error"
             ) from e
 
+        # Output will be a dict if there is an error
+        if "error" in output:
+            raise MistralException(f"{output['error']}", error_type="MistralError")
+
+        # Output will be a List[dict] if there is no error
         return output[0]["generated_text"]
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
