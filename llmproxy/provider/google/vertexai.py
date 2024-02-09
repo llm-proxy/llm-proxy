@@ -1,3 +1,6 @@
+import multiprocessing
+import threading
+
 from google.api_core import exceptions as api_exceptions
 from google.auth import exceptions as auth_exceptions
 from google.cloud import aiplatform
@@ -64,12 +67,7 @@ class VertexAIAdapter(BaseAdapter):
         self.timeout = timeout
         self.force_timeout = force_timeout
 
-    def get_completion(self, prompt: str = "") -> str:
-        if self.model not in VertexAIModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
-                error_type="ValueError",
-            )
+    def _make_request(self, prompt, result):
         try:
             aiplatform.init(project=self.project_id, location=self.location)
             parameters = {
@@ -80,29 +78,45 @@ class VertexAIAdapter(BaseAdapter):
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
 
-            if not self.force_timeout:
-                response = chat_model.predict(**parameters)
-            else:
-                response = timeout_function(
-                    func=chat_model.predict, timeout=self.timeout, **parameters
-                )
+            response = chat_model.predict(**parameters)
+            result["output"] = response.text
 
-            output = response.text
-
-        except api_exceptions.GoogleAPIError as e:
-            raise VertexAIException(
-                exception=e.args[0], error_type=type(e).__name__
-            ) from e
-        except auth_exceptions.GoogleAuthError as e:
-            raise VertexAIException(
-                exception=e.args[0], error_type=type(e).__name__
-            ) from e
         except Exception as e:
-            raise VertexAIException(
-                exception=e.args[0], error_type=type(e).__name__
-            ) from e
+            result["exception"] = e
 
-        return output
+    def get_completion(self, prompt: str = "") -> str:
+        if self.model not in VertexAIModel:
+            raise UnsupportedModel(
+                exception=f"Model not supported. Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
+                error_type="ValueError",
+            )
+
+        result = {"output": None, "exception": None}
+
+        if not self.force_timeout:
+            result = {"output": None, "exception": None}
+            self._make_request(prompt, result)
+
+        else:
+            thread = threading.Thread(target=self._make_request, args=(prompt, result))
+
+            # make thread daemon so it can run in background
+            # Allows main thread to exit without child thread
+            thread.daemon = True
+            thread.start()
+            thread.join(self.timeout)
+
+            if thread.is_alive():
+                # process.terminate()
+                raise TimeoutError("Operation timed out")
+
+        if result["exception"]:
+            raise VertexAIException(
+                exception=result["exception"].args[0],
+                error_type=type(result["exception"]).__name__,
+            ) from result.get("exception", None)
+
+        return result.get("output")
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

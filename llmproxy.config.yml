@@ -1,5 +1,5 @@
 optional_configuration:
-  timeout: 10 # Timeout for request to models
+  timeout: 1 # Timeout for request to models
   force_timeout: true # WARNING: This can cause additonal costs!
 
 provider_settings:
@@ -13,35 +13,35 @@ provider_settings:
       - gpt-3.5-turbo-1106
       - gpt-4
       - gpt-4-32k
-  #
-  # - provider: Llama2
-  #   api_key_var: HUGGING_FACE_API_KEY
-  #   max_output_tokens: 256
-  #   temperature: 0.1
-  #   models:
-  #     - Llama-2-7b-chat-hf
-  #     - Llama-2-7b-chat
-  #     - Llama-2-7b-hf
-  #     - Llama-2-7b
-  #     - Llama-2-13b-chat-hf
-  #     - Llama-2-13b-chat
-  #     - Llama-2-13b-hf
-  #     - Llama-2-13b
-  #     - Llama-2-70b-chat-hf
-  #     - Llama-2-70b-chat
-  #     - Llama-2-70b-hf
-  #     - Llama-2-70b
-  #
-  # - provider: Cohere
-  #   api_key_var: COHERE_API_KEY
-  #   max_output_tokens: 256
-  #   temperature: 0.1
-  #   models:
-  #     - command
-  #     - command-light
-  #     - command-nightly
-  #     - command-light-nightly
-  #
+
+  - provider: Llama2
+    api_key_var: HUGGING_FACE_API_KEY
+    max_output_tokens: 256
+    temperature: 0.1
+    models:
+      - Llama-2-7b-chat-hf
+      - Llama-2-7b-chat
+      - Llama-2-7b-hf
+      - Llama-2-7b
+      - Llama-2-13b-chat-hf
+      - Llama-2-13b-chat
+      - Llama-2-13b-hf
+      - Llama-2-13b
+      - Llama-2-70b-chat-hf
+      - Llama-2-70b-chat
+      - Llama-2-70b-hf
+      - Llama-2-70b
+
+  - provider: Cohere
+    api_key_var: COHERE_API_KEY
+    max_output_tokens: 256
+    temperature: 0.1
+    models:
+      - command
+      - command-light
+      - command-nightly
+      - command-light-nightly
+
   # - provider: Mistral
   #   api_key_var: HUGGING_FACE_API_KEY
   #   max_output_tokens: 256
@@ -51,11 +51,11 @@ provider_settings:
   #     - Mistral-7B-Instruct-v0.2
   #     - Mistral-8x7B-Instruct-v0.1
   #
-  # - provider: VertexAI
-  #   temperature: 0.1
-  #   project_id_var: GOOGLE_PROJECT_ID
-  #   max_output_tokens: 256
-  #   models:
-  #     - text-bison
-  # Currently not working
-  # - chat-bison
+  - provider: VertexAI
+    temperature: 0.1
+    project_id_var: GOOGLE_PROJECT_ID
+    max_output_tokens: 256
+    models:
+      - text-bison
+      #       #Currently not working
+      # - chat-bison
