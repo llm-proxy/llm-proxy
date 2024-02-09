@@ -8,6 +8,7 @@ from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 from llmproxy.utils.log import logger
+from llmproxy.utils.timeout import timeout_function
 
 # VERTEX IS PER CHARACTER
 vertexai_price_data = {
@@ -50,7 +51,9 @@ class VertexAIAdapter(BaseAdapter):
         model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
         location: str | None = "us-central1",
-        max_output_tokens: int = None,
+        max_output_tokens: int | None = None,
+        timeout: int | None = None,
+        force_timeout: bool = False,
     ) -> None:
         self.prompt = prompt
         self.temperature = temperature
@@ -58,6 +61,8 @@ class VertexAIAdapter(BaseAdapter):
         self.project_id = project_id
         self.location = location
         self.max_output_tokens = max_output_tokens
+        self.timeout = timeout
+        self.force_timeout = force_timeout
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in VertexAIModel:
@@ -67,16 +72,21 @@ class VertexAIAdapter(BaseAdapter):
             )
         try:
             aiplatform.init(project=self.project_id, location=self.location)
-            # TODO developer - override these parameters as needed:
             parameters = {
-                # Temperature controls the degree of randomness in token selection.
+                "prompt": prompt or self.prompt,
                 "temperature": self.temperature,
-                # Token limit determines the maximum amount of text output.
                 "max_output_tokens": self.max_output_tokens,
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(prompt or self.prompt, **parameters)
+
+            if not self.force_timeout:
+                response = chat_model.predict(**parameters)
+            else:
+                response = timeout_function(
+                    func=chat_model.predict, timeout=self.timeout, **parameters
+                )
+
             output = response.text
 
         except api_exceptions.GoogleAPIError as e:
@@ -129,7 +139,7 @@ class VertexAIAdapter(BaseAdapter):
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> str:
+    def get_category_rank(self, category: str = "") -> int:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
         category_rank = vertexai_category_data["model-categories"][self.model][category]

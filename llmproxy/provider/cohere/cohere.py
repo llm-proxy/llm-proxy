@@ -82,29 +82,27 @@ class CohereAdapter(BaseAdapter):
         prompt: str = "",
         model: CohereModel = CohereModel.COMMAND.value,
         temperature: float = 0.0,
-        api_key: str | None = "",
-        max_output_tokens: int = None,
+        api_key: str = "",
+        max_output_tokens: int | None = None,
+        timeout: int = 120,  # default based on Cohere's API
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.temperature = temperature
         self.api_key = api_key
         self.max_output_tokens = max_output_tokens
-        self.co = None
-        try:
-            self.co = cohere.Client(self.api_key)
-        except cohere.CohereError as e:
-            raise CohereException(exception=e, error_type=ValueError)
+        self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in CohereModel:
             raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
-                error_type=ValueError,
+                error_type="UnsupportedModel",
             )
 
         try:
-            response = self.co.chat(
+            co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
+            response = co.chat(
                 max_tokens=self.max_output_tokens,
                 message=prompt or self.prompt,
                 model=self.model,
@@ -112,9 +110,11 @@ class CohereAdapter(BaseAdapter):
             )
             return response.text
         except cohere.CohereError as e:
-            raise CohereException(exception=e.message, error_type=e.http_status) from e
+            raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
-            raise CohereException("Unknown Cohere error when making API call") from e
+            raise CohereException(
+                exception=str(e), error_type="Unknown Cohere Error"
+            ) from e
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -157,7 +157,7 @@ class CohereAdapter(BaseAdapter):
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> str:
+    def get_category_rank(self, category: str = "") -> int:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
         category_rank = cohere_category_data["model-categories"][self.model][category]
