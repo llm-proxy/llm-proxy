@@ -1,15 +1,21 @@
 """
-Module for executing functions with timeouts using multiprocessing.
+Module for executing functions with timeouts using multiprocessing and threading.
 
-This module provides a function, timeout_function, which executes a given function
-with a timeout using multiprocessing. It ensures that if the function takes longer
-than the specified timeout, it returns None.
+This module provides two functions:
+1. timeout_function: Executes a given function with a timeout using multiprocessing. It ensures that if the function takes longer than the specified timeout, it returns None.
+2. timeout_wrapper: Wraps a function call in a thread with a timeout using threading. If the function does not complete within the specified timeout, it raises a TimeoutError.
 
 Example usage:
     res = timeout_function(some_function, 10)
     print(res)  # Prints the result of some_function if it completes within 10 seconds, else None.
+
+    try:
+        timeout_wrapper(some_function, 5)
+    except TimeoutError as e:
+        print(e) # Prints "Operation timed out" if some_function does not complete within 5 seconds.
 """
 import multiprocessing
+import threading
 from typing import Any, Callable, Union
 
 
@@ -65,11 +71,24 @@ def timeout_function(
     return result
 
 
-import threading
+def timeout_wrapper(func: Callable, timeout: int, *args, **kwargs):
+    """
+    Wrap a function call in a thread with a timeout.
 
+    Parameters:
+        func (callable): The function to be called.
+        args (tuple): The arguments to pass to the function.
+        timeout (int): The maximum time to wait for the function to complete, in seconds.
 
-def timeout_wrapper(func, args, timeout):
-    thread = threading.Thread(target=func, args=args)
+    Raises:
+        TimeoutError: If the function does not complete within the specified timeout.
+
+    Note:
+        This function creates a daemon thread to execute the given function with the provided arguments.
+        If the function does not complete within the specified timeout, a TimeoutError is raised.
+    """
+
+    thread = threading.Thread(target=func, args=args, kwargs=kwargs)
     # make thread daemon so it can run in background
     # Allows main thread to exit without child thread
     thread.daemon = True

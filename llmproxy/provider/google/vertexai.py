@@ -90,7 +90,9 @@ class VertexAIAdapter(BaseAdapter):
         if not self.force_timeout:
             self._make_request(prompt, result)
         else:
-            timeout.timeout_wrapper(self._make_request, (prompt, result), self.timeout)
+            timeout.timeout_wrapper(
+                self._make_request, self.timeout, prompt=prompt, result=result
+            )
 
         # We handle exception here so that it is picked up by logger
         if result["exception"]:
