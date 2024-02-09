@@ -93,7 +93,7 @@ class CohereAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str:
+    def get_completion(self, prompt: str = "") -> str | None:
         if self.model not in CohereModel:
             raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",

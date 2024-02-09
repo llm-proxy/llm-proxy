@@ -1,17 +1,11 @@
-import multiprocessing
-import threading
-
-from google.api_core import exceptions as api_exceptions
-from google.auth import exceptions as auth_exceptions
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import tokenizer
+from llmproxy.utils import timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 from llmproxy.utils.log import logger
-from llmproxy.utils.timeout import timeout_function
 
 # VERTEX IS PER CHARACTER
 vertexai_price_data = {
@@ -84,7 +78,7 @@ class VertexAIAdapter(BaseAdapter):
         except Exception as e:
             result["exception"] = e
 
-    def get_completion(self, prompt: str = "") -> str:
+    def get_completion(self, prompt: str = "") -> str | None:
         if self.model not in VertexAIModel:
             raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
@@ -94,22 +88,11 @@ class VertexAIAdapter(BaseAdapter):
         result = {"output": None, "exception": None}
 
         if not self.force_timeout:
-            result = {"output": None, "exception": None}
             self._make_request(prompt, result)
-
         else:
-            thread = threading.Thread(target=self._make_request, args=(prompt, result))
+            timeout.timeout_wrapper(self._make_request, (prompt, result), self.timeout)
 
-            # make thread daemon so it can run in background
-            # Allows main thread to exit without child thread
-            thread.daemon = True
-            thread.start()
-            thread.join(self.timeout)
-
-            if thread.is_alive():
-                # process.terminate()
-                raise TimeoutError("Operation timed out")
-
+        # We handle exception here so that it is picked up by logger
         if result["exception"]:
             raise VertexAIException(
                 exception=result["exception"].args[0],

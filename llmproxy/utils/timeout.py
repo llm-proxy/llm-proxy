@@ -63,3 +63,17 @@ def timeout_function(
         raise error
 
     return result
+
+
+import threading
+
+
+def timeout_wrapper(func, args, timeout):
+    thread = threading.Thread(target=func, args=args)
+    # make thread daemon so it can run in background
+    # Allows main thread to exit without child thread
+    thread.daemon = True
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError("Operation timed out")

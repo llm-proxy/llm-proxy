@@ -1,5 +1,5 @@
 optional_configuration:
-  timeout: 1 # Timeout for request to models
+  timeout: 10 # Timeout for request to models
   force_timeout: true # WARNING: This can cause additonal costs!
 
 provider_settings:
@@ -42,15 +42,15 @@ provider_settings:
       - command-nightly
       - command-light-nightly
 
-  # - provider: Mistral
-  #   api_key_var: HUGGING_FACE_API_KEY
-  #   max_output_tokens: 256
-  #   temperature: 0.1
-  #   models:
-  #     - Mistral-7B-v0.1
-  #     - Mistral-7B-Instruct-v0.2
-  #     - Mistral-8x7B-Instruct-v0.1
-  #
+  - provider: Mistral
+    api_key_var: HUGGING_FACE_API_KEY
+    max_output_tokens: 256
+    temperature: 0.1
+    models:
+      - Mistral-7B-v0.1
+      - Mistral-7B-Instruct-v0.2
+      - Mistral-8x7B-Instruct-v0.1
+
   - provider: VertexAI
     temperature: 0.1
     project_id_var: GOOGLE_PROJECT_ID
