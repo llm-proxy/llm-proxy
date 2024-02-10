@@ -20,7 +20,7 @@ from llmproxy.utils.exceptions.llmproxy_client import (
     UserConfigError,
 )
 from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.utils.log import CustomLogger, logger
+from llmproxy.utils.log import CustomLogger, file_logger,console_logger
 from llmproxy.utils.sorting import MinHeap
 
 
@@ -203,16 +203,19 @@ class LLMProxy:
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             try:
-                logger.info(msg="========Start Cost Estimation===========")
+                file_logger.info(msg="========Start Cost Estimation===========")
+                console_logger.info(msg="========Start Cost Estimation===========")
                 # CustomLogger.loading_animation_sucess()
 
                 cost = instance.get_estimated_max_cost(prompt=prompt)
-                logger.info(msg="========End Cost Estimation===========\n")
+                file_logger.info(msg="========End Cost Estimation===========\n")
+                console_logger.info(msg="========End Cost Estimation===========\n")
 
                 item = {"name": model_name, "cost": cost, "instance": instance}
                 min_heap.push(cost, item)
             except Exception as e:
-                logger.error(msg=e)
+                file_logger.error(msg=e)
+                console_logger.error(msg=e)
 
         completion_res = None
         errors = []
@@ -224,9 +227,12 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info(msg="========START ROUTING===========")
-            logger.info(f"Making request to model:{instance_data['name']}")
-            logger.info("ROUTING...")
+            file_logger.info(msg="========START ROUTING===========")
+            console_logger.info(msg="========START ROUTING===========")
+            file_logger.info(f"Making request to model:{instance_data['name']}")
+            console_logger.info(f"Making request to model:{instance_data['name']}")
+            file_logger.info("ROUTING...")
+            console_logger.info("ROUTING...")
             # CustomLogger.loading_animation_sucess()
 
             # Attempt to make request to model
@@ -236,16 +242,18 @@ class LLMProxy:
 
                 response_model = instance_data["name"]
 
-                logger.info(
-                    "==========ROUTING COMPLETE! Call to model successful!==========\n"
-                )
+                file_logger.info("==========ROUTING COMPLETE! Call to model successful!==========\n")
+                console_logger.info("==========ROUTING COMPLETE! Call to model successful!==========\n")
             except Exception as e:
-                CustomLogger.loading_animation_failure()
+               ## CustomLogger.loading_animation_failure()
                 errors.append({"model_name": instance_data["name"], "error": e})
 
-                logger.warning(f"Request to model {instance_data['name']} failed!")
-                logger.warning(f"Error when making request to model: {e}")
-                logger.info(msg="========ROUTING FAILED!===========\n")
+                file_logger.warning(f"Request to model {instance_data['name']} failed!")
+                console_logger.warning(f"Request to model {instance_data['name']} failed!")
+                file_logger.warning(f"Error when making request to model: {e}")
+                console_logger.warning(f"Error when making request to model: {e}")
+                file_logger.info(msg="========ROUTING FAILED!===========\n")
+                console_logger.info(msg="========ROUTING FAILED!===========\n")
 
         # If all model fails raise an Exception to notify user
         if not completion_res:

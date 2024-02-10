@@ -4,7 +4,7 @@ from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
-from llmproxy.utils.log import logger
+from llmproxy.utils.log import CustomLogger, file_logger, console_logger
 
 cohere_price_data_summarize_generate_chat = {
     "max-output-tokens": 50,
@@ -118,32 +118,36 @@ class CohereAdapter(BaseAdapter):
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
-            logger.info("No prompt provided.")
+            file_logger.info("No prompt provided.")
+            console_logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
 
-        logger.info(f"MODEL: {self.model}")
+        file_logger.info(f"MODEL: {self.model}")
+        console_logger.info(f"MODEL: {self.model}")
 
         prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
         ]["prompt"]
-        logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
+        file_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
+        console_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
         completion_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
         ]["completion"]
-        logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+        file_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+        console_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         # Note: Avoiding costs for now
         # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
-        logger.info(f"INPUT TOKENS: {len(tokens)}")
+        file_logger.info(f"INPUT TOKENS: {len(tokens)}")
+        console_logger.info(f"INPUT TOKENS: {len(tokens)}")
 
-        logger.info(
-            f"COMPLETION TOKENS: {cohere_price_data_summarize_generate_chat['max-output-tokens']}"
-        )
+        file_logger.info(f"COMPLETION TOKENS: {cohere_price_data_summarize_generate_chat['max-output-tokens']}")
+        console_logger.info(f"COMPLETION TOKENS: {cohere_price_data_summarize_generate_chat['max-output-tokens']}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
@@ -152,7 +156,8 @@ class CohereAdapter(BaseAdapter):
             8,
         )
 
-        logger.info(f"COST: {cost}")
+        file_logger.info(f"COST: {cost}")
+        console_logger.info(f"COST: {cost}")
 
         return cost
 

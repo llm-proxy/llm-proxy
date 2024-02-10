@@ -8,7 +8,7 @@ from llmproxy.utils.exceptions.provider import (
     Llama2Exception,
     UnsupportedModel,
 )
-from llmproxy.utils.log import logger
+from llmproxy.utils.log import CustomLogger, file_logger, console_logger
 
 llama2_price_data = {
     "max-output-tokens": 50,
@@ -295,25 +295,31 @@ class Llama2Adapter(BaseAdapter):
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
-            logger.info("No prompt provided.")
+            file_logger.info("No prompt provided.")
+            console_logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-        logger.info(f"MODEL: {self.model}")
+        file_logger.info(f"MODEL: {self.model}")
+        console_logger.info(f"MODEL: {self.model}")
 
         prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
-        logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
+        file_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
+        console_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
         completion_cost_per_token = llama2_price_data["model-costs"][self.model][
             "completion"
         ]
-        logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+        file_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+        console_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
-        logger.info(f"INPUT TOKENS: {len(tokens)}")
+        file_logger.info(f"INPUT TOKENS: {len(tokens)}")
+        console_logger.info(f"INPUT TOKENS: {len(tokens)}")
 
-        logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
+        file_logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
+        console_logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
@@ -321,7 +327,8 @@ class Llama2Adapter(BaseAdapter):
             8,
         )
 
-        logger.info(f"COST: {cost}")
+        file_logger.info(f"COST: {cost}")
+        console_logger.info(f"COST: {cost}")
 
         return cost
 
