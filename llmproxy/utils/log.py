@@ -3,85 +3,70 @@ import logging
 import sys
 import time
 
-
 class CustomLogger:
     _logger = None
-    _show_details = True
 
     class CustomFormatter(logging.Formatter):
-        """Logging Levels
-        1. Debug: Used when diagnosing problems
-        2. Info: Confirm that things are working as expected
-        3. Warning: Indication that something unexpected happened, or something that may lead to a bigger issue
-        4. Error: A serious problem; the software wasn't able to do something
-        5. Critical: A serious error; program may be unable to continue running
-        """
-
-        grey = "\x1b[38;20m"
-        yellow = "\x1b[33;20m"
-        red = "\x1b[31;20m"
+        """Custom Formatter incorporating color coding for console logs."""
+        grey = "\x1b[38;21m"
+        yellow = "\x1b[33;21m"
+        red = "\x1b[31;21m"
         bold_red = "\x1b[31;1m"
         reset = "\x1b[0m"
-        green = "\x1b[32;20m"
-
-        log_format = " %(name)s: %(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
+        format = " >> %(message)s"
 
         FORMATS = {
-            logging.DEBUG: grey + log_format + reset,
-            logging.INFO: grey + log_format + reset,
-            logging.WARNING: yellow + log_format + reset,
-            logging.ERROR: red + log_format + reset,
-            logging.CRITICAL: bold_red + log_format + reset,
+            logging.DEBUG: grey + format + reset,
+            logging.INFO: grey + format + reset,
+            logging.WARNING: yellow + format + reset,
+            logging.ERROR: red + format + reset,
+            logging.CRITICAL: bold_red + format + reset
         }
 
         def format(self, record):
             log_fmt = self.FORMATS.get(record.levelno)
-            if not CustomLogger._show_details:
-                # log_fmt = " %(name)s: %(asctime)s [%(levelname)s] >> %(message)s"
-                log_fmt = ">> %(message)s"
-            formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
+            formatter = logging.Formatter(log_fmt, datefmt='%Y-%m-%d %H:%M:%S')
             return formatter.format(record)
 
-    @classmethod
-    def get_logger(cls, logger_name: str = "LOGGER", show_details: bool = True):
-        # If logger exist return the logger else create new logger and return
-        if cls._logger is not None:
-            return cls._logger
-
-        today = dt.datetime.today()
-        filename = f"{today.month:02d}-{today.day:02d}-{today.year}.log"
-
+    @staticmethod
+    def file_formatter():
+        """Formatter for file logger"""
         log_format = " %(name)s: %(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
+        return logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S')
 
-        # Setup logger
-        logger = logging.getLogger(logger_name)
-        logger.setLevel(level=logging.DEBUG)
+    @staticmethod
+    def console_formatter():
+        """Formatter for console logger with color coding"""
+        return CustomLogger.CustomFormatter()
 
-        cls._show_details = show_details
 
-        cls._configure_handlers(logger, filename, log_format)
+    @staticmethod
+    def get_logger():
+        if CustomLogger._logger is not None:
+            return CustomLogger._logger
 
-        cls._logger = logger
-        return logger
+        # Create a parent logger
+        CustomLogger._logger = logging.getLogger("parent_logger")
+        CustomLogger._logger.setLevel(logging.DEBUG)
 
-    @classmethod
-    def _configure_handlers(cls, logger, filename, log_format):
-        # Remove existing handlers (if any)
-        for handler in logger.handlers[:]:
-            logger.removeHandler(handler)
-
-        # Console handler
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        ch.setFormatter(cls.CustomFormatter())
-        logger.addHandler(ch)
-
-        # File handler
-        file_handler = logging.FileHandler(filename=filename)
+        # Child logger for file output
+        file_logger = logging.getLogger("parent_logger.file_logger")
+        file_handler = logging.FileHandler("log_file.log")
         file_handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(log_format)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        file_handler.setFormatter(CustomLogger.file_formatter())
+        file_logger.addHandler(file_handler)
+        file_logger.propagate = False
+
+        # Child logger for terminal output
+        console_logger = logging.getLogger("parent_logger.console_logger")
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.DEBUG)
+        console_handler.setFormatter(CustomLogger.console_formatter())
+        console_logger.addHandler(console_handler)
+        console_logger.propagate = False
+
+        return [file_logger, console_logger]
+
 
     @classmethod
     def loading_animation_sucess(cls):
@@ -134,4 +119,4 @@ class CustomLogger:
 
 
 # Toggle
-logger = CustomLogger.get_logger("LOG", show_details=False)
+file_logger, console_logger = CustomLogger.get_logger()
