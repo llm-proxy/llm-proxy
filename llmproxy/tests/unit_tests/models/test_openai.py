@@ -36,6 +36,7 @@ def test_unsupported_model():
         chatbot.get_completion()
 
 
+# TODO: Slowing down Unit tests too much, TEST LATER IN INTEGRATION TESTS
 def test_get_estimated_max_cost():
     # Arrange
     gpt = OpenAIAdapter(api_key=openai_api_key)

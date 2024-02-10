@@ -1,10 +1,8 @@
-from google.api_core import exceptions as api_exceptions
-from google.auth import exceptions as auth_exceptions
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import tokenizer
+from llmproxy.utils import timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 from llmproxy.utils.log import logger
@@ -50,7 +48,9 @@ class VertexAIAdapter(BaseAdapter):
         model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
         project_id: str | None = "",
         location: str | None = "us-central1",
-        max_output_tokens: int = None,
+        max_output_tokens: int | None = None,
+        timeout: int | None = None,
+        force_timeout: bool = False,
     ) -> None:
         self.prompt = prompt
         self.temperature = temperature
@@ -58,41 +58,50 @@ class VertexAIAdapter(BaseAdapter):
         self.project_id = project_id
         self.location = location
         self.max_output_tokens = max_output_tokens
+        self.timeout = timeout
+        self.force_timeout = force_timeout
 
-    def get_completion(self, prompt: str = "") -> str:
-        if self.model not in VertexAIModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
-                error_type="ValueError",
-            )
+    def _make_request(self, prompt, result):
         try:
             aiplatform.init(project=self.project_id, location=self.location)
-            # TODO developer - override these parameters as needed:
             parameters = {
-                # Temperature controls the degree of randomness in token selection.
+                "prompt": prompt or self.prompt,
                 "temperature": self.temperature,
-                # Token limit determines the maximum amount of text output.
                 "max_output_tokens": self.max_output_tokens,
             }
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
-            response = chat_model.predict(prompt or self.prompt, **parameters)
-            output = response.text
 
-        except api_exceptions.GoogleAPIError as e:
-            raise VertexAIException(
-                exception=e.args[0], error_type=type(e).__name__
-            ) from e
-        except auth_exceptions.GoogleAuthError as e:
-            raise VertexAIException(
-                exception=e.args[0], error_type=type(e).__name__
-            ) from e
+            response = chat_model.predict(**parameters)
+            result["output"] = response.text
+
         except Exception as e:
-            raise VertexAIException(
-                exception=e.args[0], error_type=type(e).__name__
-            ) from e
+            result["exception"] = e
 
-        return output
+    def get_completion(self, prompt: str = "") -> str | None:
+        if self.model not in VertexAIModel:
+            raise UnsupportedModel(
+                exception=f"Model not supported. Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
+                error_type="ValueError",
+            )
+
+        result = {"output": None, "exception": None}
+
+        if not self.force_timeout:
+            self._make_request(prompt, result)
+        else:
+            timeout.timeout_wrapper(
+                self._make_request, self.timeout, prompt=prompt, result=result
+            )
+
+        # We handle exception here so that it is picked up by logger
+        if result["exception"]:
+            raise VertexAIException(
+                exception=result["exception"].args[0],
+                error_type=type(result["exception"]).__name__,
+            ) from result.get("exception", None)
+
+        return result.get("output")
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -125,7 +134,7 @@ class VertexAIAdapter(BaseAdapter):
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> str:
+    def get_category_rank(self, category: str = "") -> int:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
         category_rank = vertexai_category_data["model-categories"][self.model][category]

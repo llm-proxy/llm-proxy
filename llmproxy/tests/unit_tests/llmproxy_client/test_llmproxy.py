@@ -3,6 +3,7 @@ import os
 import pytest
 import yaml
 
+from llmproxy.config.internal_config import internal_config
 from llmproxy.llmproxy import (
     LLMProxy,
     UserConfigError,
@@ -12,7 +13,7 @@ from llmproxy.llmproxy import (
 )
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-path_to_env_test = ".env.test"
+PATH_TO_ENV_TEST = ".env.test"
 
 
 def test_empty_model() -> None:
@@ -35,20 +36,20 @@ def test_no_user_setting(tmp_path) -> None:
     with pytest.raises(UserConfigError, match=text):
         LLMProxy(
             path_to_user_configuration=yml_path,
-            path_to_env_vars=path_to_env_test,
+            path_to_env_vars=PATH_TO_ENV_TEST,
         )
 
 
 def test_no_model_in_user_setting(tmp_path) -> None:
     yml_content = """
-    user_settings:
+    provider_settings:
     """
     yml_path = tmp_path / "test_settings.yml"
     with open(yml_path, "w", encoding="utf-8") as file:
         file.write(yml_content)
     text = "No models found in user settings. Please ensure the format of the configuration file is correct."
     with pytest.raises(UserConfigError, match=text):
-        LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=path_to_env_test)
+        LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=PATH_TO_ENV_TEST)
 
 
 def test_invalid_model() -> None:
@@ -61,7 +62,7 @@ def test_invalid_model() -> None:
 
 def test_get_settings_from_yml(tmp_path) -> None:
     yml_content = """
-    user_settings:
+    provider_settings:
       - provider: OpenAI
         api_key_var: OPENAI_API_KEY
         max_output_tokens: 256
@@ -76,7 +77,7 @@ def test_get_settings_from_yml(tmp_path) -> None:
     with open(yml_path, "w", encoding="utf-8") as file:
         file.write(yml_content)
 
-    LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=path_to_env_test)
+    LLMProxy(path_to_user_configuration=yml_path, path_to_env_vars=PATH_TO_ENV_TEST)
 
 
 def test_get_settings_from_invalid_yml() -> None:
@@ -84,13 +85,12 @@ def test_get_settings_from_invalid_yml() -> None:
     with pytest.raises((FileNotFoundError, yaml.YAMLError)):
         LLMProxy(
             path_to_user_configuration=invalid_yml_path,
-            path_to_env_vars=path_to_env_test,
+            path_to_env_vars=PATH_TO_ENV_TEST,
         )
 
 
 def test_setup_available_models() -> None:
-    setting = _get_settings_from_yml("llmproxy/config/internal.config.yml")
-    _setup_available_models(settings=setting)
+    _setup_available_models(settings=internal_config)
 
 
 # TODO: ADD TEST
@@ -98,7 +98,7 @@ def test_setup_user_models() -> None:
     path_to_user_configuration_test = f"{CURRENT_DIRECTORY}/test.yml"
     LLMProxy(
         path_to_user_configuration=path_to_user_configuration_test,
-        path_to_env_vars=path_to_env_test,
+        path_to_env_vars=PATH_TO_ENV_TEST,
     )
 
 
@@ -116,10 +116,7 @@ def test_setup_user_models_no_setting_UserConfigError():
         UserConfigError,
         match="Configuration not found, please ensure that you the correct path and format of configuration file",
     ):
-        test_setting = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
-        test_available_model = _setup_available_models(settings=test_setting)
+        test_available_model = _setup_available_models(settings=internal_config)
         _setup_user_models(available_models=test_available_model, settings=None)
 
 
@@ -128,12 +125,9 @@ def test_setup_user_models_empty_user_settings():
         UserConfigError,
         match="No models found in user settings. Please ensure the format of the configuration file is correct.",
     ):
-        test_setting = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
-        test_available_model = _setup_available_models(settings=test_setting)
+        test_available_model = _setup_available_models(settings=internal_config)
         _setup_user_models(
-            available_models=test_available_model, settings={"user_settings": []}
+            available_models=test_available_model, settings={"provider_settings": []}
         )
 
 
@@ -141,15 +135,12 @@ def test_setup_user_models_no_variation() -> None:
     with pytest.raises(
         UserConfigError,
     ):
-        test_setting = _get_settings_from_yml(
-            path_to_yml="llmproxy/config/internal.config.yml"
-        )
-        test_available_model = _setup_available_models(settings=test_setting)
+        test_available_model = _setup_available_models(settings=internal_config)
 
         _setup_user_models(
             available_models=test_available_model,
             settings={
-                "user_settings": [
+                "provider_settings": [
                     {
                         "provider": "OpenAI",
                         "api_key_var": "OPENAI_API_KEY",

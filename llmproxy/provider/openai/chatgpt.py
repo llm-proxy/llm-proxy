@@ -1,6 +1,5 @@
+import openai
 import tiktoken
-from openai import OpenAI, OpenAIError
-from openai.types import model
 
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils.enums import BaseEnum
@@ -110,31 +109,41 @@ class OpenAIAdapter(BaseAdapter):
         model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO_1106.value,
         temperature: float = 0,
         api_key: str = "",
-        max_output_tokens: int = None,
+        max_output_tokens: int | None = None,
+        timeout: int | None = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
         self.api_key = api_key
+        self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str:
+    def get_completion(self, prompt: str = "") -> str | None:
         if self.model not in OpenAIModel:
             raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
-                error_type="OpenAI Error",
+                error_type="UnsupportedModel",
+            )
+
+        # Prevent API Connection Error with empty API KEY
+        if self.api_key == "":
+            raise OpenAIException(
+                exception="EMPTY API KEY: API key not provided",
+                error_type="No API Key Provided",
             )
 
         try:
-            client = OpenAI(api_key=self.api_key)
+            client = openai.OpenAI(api_key=self.api_key)
             response = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt or self.prompt}],
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
+                timeout=self.timeout,
             )
 
-        except OpenAIError as e:
+        except openai.OpenAIError as e:
             raise OpenAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e
@@ -143,7 +152,7 @@ class OpenAIAdapter(BaseAdapter):
                 exception=e.args[0], error_type="Unknown OpenAI Error"
             ) from e
 
-        return response.choices[0].message.content
+        return response.choices[0].message.content or None
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -179,7 +188,7 @@ class OpenAIAdapter(BaseAdapter):
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> str:
+    def get_category_rank(self, category: str = "") -> int:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
         category_rank = open_ai_category_data["model-categories"][self.model][category]

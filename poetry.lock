@@ -381,13 +381,13 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "cohere"
-version = "4.45"
+version = "4.46"
 description = "Python SDK for the Cohere API"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "cohere-4.45-py3-none-any.whl", hash = "sha256:bdaa2e5e1c64cf3b1d55caf9d483a33fa8eafed731a999fb0934ae12c0638b75"},
-    {file = "cohere-4.45.tar.gz", hash = "sha256:63b21b2dc3abd718b18cae726a69d1b096a34eb59f3331c20469fd0df1672816"},
+    {file = "cohere-4.46-py3-none-any.whl", hash = "sha256:6448795ee0425b4445c216aa578d9eac1d1b59295c9277053a110248582b7172"},
+    {file = "cohere-4.46.tar.gz", hash = "sha256:f91d59f8dc51b9d13caf9f509378c5482ae3f82ef7579a4379fc43dbb74a6f07"},
 ]
 
 [package.dependencies]
@@ -766,13 +766,13 @@ tqdm = ["tqdm"]
 
 [[package]]
 name = "google-api-core"
-version = "2.16.2"
+version = "2.17.0"
 description = "Google API client core library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google-api-core-2.16.2.tar.gz", hash = "sha256:032d37b45d1d6bdaf68fb11ff621e2593263a239fa9246e2e94325f9c47876d2"},
-    {file = "google_api_core-2.16.2-py3-none-any.whl", hash = "sha256:449ca0e3f14c179b4165b664256066c7861610f70b6ffe54bb01a04e9b466929"},
+    {file = "google-api-core-2.17.0.tar.gz", hash = "sha256:de7ef0450faec7c75e0aea313f29ac870fdc44cfaec9d6499a9a17305980ef66"},
+    {file = "google_api_core-2.17.0-py3-none-any.whl", hash = "sha256:08ed79ed8e93e329de5e3e7452746b734e6bf8438d8d64dd3319d21d3164890c"},
 ]
 
 [package.dependencies]
@@ -813,13 +813,13 @@ requests = ["requests (>=2.20.0,<3.0.0.dev0)"]
 
 [[package]]
 name = "google-cloud-aiplatform"
-version = "1.40.0"
+version = "1.41.0"
 description = "Vertex AI API client library"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "google-cloud-aiplatform-1.40.0.tar.gz", hash = "sha256:1ee9aff2fa27c6852558a2abeaf0ffe0537bff90c5dc9f0e967762ac17291001"},
-    {file = "google_cloud_aiplatform-1.40.0-py2.py3-none-any.whl", hash = "sha256:9c67a2664e138387ea82d70dec4b54e081b7de6e1089ed23fdaf66900d00320a"},
+    {file = "google-cloud-aiplatform-1.41.0.tar.gz", hash = "sha256:ffd049cffa5b53e354a25a5c0b5560d8b2aa6ba30b1f93a4bd1d75a3338a667e"},
+    {file = "google_cloud_aiplatform-1.41.0-py2.py3-none-any.whl", hash = "sha256:0af867c0f175c2639f1b68eaf9293e2fe8435aaf3b261fde6ec11fb8243a0442"},
 ]
 
 [package.dependencies]
@@ -1744,13 +1744,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.11.1"
+version = "1.12.0"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.7.1"
 files = [
-    {file = "openai-1.11.1-py3-none-any.whl", hash = "sha256:e0f388ce499f53f58079d0c1f571f356f2b168b84d0d24a412506b6abc714980"},
-    {file = "openai-1.11.1.tar.gz", hash = "sha256:f66b8fe431af43e09594147ef3cdcb79758285de72ebafd52be9700a2af41e99"},
+    {file = "openai-1.12.0-py3-none-any.whl", hash = "sha256:a54002c814e05222e413664f651b5916714e4700d041d5cf5724d3ae1a3e3481"},
+    {file = "openai-1.12.0.tar.gz", hash = "sha256:99c5d257d09ea6533d689d1cc77caa0ac679fa21efef8893d8b0832a86877f1b"},
 ]
 
 [package.dependencies]
@@ -2166,24 +2166,6 @@ pluggy = ">=0.12,<2.0"
 
 [package.extras]
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
-
-[[package]]
-name = "pytest-cov"
-version = "4.1.0"
-description = "Pytest plugin for measuring coverage."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pytest-cov-4.1.0.tar.gz", hash = "sha256:3904b13dfbfec47f003b8e77fd5b589cd11904a21ddf1ab38a64f204d6a10ef6"},
-    {file = "pytest_cov-4.1.0-py3-none-any.whl", hash = "sha256:6ba70b9e97e69fcc3fb45bfeab2d0a138fb65c4d0d6a41ef33983ad114be8c3a"},
-]
-
-[package.dependencies]
-coverage = {version = ">=5.2.1", extras = ["toml"]}
-pytest = ">=4.6"
-
-[package.extras]
-testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtualenv"]
 
 [[package]]
 name = "python-dateutil"
@@ -3294,4 +3276,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d337bebf01495b41998063f884baba37e8169973961a923e1295196703ca9322"
+content-hash = "437bfdaf8ba3da806c4307d5c156b64faefff6a63ef2990af8c080cb73ec8f0e"
