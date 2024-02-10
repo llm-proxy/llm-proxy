@@ -80,28 +80,34 @@ class MistralAdapter(BaseAdapter):
         model: MistralModel = MistralModel.Mistral_7B_V01.value,
         api_key: str | None = "",
         temperature: float = 1.0,
-        max_output_tokens: int = None,
+        max_output_tokens: int | None = None,
+        timeout: int | None = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.api_key = api_key
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
+        self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in MistralModel:
             raise UnsupportedModel(
                 exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
-                error_type=ValueError,
+                error_type="UnsupportedModel",
             )
+
+        if not self.api_key:
+            raise ValueError("No Hugging Face API Key Provided")
+
         try:
-            API_URL = (
+            api_url = (
                 f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
             )
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
+                response = requests.post(api_url, headers=headers, json=payload)
                 return response.json()
 
             output = query(
@@ -110,27 +116,26 @@ class MistralAdapter(BaseAdapter):
                     "parameters": {
                         "temperature": self.temperature,
                         "max_length": self.max_output_tokens,
+                        "max_time": self.timeout,
                     },
                 }
             )
+
         except requests.RequestException as e:
             raise MistralException(
                 f"Request error: {e}", error_type="RequestError"
             ) from e
         except Exception as e:
             raise MistralException(
-                f"Unknown error: {e}", error_type="UnknownError"
+                f"Unknown error: {e}", error_type=" Unknown Mistral Error"
             ) from e
 
-        response = ""
-        if isinstance(output, list) and "generated_text" in output[0]:
-            response = output[0]["generated_text"]
-        elif "error" in output:
+        # Output will be a dict if there is an error
+        if "error" in output:
             raise MistralException(f"{output['error']}", error_type="MistralError")
-        else:
-            raise ValueError("Unknown output format")
 
-        return response
+        # Output will be a List[dict] if there is no error
+        return output[0]["generated_text"]
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -168,7 +173,7 @@ class MistralAdapter(BaseAdapter):
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> str:
+    def get_category_rank(self, category: str = "") -> int:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
         category_rank = mistral_category_data["model-categories"][self.model][category]

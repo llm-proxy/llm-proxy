@@ -42,7 +42,7 @@ def test_no_user_setting(tmp_path) -> None:
 
 def test_no_model_in_user_setting(tmp_path) -> None:
     yml_content = """
-    user_settings:
+    provider_settings:
     """
     yml_path = tmp_path / "test_settings.yml"
     with open(yml_path, "w", encoding="utf-8") as file:
@@ -62,7 +62,7 @@ def test_invalid_model() -> None:
 
 def test_get_settings_from_yml(tmp_path) -> None:
     yml_content = """
-    user_settings:
+    provider_settings:
       - provider: OpenAI
         api_key_var: OPENAI_API_KEY
         max_output_tokens: 256
@@ -127,7 +127,7 @@ def test_setup_user_models_empty_user_settings():
     ):
         test_available_model = _setup_available_models(settings=internal_config)
         _setup_user_models(
-            available_models=test_available_model, settings={"user_settings": []}
+            available_models=test_available_model, settings={"provider_settings": []}
         )
 
 
@@ -140,7 +140,7 @@ def test_setup_user_models_no_variation() -> None:
         _setup_user_models(
             available_models=test_available_model,
             settings={
-                "user_settings": [
+                "provider_settings": [
                     {
                         "provider": "OpenAI",
                         "api_key_var": "OPENAI_API_KEY",

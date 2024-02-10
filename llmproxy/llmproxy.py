@@ -7,6 +7,7 @@ import yaml
 from dotenv import load_dotenv
 
 from llmproxy.config.internal_config import internal_config
+from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import categorization
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.llmproxy_client import (
@@ -62,8 +63,9 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(available_models=None, settings=None) -> Dict[str, object]:
+def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAdapter]:
     """Setup all available models and return dict of {name: instance_of_model}"""
+
     if not available_models:
         raise UserConfigError(
             "Available models not found, please ensure you have the latest version of LLM Proxy."
@@ -72,15 +74,16 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, object
         raise UserConfigError(
             "Configuration not found, please ensure that you the correct path and format of configuration file"
         )
-    if not settings["user_settings"]:
+    if not settings["provider_settings"]:
         raise UserConfigError(
             "No models found in user settings. Please ensure the format of the configuration file is correct."
         )
 
     try:
+        optional_config = settings.get("optional_configuration", {})
         user_models = {}
         # Compare user models with available_models
-        for provider in settings["user_settings"]:
+        for provider in settings["provider_settings"]:
             model_name = provider["provider"].lower().strip()
             # Check if user model in available models
 
@@ -105,12 +108,20 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, object
                         "max_output_tokens": provider["max_output_tokens"],
                         "temperature": provider["temperature"],
                         "model": model,
+                        "timeout": optional_config.get("timeout", None),
                     }
 
                     # Different setup for vertexai
                     if model_name == "vertexai":
-                        common_parameters["project_id"] = os.getenv(
-                            provider["project_id_var"]
+                        common_parameters.update(
+                            {
+                                # Project ID required for VertexAI
+                                "project_id": os.getenv(provider["project_id_var"]),
+                                # No internal timeout flag provided
+                                "force_timeout": optional_config.get(
+                                    "force_timeout", False
+                                ),
+                            }
                         )
                     else:
                         common_parameters["api_key"] = os.getenv(
@@ -139,6 +150,7 @@ class CompletionResponse:
     """
 
     response: str = ""
+    response_model: str = ""
     errors: List = field(default_factory=list)
 
 
@@ -153,7 +165,6 @@ class LLMProxy:
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
     ) -> None:
-        self.user_models = {}
         self.route_type = "cost"
 
         load_dotenv(path_to_env_vars)
@@ -165,7 +176,7 @@ class LLMProxy:
         available_models = _setup_available_models(settings=internal_config)
 
         # Setup user models
-        self.user_models = _setup_user_models(
+        self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
             settings=user_settings, available_models=available_models
         )
 
@@ -199,6 +210,7 @@ class LLMProxy:
 
         completion_res = None
         errors = []
+        response_model = ""
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -212,6 +224,7 @@ class LLMProxy:
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                response_model = instance_data["name"]
                 logger.info(
                     "==========ROUTING COMPLETE! Call to model successful!==========\n"
                 )
@@ -226,7 +239,9 @@ class LLMProxy:
                 "Requests to all models failed! Please check your configuration!"
             )
 
-        return CompletionResponse(response=completion_res, errors=errors)
+        return CompletionResponse(
+            response=completion_res, response_model=response_model, errors=errors
+        )
 
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
@@ -258,7 +273,6 @@ class LLMProxy:
             logger.info("Making request to model: %s", instance_data["name"])
             logger.info("ROUTING...")
 
-            # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.info("ROUTING COMPLETE! Call to model successful!\n")

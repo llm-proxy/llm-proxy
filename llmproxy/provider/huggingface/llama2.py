@@ -238,7 +238,8 @@ class Llama2Adapter(BaseAdapter):
         api_key: str | None = "",
         temperature: float = 1.0,
         model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
-        max_output_tokens: int = None,
+        max_output_tokens: int | None = None,
+        timeout: int | None = None,
     ) -> None:
         self.system_prompt = system_prompt
         self.prompt = prompt
@@ -246,9 +247,9 @@ class Llama2Adapter(BaseAdapter):
         self.temperature = temperature
         self.model = model
         self.max_output_tokens = max_output_tokens
+        self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str:
-        # If empty api key
+    def get_completion(self, prompt: str = "") -> str | None:
         if not self.api_key:
             raise Llama2Exception(exception="No API Provided", error_type="ValueError")
 
@@ -261,23 +262,25 @@ class Llama2Adapter(BaseAdapter):
                 error_type="ValueError",
             )
         try:
-            API_URL = (
+            api_url = (
                 f"https://api-inference.huggingface.co/models/meta-llama/{self.model}"
             )
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
+                response = requests.post(api_url, headers=headers, json=payload)
                 return response.json()
 
             # Llama2 prompt template
             prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt or self.prompt} }}}}\n[/INST]"
+
             output = query(
                 {
                     "inputs": prompt_template,
                     "parameters": {
                         "max_length": self.max_output_tokens,
                         "temperature": self.temperature,
+                        "max_time": self.timeout,
                     },
                 }
             )
@@ -288,7 +291,7 @@ class Llama2Adapter(BaseAdapter):
         if output["error"]:
             raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
-        return output
+        return output[0]["generated_text"]
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
