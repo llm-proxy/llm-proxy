@@ -315,8 +315,12 @@ class LLMProxy:
 
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
-                file_logger.info("CATEGORY ROUTING COMPLETE! Call to model successful!\n")
-                console_logger.info("CATEGORY ROUTING COMPLETE! Call to model successful!")
+                file_logger.info(
+                    "CATEGORY ROUTING COMPLETE! Call to model successful!\n"
+                )
+                console_logger.info(
+                    "CATEGORY ROUTING COMPLETE! Call to model successful!"
+                )
                 console_logger.info(
                     CustomLogger.CustomFormatter.green
                     + "(• ◡ •)\n"
