@@ -1,3 +1,10 @@
+proxy_configuration:
+  route_type: interest
+
+optional_configuration:
+  timeout: 10 # Timeout for request to models
+  force_timeout: true # WARNING: This can cause additonal costs!
+
 provider_settings:
   - provider: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key

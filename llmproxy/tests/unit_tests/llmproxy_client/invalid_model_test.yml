@@ -1,8 +1,14 @@
----
 llm_proxy:
   name: LLM proxy API
   version: demo 1.0
   description: An API that act as a proxy to multiple language models
+
+proxy_configuration:
+  route_type: cost
+
+optional_configuration:
+  timeout: 10 # Timeout for request to models
+  force_timeout: true # WARNING: This can cause additonal costs!
 
 provider_settings:
   - provider: OpenAI
