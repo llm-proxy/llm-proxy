@@ -60,6 +60,7 @@ class VertexAIAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
         self.force_timeout = force_timeout
+        print(timeout, force_timeout)
 
     def _make_request(self, prompt, result):
         try:

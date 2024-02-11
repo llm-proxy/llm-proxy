@@ -89,6 +89,7 @@ class MistralAdapter(BaseAdapter):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
+        print(timeout)
 
     def get_completion(self, prompt: str = "") -> str:
         if self.model not in MistralModel:

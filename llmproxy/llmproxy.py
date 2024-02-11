@@ -63,27 +63,34 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAdapter]:
+def _setup_user_models(
+    available_models=None, yml_settings=None, constructor_settings=None
+) -> Dict[str, BaseAdapter]:
     """Setup all available models and return dict of {name: instance_of_model}"""
 
     if not available_models:
         raise UserConfigError(
             "Available models not found, please ensure you have the latest version of LLM Proxy."
         )
-    if not settings:
+    if not yml_settings:
         raise UserConfigError(
             "Configuration not found, please ensure that you the correct path and format of configuration file"
         )
-    if not settings["provider_settings"]:
+    if not yml_settings["provider_settings"]:
         raise UserConfigError(
             "No models found in user settings. Please ensure the format of the configuration file is correct."
         )
 
     try:
-        optional_config = settings.get("optional_configuration", {})
+        # optional_config = yml_settings.get("optional_configuration", constructor_settings) or {}
+        optional_config = (
+            yml_settings.get("optional_configuration", None)
+            or constructor_settings
+            or {}
+        )
         user_models = {}
         # Compare user models with available_models
-        for provider in settings["provider_settings"]:
+        for provider in yml_settings["provider_settings"]:
             model_name = provider["provider"].lower().strip()
             # Check if user model in available models
 
@@ -142,6 +149,38 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
         ) from e
 
 
+def _get_route_type(
+    user_settings: Dict[str, Any] | None,
+    constructor_route_type: Literal["cost", "category"] | None,
+) -> Literal["cost", "category"]:
+    """
+    Get the route type from user settings or constructor parameters.
+
+    Args:
+        user_settings (Optional[Dict[str, Any]]): User settings containing proxy configuration.
+            If None, the route type will default to constructor_route_type.
+        constructor_route_type (Optional[Literal["cost", "category"]]): Route type specified during object construction.
+
+    Raises:
+        ValueError: If no route type is specified in either user settings or constructor parameters.
+
+    """
+    if user_settings and user_settings.get("proxy_configuration", None):
+        route_type = (
+            user_settings.get("proxy_configuration", None).get("route_type", None)
+            or constructor_route_type
+        )
+    else:
+        route_type = constructor_route_type
+
+    if route_type:
+        return route_type
+
+    raise ValueError(
+        "No route type was specified, please add the rout_type in the yaml config or LLMProxy constructor"
+    )
+
+
 @dataclass
 class CompletionResponse:
     """
@@ -164,30 +203,37 @@ class LLMProxy:
         self,
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
+        route_type: Literal["cost", "category"] | None = None,
+        timeout: int | None = None,
+        force_timeout: bool = False,
     ) -> None:
-        self.route_type = "cost"
-
         load_dotenv(path_to_env_vars)
 
-        # Read YML and see which models the user wants
+        # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
+
+        # Setup user cost
+        self.route_type = _get_route_type(
+            user_settings=user_settings, constructor_route_type=route_type
+        )
 
         # Setup available models
         available_models = _setup_available_models(settings=internal_config)
 
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
-            settings=user_settings, available_models=available_models
+            yml_settings=user_settings,
+            available_models=available_models,
+            constructor_settings={"timeout": timeout, "force_timeout": force_timeout},
         )
 
         self.available_models = available_models
 
     def route(
         self,
-        route_type: Literal["cost", "category"] = RouteType.COST.value,
         prompt: str = "",
     ) -> CompletionResponse:
-        match RouteType(route_type.lower()):
+        match RouteType(self.route_type):
             case RouteType.COST:
                 return self._cost_route(prompt=prompt)
             case RouteType.CATEGORY:
