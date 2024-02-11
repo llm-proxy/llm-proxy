@@ -272,17 +272,16 @@ class LLMProxy:
             model_name,
             instance,
         ) in self.user_models.items():
-            logger.info(
-                msg="========Start fetching model for category routing==========="
-            )
+            file_logger.info(msg="========Start fetching model for category routing===========")
+            console_logger.info(msg="========Start fetching model for category routing===========")
 
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            logger.info(msg="Sorting fetched models based on proficency...")
-            logger.info(
-                msg="========Finished fetching model for category routing=============\n"
-            )
+            file_logger.info(msg="Sorting fetched models based on proficency...")
+            console_logger.info(msg="Sorting fetched models based on proficency...")
+            file_logger.info(msg="========Finished fetching model for category routing=============\n")
+            console_logger.info(msg="========Finished fetching model for category routing=============\n")
 
         completion_res = None
         errors = []
@@ -293,15 +292,19 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info(f"Making request to model: {instance_data['name']}")
+            file_logger.info(f"Making request to model: {instance_data['name']}")
+            console_logger.info(f"Making request to model: {instance_data['name']}")
 
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
-                logger.info("ROUTING COMPLETE! Call to model successful!\n")
+                file_logger.info("ROUTING COMPLETE! Call to model successful!\n")
+                console_logger.info("ROUTING COMPLETE! Call to model successful!\n")
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning("Request to model %s failed!\n", instance_data["name"])
-                logger.warning("Error when making request to model: %s\n", e)
+                file_logger.warning("Request to model %s failed!\n", instance_data["name"])
+                console_logger.warning("Request to model %s failed!\n", instance_data["name"])
+                file_logger.warning("Error when making request to model: %s\n", e)
+                console_logger.warning("Error when making request to model: %s\n", e)
 
         if not completion_res:
             raise RequestsFailed(

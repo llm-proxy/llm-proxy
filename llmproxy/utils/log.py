@@ -8,6 +8,8 @@ class CustomLogger:
 
     class CustomFormatter(logging.Formatter):
         """Custom Formatter incorporating color coding for console logs."""
+        purple = "\x1b[35;1m"
+        green = "\x1b[32;1m"
         grey = "\x1b[38;21m"
         yellow = "\x1b[33;21m"
         red = "\x1b[31;21m"
@@ -51,7 +53,7 @@ class CustomLogger:
 
         # Child logger for file output
         file_logger = logging.getLogger("parent_logger.file_logger")
-        file_handler = logging.FileHandler("log_file.log")
+        file_handler = logging.FileHandler(f"%Y-%m-%d.log", )
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(CustomLogger.file_formatter())
         file_logger.addHandler(file_handler)
