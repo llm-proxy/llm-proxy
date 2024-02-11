@@ -1,6 +1,6 @@
 from transformers import pipeline
 
-from llmproxy.utils.log import CustomLogger, file_logger, console_logger
+from llmproxy.utils.log import CustomLogger, console_logger, file_logger
 
 
 def categorize_text(prompt: str) -> str:
