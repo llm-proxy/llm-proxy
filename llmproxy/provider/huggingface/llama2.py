@@ -248,7 +248,6 @@ class Llama2Adapter(BaseAdapter):
         self.model = model
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
-        print(timeout)
 
     def get_completion(self, prompt: str = "") -> str | None:
         if not self.api_key:

@@ -118,7 +118,6 @@ class OpenAIAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.api_key = api_key
         self.timeout = timeout
-        print(timeout)
 
     def get_completion(self, prompt: str = "") -> str | None:
         if self.model not in OpenAIModel:
