@@ -8,7 +8,7 @@ from llmproxy.utils.exceptions.provider import (
     Llama2Exception,
     UnsupportedModel,
 )
-from llmproxy.utils.log import CustomLogger, file_logger, console_logger
+from llmproxy.utils.log import CustomLogger, console_logger, file_logger
 
 llama2_price_data = {
     "max-output-tokens": 50,
@@ -295,13 +295,15 @@ class Llama2Adapter(BaseAdapter):
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
-            file_logger.info("No prompt provided.")
-            console_logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
         file_logger.info(f"MODEL: {self.model}")
-        console_logger.info(CustomLogger.CustomFormatter.purple + f"MODEL: {self.model}" + CustomLogger.CustomFormatter.reset)
+        console_logger.info(
+            CustomLogger.CustomFormatter.purple
+            + f"MODEL: {self.model}"
+            + CustomLogger.CustomFormatter.reset
+        )
 
         prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
         file_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
@@ -319,7 +321,9 @@ class Llama2Adapter(BaseAdapter):
         console_logger.info(f"INPUT TOKENS: {len(tokens)}")
 
         file_logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
-        console_logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
+        console_logger.info(
+            f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}"
+        )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
@@ -328,16 +332,28 @@ class Llama2Adapter(BaseAdapter):
         )
 
         file_logger.info(f"COST: {cost}")
-        console_logger.info(CustomLogger.CustomFormatter.green + f"COST: {cost}" + CustomLogger.CustomFormatter.reset)
+        console_logger.info(
+            CustomLogger.CustomFormatter.green
+            + f"COST: {cost}"
+            + CustomLogger.CustomFormatter.reset
+        )
 
         return cost
 
     def get_category_rank(self, category: str = "") -> str:
-        file_logger.info(msg=f"Current model: {self.model}")
-        console_logger.info(msg=f"Current model: {self.model}")
-        file_logger.info(msg=f"Category of prompt: {category}")
-        console_logger.info(msg=f"Category of prompt: {category}")
+        file_logger.info(f"MODEL: {self.model}")
+        console_logger.info(
+            CustomLogger.CustomFormatter.purple
+            + f"MODEL: {self.model}"
+            + CustomLogger.CustomFormatter.reset
+        )
+        file_logger.info(f"CATEGORY OF PROMPT: {category}")
+        console_logger.info(f"CATEGORY OF PROMPT: {category}")
         category_rank = llama2_category_data["model-categories"][self.model][category]
-        file_logger.info(msg=f"Rank of category: {category_rank}")
-        console_logger.info(msg=f"Rank of category: {category_rank}")
+        file_logger.info(f"RANK OF PROMPT: {category_rank}")
+        console_logger.info(
+            CustomLogger.CustomFormatter.blue
+            + f"RANK OF PROMPT: {category_rank}"
+            + CustomLogger.CustomFormatter.reset
+        )
         return category_rank
