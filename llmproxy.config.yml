@@ -1,20 +1,27 @@
-optional_configuration:
-  timeout: 10 # Timeout for request to models
-  force_timeout: true # WARNING: This can cause additonal costs!
+llm_proxy:
+  name: LLM proxy API
+  version: demo 1.0
+  description: An API that act as a proxy to multiple language models
 
-provider_settings:
-  - provider: OpenAI
+user_settings:
+  # Example
+  # - routing_mode:
+  #   - cost_routing:
+  #       enable: false
+
+  - model: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key
     max_output_tokens: 256
     temperature: 0.1
-    models: # input names of models you want to use (see below for all models provided)
+    models: # input names of models you want to you (see below for all models provided)
       # Only models specified here will be added to routing pool
       - gpt-3.5-turbo-instruct
       - gpt-3.5-turbo-1106
       - gpt-4
       - gpt-4-32k
+    # context: "Answer politely"
 
-  - provider: Llama2
+  - model: Llama2
     api_key_var: HUGGING_FACE_API_KEY
     max_output_tokens: 256
     temperature: 0.1
@@ -32,7 +39,7 @@ provider_settings:
       - Llama-2-70b-hf
       - Llama-2-70b
 
-  - provider: Cohere
+  - model: Cohere
     api_key_var: COHERE_API_KEY
     max_output_tokens: 256
     temperature: 0.1
@@ -42,7 +49,7 @@ provider_settings:
       - command-nightly
       - command-light-nightly
 
-  - provider: Mistral
+  - model: Mistral
     api_key_var: HUGGING_FACE_API_KEY
     max_output_tokens: 256
     temperature: 0.1
@@ -51,11 +58,11 @@ provider_settings:
       - Mistral-7B-Instruct-v0.2
       - Mistral-8x7B-Instruct-v0.1
 
-  - provider: VertexAI
+  - model: VertexAI
     temperature: 0.1
     project_id_var: GOOGLE_PROJECT_ID
     max_output_tokens: 256
     models:
       - text-bison
-      #       #Currently not working
+      # Currently not working
       # - chat-bison

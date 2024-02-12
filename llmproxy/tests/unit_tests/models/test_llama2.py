@@ -3,11 +3,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from llmproxy.provider.huggingface.llama2 import (
-    Llama2Adapter,
-    Llama2Exception,
-    Llama2Model,
-)
+from llmproxy.provider.huggingface.llama2 import Llama2, Llama2Exception, Llama2Model
 from llmproxy.utils.exceptions.provider import EmptyPrompt, UnsupportedModel
 
 load_dotenv(".env.test")
@@ -20,7 +16,7 @@ default_model = Llama2Model.LLAMA_2_7B.value
 
 
 def test_llama2_empty_prompt() -> None:
-    llama2_empty_prompt = Llama2Adapter(
+    llama2_empty_prompt = Llama2(
         prompt="",
         system_prompt=default_system_prompt,
         model=default_model,
@@ -32,7 +28,7 @@ def test_llama2_empty_prompt() -> None:
 
 
 def test_llama2_invalid_api_key() -> None:
-    test_api_key = Llama2Adapter(
+    test_api_key = Llama2(
         prompt=default_prompt,
         system_prompt=default_system_prompt,
         api_key="LMAO-key",
@@ -44,7 +40,7 @@ def test_llama2_invalid_api_key() -> None:
 
 
 def test_llama2_free_subscription_api_key() -> None:
-    test_model = Llama2Adapter(
+    test_model = Llama2(
         prompt=default_prompt,
         system_prompt=default_system_prompt,
         api_key=default_api_key,
@@ -56,7 +52,7 @@ def test_llama2_free_subscription_api_key() -> None:
 
 
 def test_llama2_emp_model() -> None:
-    test_emp_model = Llama2Adapter(
+    test_emp_model = Llama2(
         prompt=default_prompt,
         system_prompt=default_system_prompt,
         api_key=default_api_key,

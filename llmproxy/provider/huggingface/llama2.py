@@ -1,6 +1,7 @@
 import requests
 
-from llmproxy.provider.base import BaseAdapter
+from llmproxy.llmproxy import load_model_costs
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import (
@@ -10,60 +11,7 @@ from llmproxy.utils.exceptions.provider import (
 )
 from llmproxy.utils.log import logger
 
-llama2_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "Llama-2-7b-chat-hf": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b-chat": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b-hf": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-13b-chat-hf": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b-chat": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b-hf": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-70b-chat-hf": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b-chat": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b-hf": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-    },
-}
+llama2_price_data = load_model_costs("llmproxy/config/internal.config.yml", "Llama2")
 
 llama2_category_data = {
     "model-categories": {
@@ -103,114 +51,6 @@ llama2_category_data = {
             "Financial Task": 1,
             "Content Recommendation Task": 1,
         },
-        "Llama-2-7b-chat": {
-            "Code Generation Task": 4,
-            "Text Generation Task": 5,
-            "Translation and Multilingual Applications Task": 4,
-            "Natural Language Processing Task": 5,
-            "Conversational AI Task": 5,
-            "Educational Applications Task": 4,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 4,
-        },
-        "Llama-2-7b-hf": {
-            "Code Generation Task": 4,
-            "Text Generation Task": 5,
-            "Translation and Multilingual Applications Task": 4,
-            "Natural Language Processing Task": 5,
-            "Conversational AI Task": 5,
-            "Educational Applications Task": 4,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 4,
-        },
-        "Llama-2-7b": {
-            "Code Generation Task": 4,
-            "Text Generation Task": 5,
-            "Translation and Multilingual Applications Task": 4,
-            "Natural Language Processing Task": 5,
-            "Conversational AI Task": 5,
-            "Educational Applications Task": 4,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 4,
-        },
-        "Llama-2-13b-chat": {
-            "Code Generation Task": 3,
-            "Text Generation Task": 3,
-            "Translation and Multilingual Applications Task": 3,
-            "Natural Language Processing Task": 3,
-            "Conversational AI Task": 3,
-            "Educational Applications Task": 3,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 3,
-        },
-        "Llama-2-13b-hf": {
-            "Code Generation Task": 3,
-            "Text Generation Task": 3,
-            "Translation and Multilingual Applications Task": 3,
-            "Natural Language Processing Task": 3,
-            "Conversational AI Task": 3,
-            "Educational Applications Task": 3,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 3,
-        },
-        "Llama-2-13b": {
-            "Code Generation Task": 3,
-            "Text Generation Task": 3,
-            "Translation and Multilingual Applications Task": 3,
-            "Natural Language Processing Task": 3,
-            "Conversational AI Task": 3,
-            "Educational Applications Task": 3,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 3,
-        },
-        "Llama-2-70b-chat": {
-            "Code Generation Task": 3,
-            "Text Generation Task": 3,
-            "Translation and Multilingual Applications Task": 3,
-            "Natural Language Processing Task": 3,
-            "Conversational AI Task": 3,
-            "Educational Applications Task": 3,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 3,
-        },
-        "Llama-2-70b-hf": {
-            "Code Generation Task": 3,
-            "Text Generation Task": 3,
-            "Translation and Multilingual Applications Task": 3,
-            "Natural Language Processing Task": 3,
-            "Conversational AI Task": 3,
-            "Educational Applications Task": 3,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 3,
-        },
-        "Llama-2-70b": {
-            "Code Generation Task": 3,
-            "Text Generation Task": 3,
-            "Translation and Multilingual Applications Task": 3,
-            "Natural Language Processing Task": 3,
-            "Conversational AI Task": 3,
-            "Educational Applications Task": 3,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 3,
-        },
     }
 }
 
@@ -230,7 +70,7 @@ class Llama2Model(str, BaseEnum):
     LLAMA_2_70B = "Llama-2-70b"
 
 
-class Llama2Adapter(BaseAdapter):
+class Llama2(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
@@ -238,8 +78,7 @@ class Llama2Adapter(BaseAdapter):
         api_key: str | None = "",
         temperature: float = 1.0,
         model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
-        max_output_tokens: int | None = None,
-        timeout: int | None = None,
+        max_output_tokens: int = None,
     ) -> None:
         self.system_prompt = system_prompt
         self.prompt = prompt
@@ -247,9 +86,9 @@ class Llama2Adapter(BaseAdapter):
         self.temperature = temperature
         self.model = model
         self.max_output_tokens = max_output_tokens
-        self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(self, prompt: str = "") -> str:
+        # If empty api key
         if not self.api_key:
             raise Llama2Exception(exception="No API Provided", error_type="ValueError")
 
@@ -262,25 +101,23 @@ class Llama2Adapter(BaseAdapter):
                 error_type="ValueError",
             )
         try:
-            api_url = (
+            API_URL = (
                 f"https://api-inference.huggingface.co/models/meta-llama/{self.model}"
             )
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
             def query(payload):
-                response = requests.post(api_url, headers=headers, json=payload)
+                response = requests.post(API_URL, headers=headers, json=payload)
                 return response.json()
 
             # Llama2 prompt template
             prompt_template = f"<s>[INST] <<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt or self.prompt} }}}}\n[/INST]"
-
             output = query(
                 {
                     "inputs": prompt_template,
                     "parameters": {
                         "max_length": self.max_output_tokens,
                         "temperature": self.temperature,
-                        "max_time": self.timeout,
                     },
                 }
             )
@@ -291,7 +128,7 @@ class Llama2Adapter(BaseAdapter):
         if output["error"]:
             raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
-        return output[0]["generated_text"]
+        return output
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:

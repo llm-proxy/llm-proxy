@@ -7,7 +7,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+openai = "^0.28.1"
 python-dotenv = "^1.0.0"
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
 cohere = "^4.27"
 tiktoken = "^0.5.1"
 tokenizers = "^0.14.1"
@@ -17,23 +20,16 @@ google-cloud-aiplatform = "^1.35.0"
 pyyaml = "^6.0.1"
 datasets = "^2.14.7"
 evaluate = "^0.4.1"
-openai = "^1.11.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
-isort = "^5.13.2"
-pre-commit = "^3.6.1"
-
-[tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"
 coverage = "^7.3.2"
+pytest-cov = "^4.1.0"
+isort = "^5.13.2"
 
 [tool.pytest.ini_options]
 # filterwarnings = ["ignore::DeprecationWarning"]
-testpaths = [
-    "llmproxy/tests/unit_tests",
-    "llmproxy/tests/integration_tests"
-]
 
 pythonpath = ["."]
 

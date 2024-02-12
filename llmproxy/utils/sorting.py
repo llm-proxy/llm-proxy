@@ -14,6 +14,7 @@ class MinHeap:
     def pop_min(self):
         if self.heap:
             _, _, data = heapq.heappop(self.heap)
+            print()
             return {"data": data}
         else:
             return None

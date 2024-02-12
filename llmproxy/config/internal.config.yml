@@ -93,8 +93,8 @@ available_models:
     max-output-tokens: 50
     models:
       - name: text-bison
-        cost_per_token_input: 0.0000015
-        cost_per_token_output: 0.000002
+        cost_per_token_input: 0.0000005
+        cost_per_token_output: 0.0000005
       # Currently not working
       # - name: chat-bison-32k
       #   cost_per_token_input: 0.000002

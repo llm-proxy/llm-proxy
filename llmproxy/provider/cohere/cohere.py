@@ -1,18 +1,14 @@
 import cohere
 
-from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import tokenizer
+from llmproxy.llmproxy import load_model_costs
+from llmproxy.provider.base import BaseProvider
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
 
-cohere_price_data_summarize_generate_chat = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        "prompt": 1.50 / 1_000_000,
-        "completion": 2.00 / 1_000_000,
-    },
-}
+cohere_price_data_summarize_generate_chat = load_model_costs(
+    "llmproxy/config/internal.config.yml", "Cohere"
+)
 
 cohere_category_data = {
     "model-categories": {
@@ -76,33 +72,35 @@ class CohereModel(str, BaseEnum):
     COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
 
 
-class CohereAdapter(BaseAdapter):
+class Cohere(BaseProvider):
     def __init__(
         self,
         prompt: str = "",
         model: CohereModel = CohereModel.COMMAND.value,
         temperature: float = 0.0,
-        api_key: str = "",
-        max_output_tokens: int | None = None,
-        timeout: int = 120,  # default based on Cohere's API
+        api_key: str | None = "",
+        max_output_tokens: int = None,
     ) -> None:
         self.prompt = prompt
         self.model = model
         self.temperature = temperature
         self.api_key = api_key
         self.max_output_tokens = max_output_tokens
-        self.timeout = timeout
+        self.co = None
+        try:
+            self.co = cohere.Client(self.api_key)
+        except cohere.CohereError as e:
+            raise CohereException(exception=e, error_type=ValueError)
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(self, prompt: str = "") -> str:
         if self.model not in CohereModel:
             raise UnsupportedModel(
                 exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
-                error_type="UnsupportedModel",
+                error_type=ValueError,
             )
 
         try:
-            co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
-            response = co.chat(
+            response = self.co.chat(
                 max_tokens=self.max_output_tokens,
                 message=prompt or self.prompt,
                 model=self.model,
@@ -110,11 +108,9 @@ class CohereAdapter(BaseAdapter):
             )
             return response.text
         except cohere.CohereError as e:
-            raise CohereException(exception=str(e), error_type="CohereError") from e
+            raise CohereException(exception=e.message, error_type=e.http_status) from e
         except Exception as e:
-            raise CohereException(
-                exception=str(e), error_type="Unknown Cohere Error"
-            ) from e
+            raise CohereException("Unknown Cohere error when making API call") from e
 
     def get_estimated_max_cost(self, prompt: str = "") -> float:
         if not self.prompt and not prompt:
@@ -126,17 +122,15 @@ class CohereAdapter(BaseAdapter):
 
         prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
-        ]["prompt"]
+        ][self.model]["prompt"]
         logger.info("Prompt Cost per token: %s", prompt_cost_per_token)
 
         completion_cost_per_token = cohere_price_data_summarize_generate_chat[
             "model-costs"
-        ]["completion"]
+        ][self.model]["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_token)
 
-        # Note: Avoiding costs for now
-        # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
-        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
+        tokens = self.co.tokenize(text=prompt or self.prompt).tokens
 
         logger.info("Number of input tokens found: %d", len(tokens))
 
@@ -157,7 +151,7 @@ class CohereAdapter(BaseAdapter):
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> int:
+    def get_category_rank(self, category: str = "") -> str:
         logger.info(msg=f"Current model: {self.model}")
         logger.info(msg=f"Category of prompt: {category}")
         category_rank = cohere_category_data["model-categories"][self.model][category]
