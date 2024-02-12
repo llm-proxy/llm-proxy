@@ -109,7 +109,7 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
                             error_type="UnsupportedModel",
                         )
                     # Added the max tokens param to be used in load_model_costs()
-                    available_models[provider.lower()]["max_output_tokens"] = provider[
+                    available_models[model_name]["max-output-tokens"] = provider[
                         "max_output_tokens"
                     ]
                     # Common params among all models
@@ -152,14 +152,17 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
 
 
 def load_model_costs(models_cost_data: Dict[str, Any], model_name: str) -> dict:
-    if model_name in models_cost_data:
-        return {
-            "max_output_tokens": models_cost_data[model_name]["max_output_tokens"],
-            "prompt": models_cost_data[model_name]["cost_per_token_input"],
-            "completion": models_cost_data[model_name]["cost_per_token_output"],
-        }
-    else:
-        raise ValueError("Models not found in the config file")
+    for model in models_cost_data["models"]:
+        if model == model_name:
+            return {
+                "max-output-tokens": models_cost_data["max-output-tokens"],
+                "prompt": models_cost_data["models_cost_data"][model][
+                    "cost_per_token_input"
+                ],
+                "completion": models_cost_data["models_cost_data"][model][
+                    "cost_per_token_output"
+                ],
+            }
 
 
 @dataclass
@@ -211,18 +214,21 @@ class LLMProxy:
             case RouteType.COST:
                 return self._cost_route(
                     prompt=prompt,
-                    models_cost_data=self.available_models["models_cost_data"],
+                    available_models=self.available_models,
                 )
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
             case _:
                 raise ValueError("Invalid route type, please try again")
 
-    def _cost_route(self, prompt: str, models_cost_data: Dict[str, Any]):
+    def _cost_route(self, prompt: str, available_models: None):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
+            class_name = instance.__class__.__name__
+            formatted_name = class_name.replace("Adapter", "").lower()
             try:
                 logger.info(msg="========Start Cost Estimation===========")
+                models_cost_data = available_models[formatted_name]
                 model_cost_obj = load_model_costs(models_cost_data, model_name)
                 cost = instance.get_estimated_max_cost(
                     prompt=prompt, price_data=model_cost_obj
