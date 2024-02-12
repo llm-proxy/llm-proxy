@@ -44,8 +44,13 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 
             # Loop through and aggregate all of the variations of "models" of each provider
             provider_models = set()
+            model_costs = {}
             for model in provider.get("models", []):
                 provider_models.add(model["name"])
+                model_costs[model["name"]] = {
+                    "cost_per_token_input": model["cost_per_token_input"],
+                    "cost_per_token_output": model["cost_per_token_output"],
+                }
 
             module_name, class_name = import_path.rsplit(".", 1)
 
@@ -56,6 +61,7 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
             available_models[key] = {
                 "adapter_instance": model_class,
                 "models": provider_models,
+                "models_cost_data": model_costs,
             }
 
         return available_models
@@ -102,7 +108,10 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
                             f"{model} is not available, yet!",
                             error_type="UnsupportedModel",
                         )
-
+                    # Added the max tokens param to be used in load_model_costs()
+                    available_models[provider.lower()]["max_output_tokens"] = provider[
+                        "max_output_tokens"
+                    ]
                     # Common params among all models
                     common_parameters = {
                         "max_output_tokens": provider["max_output_tokens"],
@@ -142,28 +151,12 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
         ) from e
 
 
-def load_model_costs(path_to_yml: str, provider_name: str) -> dict:
-    config = _get_settings_from_yml(path_to_yml)
-    models = next(
-        (
-            provider
-            for provider in config["available_models"]
-            if provider["name"] == provider_name
-        ),
-        None,
-    )
-
-    if models:
-        max_output_tokens = models.get("max-output-tokens", 50)
+def load_model_costs(models_cost_data: Dict[str, Any], model_name: str) -> dict:
+    if model_name in models_cost_data:
         return {
-            "max-output-tokens": max_output_tokens,
-            "model-costs": {
-                model["name"]: {
-                    "prompt": model["cost_per_token_input"],
-                    "completion": model["cost_per_token_output"],
-                }
-                for model in models["models"]
-            },
+            "max_output_tokens": models_cost_data[model_name]["max_output_tokens"],
+            "prompt": models_cost_data[model_name]["cost_per_token_input"],
+            "completion": models_cost_data[model_name]["cost_per_token_output"],
         }
     else:
         raise ValueError("Models not found in the config file")
@@ -216,18 +209,24 @@ class LLMProxy:
     ) -> CompletionResponse:
         match RouteType(route_type.lower()):
             case RouteType.COST:
-                return self._cost_route(prompt=prompt)
+                return self._cost_route(
+                    prompt=prompt,
+                    models_cost_data=self.available_models["models_cost_data"],
+                )
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
             case _:
                 raise ValueError("Invalid route type, please try again")
 
-    def _cost_route(self, prompt: str):
+    def _cost_route(self, prompt: str, models_cost_data: Dict[str, Any]):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             try:
                 logger.info(msg="========Start Cost Estimation===========")
-                cost = instance.get_estimated_max_cost(prompt=prompt)
+                model_cost_obj = load_model_costs(models_cost_data, model_name)
+                cost = instance.get_estimated_max_cost(
+                    prompt=prompt, price_data=model_cost_obj
+                )
                 logger.info(msg="========End Cost Estimation===========\n")
 
                 item = {"name": model_name, "cost": cost, "instance": instance}
