@@ -1,29 +1,10 @@
 import requests
-
+from typing import Any, Dict
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
 from llmproxy.utils.log import logger
-
-mistral_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "Mistral-7B-v0.1": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Mistral-7B-Instruct-v0.2": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Mistral-8x7B-Instruct-v0.1": {
-            "prompt": 0.30 / 1_000_000,
-            "completion": 1.0 / 1_000_000,
-        },
-    },
-}
 
 mistral_category_data = {
     "model-categories": {
@@ -137,7 +118,9 @@ class MistralAdapter(BaseAdapter):
         # Output will be a List[dict] if there is no error
         return output[0]["generated_text"]
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
@@ -145,12 +128,10 @@ class MistralAdapter(BaseAdapter):
         # Assumption, model exists (check should be done at yml load level)
         logger.info("Tokenizing model: %s", self.model)
 
-        prompt_cost_per_token = mistral_price_data["model-costs"][self.model]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.info("Prompt Cost per token: %s", prompt_cost_per_token)
 
-        completion_cost_per_token = mistral_price_data["model-costs"][self.model][
-            "completion"
-        ]
+        completion_cost_per_token = price_data["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_token)
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
@@ -160,12 +141,12 @@ class MistralAdapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            mistral_price_data["max-output-tokens"],
+            price_data["max-output-tokens"],
         )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * mistral_price_data["max-output-tokens"],
+            + completion_cost_per_token * price_data["max-output-tokens"],
             8,
         )
 

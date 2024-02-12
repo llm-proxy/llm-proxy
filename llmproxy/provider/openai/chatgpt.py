@@ -1,6 +1,6 @@
 import openai
 import tiktoken
-
+from typing import Any, Dict
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
@@ -8,36 +8,6 @@ from llmproxy.utils.log import logger
 
 # This should be available later from the yaml file
 # Cost is converted into whole numbers to avoid inconsistent floats
-open_ai_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "gpt-3.5-turbo-1106": {
-            "prompt": 0.0010 / 1000,
-            "completion": 0.0020 / 1000,
-        },
-        "gpt-3.5-turbo-instruct": {
-            "prompt": 0.0015 / 1000,
-            "completion": 0.0020 / 1000,
-        },
-        "gpt-4": {
-            "prompt": 0.03 / 1000,
-            "completion": 0.06 / 1000,
-        },
-        "gpt-4-32k": {
-            "prompt": 0.06 / 1000,
-            "completion": 0.12 / 1000,
-        },
-        "gpt-4-1106-preview": {
-            "prompt": 0.01 / 1000,
-            "completion": 0.03 / 1000,
-        },
-        "gpt-4-1106-vision-preview": {
-            "prompt": 0.01 / 1000,
-            "completion": 0.03 / 1000,
-        },
-    },
-}
 
 open_ai_category_data = {
     "model-categories": {
@@ -154,7 +124,9 @@ class OpenAIAdapter(BaseAdapter):
 
         return response.choices[0].message.content or None
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
@@ -164,12 +136,10 @@ class OpenAIAdapter(BaseAdapter):
 
         logger.info("Tokenizing model: %s", self.model)
 
-        prompt_cost_per_token = open_ai_price_data["model-costs"][self.model]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.info("Prompt Cost per token: %s", prompt_cost_per_token)
 
-        completion_cost_per_token = open_ai_price_data["model-costs"][self.model][
-            "completion"
-        ]
+        completion_cost_per_token = price_data["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_token)
 
         tokens = encoder.encode(prompt or self.prompt)
@@ -179,12 +149,12 @@ class OpenAIAdapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            open_ai_price_data["max-output-tokens"],
+            price_data["max-output-tokens"],
         )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * open_ai_price_data["max-output-tokens"],
+            + completion_cost_per_token * price_data["max-output-tokens"],
             8,
         )
 

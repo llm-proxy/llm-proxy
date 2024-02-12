@@ -1,15 +1,10 @@
 import cohere
-
+from typing import Any, Dict
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.llmproxy import load_model_costs
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 from llmproxy.utils.log import logger
-
-cohere_price_data_summarize_generate_chat = load_model_costs(
-    "llmproxy/config/internal.config.yml", "Cohere"
-)
 
 cohere_category_data = {
     "model-categories": {
@@ -113,7 +108,9 @@ class CohereAdapter(BaseAdapter):
                 exception=str(e), error_type="Unknown Cohere Error"
             ) from e
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
@@ -121,14 +118,10 @@ class CohereAdapter(BaseAdapter):
         # Assumption, model exists (check should be done at yml load level)
         logger.info("Tokenizing model: %s", self.model)
 
-        prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
-            "model-costs"
-        ][self.model]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.info("Prompt Cost per token: %s", prompt_cost_per_token)
 
-        completion_cost_per_token = cohere_price_data_summarize_generate_chat[
-            "model-costs"
-        ][self.model]["completion"]
+        completion_cost_per_token = price_data["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_token)
 
         # Note: Avoiding costs for now
@@ -140,13 +133,12 @@ class CohereAdapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            cohere_price_data_summarize_generate_chat["max-output-tokens"],
+            price_data["max-output-tokens"],
         )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token
-            * cohere_price_data_summarize_generate_chat["max-output-tokens"],
+            + completion_cost_per_token * price_data["max-output-tokens"],
             8,
         )
 

@@ -1,5 +1,5 @@
 import requests
-
+from typing import Any, Dict
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
@@ -9,61 +9,6 @@ from llmproxy.utils.exceptions.provider import (
     UnsupportedModel,
 )
 from llmproxy.utils.log import logger
-
-llama2_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "Llama-2-7b-chat-hf": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b-chat": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b-hf": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-7b": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Llama-2-13b-chat-hf": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b-chat": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b-hf": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-13b": {
-            "prompt": 0.10 / 1_000_000,
-            "completion": 0.50 / 1_000_000,
-        },
-        "Llama-2-70b-chat-hf": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b-chat": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b-hf": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-        "Llama-2-70b": {
-            "prompt": 0.65 / 1_000_000,
-            "completion": 2.75 / 1_000_000,
-        },
-    },
-}
 
 llama2_category_data = {
     "model-categories": {
@@ -293,7 +238,9 @@ class Llama2Adapter(BaseAdapter):
 
         return output[0]["generated_text"]
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
@@ -301,12 +248,10 @@ class Llama2Adapter(BaseAdapter):
         # Assumption, model exists (check should be done at yml load level)
         logger.info("Tokenizing model: %s", self.model)
 
-        prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.info("Prompt Cost per token: %s", prompt_cost_per_token)
 
-        completion_cost_per_token = llama2_price_data["model-costs"][self.model][
-            "completion"
-        ]
+        completion_cost_per_token = price_data["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_token)
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
@@ -316,12 +261,12 @@ class Llama2Adapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            llama2_price_data["max-output-tokens"],
+            price_data["max-output-tokens"],
         )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * llama2_price_data["max-output-tokens"],
+            + completion_cost_per_token * price_data["max-output-tokens"],
             8,
         )
 

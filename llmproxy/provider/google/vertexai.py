@@ -1,17 +1,11 @@
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
-
+from typing import Any, Dict
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.llmproxy import load_model_costs
 from llmproxy.utils import timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 from llmproxy.utils.log import logger
-
-# VERTEX IS PER CHARACTER
-vertexai_price_data = load_model_costs(
-    "llmproxy/config/internal.config.yml", "Vertexai"
-)
 
 vertexai_category_data = {
     "model-categories": {
@@ -100,7 +94,9 @@ class VertexAIAdapter(BaseAdapter):
 
         return result.get("output")
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
@@ -109,14 +105,10 @@ class VertexAIAdapter(BaseAdapter):
 
         logger.info("Tokenizing model: %s", self.model)
 
-        prompt_cost_per_character = vertexai_price_data["model-costs"][self.model][
-            "prompt"
-        ]
+        prompt_cost_per_character = price_data["prompt"]
         logger.info("Prompt Cost per token: %s", prompt_cost_per_character)
 
-        completion_cost_per_character = vertexai_price_data["model-costs"][self.model][
-            "completion"
-        ]
+        completion_cost_per_character = price_data["completion"]
         logger.info("Output cost per token: %s", completion_cost_per_character)
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
@@ -126,12 +118,12 @@ class VertexAIAdapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            vertexai_price_data["max-output-tokens"],
+            price_data["max-output-tokens"],
         )
 
         cost = round(
             prompt_cost_per_character * len(tokens)
-            + completion_cost_per_character * vertexai_price_data["max-output-tokens"],
+            + completion_cost_per_character * price_data["max-output-tokens"],
             8,
         )
 
