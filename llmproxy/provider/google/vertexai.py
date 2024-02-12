@@ -2,6 +2,7 @@ from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
 from llmproxy.provider.base import BaseAdapter
+from llmproxy.llmproxy import load_model_costs
 from llmproxy.utils import timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException

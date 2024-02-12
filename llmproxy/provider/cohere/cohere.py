@@ -1,6 +1,7 @@
 import cohere
 
 from llmproxy.provider.base import BaseAdapter
+from llmproxy.llmproxy import load_model_costs
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
