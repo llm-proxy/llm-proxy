@@ -151,15 +151,15 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
         ) from e
 
 
-def load_model_costs(models_cost_data: Dict[str, Any], model_name: str) -> dict:
-    for model in models_cost_data["models"]:
+def load_model_costs(provider_cost_data: Dict[str, Any], model_name: str) -> dict:
+    for model in provider_cost_data["models"]:
         if model == model_name:
             return {
-                "max-output-tokens": models_cost_data["max-output-tokens"],
-                "prompt": models_cost_data["models_cost_data"][model][
+                "max-output-tokens": provider_cost_data["max-output-tokens"],
+                "prompt": provider_cost_data["models_cost_data"][model][
                     "cost_per_token_input"
                 ],
-                "completion": models_cost_data["models_cost_data"][model][
+                "completion": provider_cost_data["models_cost_data"][model][
                     "cost_per_token_output"
                 ],
             }
@@ -225,13 +225,13 @@ class LLMProxy:
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             class_name = instance.__class__.__name__
-            formatted_name = class_name.replace("Adapter", "").lower()
+            key = class_name.replace("Adapter", "").lower()
             try:
                 logger.info(msg="========Start Cost Estimation===========")
-                models_cost_data = available_models[formatted_name]
-                model_cost_obj = load_model_costs(models_cost_data, model_name)
+                provider_cost_data = available_models[key]
+                model_cost_data = load_model_costs(provider_cost_data, model_name)
                 cost = instance.get_estimated_max_cost(
-                    prompt=prompt, price_data=model_cost_obj
+                    prompt=prompt, price_data=model_cost_data
                 )
                 logger.info(msg="========End Cost Estimation===========\n")
 
