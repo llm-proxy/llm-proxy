@@ -3,21 +3,19 @@ llm_proxy:
   version: demo 1.0
   description: An API that act as a proxy to multiple language models
 
-user_settings:
-  # Example
-  # - routing_mode:
-  #   - cost_routing:
-  #       enable: false
-
-  - model: OpenAI
+provider_settings:
+  - provider: OpenAI
     api_key_var: OPENAI_API_KEY # .env name for api key
-    max_output_tokens: 10000
-    temperature: 1.0
+    max_output_tokens: 256
+    temperature: 0.1
+    models: # input names of models you want to you (see below for all models provided)
 
-available_models:
-  - name: OpenAI
-    class: llmproxy.provider.openai.chatgpt.OpenAI
+  - provider: Mistral
+    api_key_var: HUGGING_FACE_API_KEY
+    max_output_tokens: 256
+    temperature: 0.1
     models:
+<<<<<<< HEAD
       - name: gpt-3.5-turbo-1106
         cost_per_token_input: 0.0000010
         cost_per_token_output: 0.0000020
@@ -48,3 +46,8 @@ available_models:
         cost_per_hour: 0.06
       - name: Mistral-7B-Instruct-v0.1
         cost_per_hour: 0.06
+=======
+      - Mistral-7B-v0.1
+      - Mistral-7B-Instruct-v0.2
+      - Mistral-8x7B-Instruct-v0.1
+>>>>>>> 2f573f8866c0502f04cf7c5b7c8e2b14dbe2691a

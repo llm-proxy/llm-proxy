@@ -3,7 +3,7 @@
 all: format test
 
 test:
-	PYTHONPATH=. pytest
+	poetry run pytest llmproxy/tests
 format:
 	poetry run isort .
 	poetry run black .
