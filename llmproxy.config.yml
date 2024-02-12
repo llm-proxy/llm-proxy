@@ -63,4 +63,6 @@ provider_settings:
     models:
       - text-bison
         #Currently not working
+      - gemini-pro
+      #       #Currently not working
       # - chat-bison

@@ -1,4 +1,7 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
+from typing import Any, Dict
+
+from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, timeout_function, tokenizer
 from proxyllm.utils.exceptions.provider import VertexAIException
 
@@ -16,6 +19,18 @@ vertexai_category_data = {
             "Legal Task": 2,
             "Financial Task": 2,
             "Content Recommendation Task": 1,
+        },
+        "gemini-pro": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 3,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
         },
     }
 }
@@ -76,11 +91,16 @@ class VertexAIAdapter(BaseAdapter):
                 "max_output_tokens": self.max_output_tokens,
             }
 
-            from vertexai.language_models import TextGenerationModel
+            if self.model == "gemini-pro":
+                from vertexai.preview.generative_models import GenerativeModel, Part
 
-            chat_model = TextGenerationModel.from_pretrained(self.model)
+                chat_model = GenerativeModel(self.model)
+                response = chat_model.generate_content(prompt or self.prompt)
+            else:
+                from vertexai.language_models import TextGenerationModel
 
-            response = chat_model.predict(**parameters)
+                chat_model = TextGenerationModel.from_pretrained(self.model)
+                response = chat_model.predict(**parameters)
             result["output"] = response.text
 
         except Exception as e:
