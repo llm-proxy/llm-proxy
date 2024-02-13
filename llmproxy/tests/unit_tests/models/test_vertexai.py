@@ -39,11 +39,12 @@ def test_unsupported_model() -> None:
 def test_get_estimated_max_cost():
     # Arrange
     vertex = VertexAIAdapter(project_id=project_id)
-    expected_cost = 0.000032
+    expected_cost = 0.000533
     prompt = "I am a cat in a hat!"
+    price_data = {"prompt": 1.5e-06, "completion": 2e-06, "max-output-tokens": 256}
 
     # Act
-    actual_cost = vertex.get_estimated_max_cost(prompt=prompt)
+    actual_cost = vertex.get_estimated_max_cost(prompt=prompt, price_data=price_data)
 
     # Assert
     assert (
