@@ -1,5 +1,7 @@
-import requests
 from typing import Any, Dict
+
+import requests
+
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum

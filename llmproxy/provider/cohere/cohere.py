@@ -1,5 +1,7 @@
-import cohere
 from typing import Any, Dict
+
+import cohere
+
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import tokenizer
 from llmproxy.utils.enums import BaseEnum

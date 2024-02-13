@@ -1,13 +1,12 @@
+from typing import Any, Dict
+
 import openai
 import tiktoken
-from typing import Any, Dict
+
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
 from llmproxy.utils.log import logger
-
-# This should be available later from the yaml file
-# Cost is converted into whole numbers to avoid inconsistent floats
 
 open_ai_category_data = {
     "model-categories": {

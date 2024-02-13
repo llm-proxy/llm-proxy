@@ -1,6 +1,8 @@
+from typing import Any, Dict
+
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
-from typing import Any, Dict
+
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
