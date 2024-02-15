@@ -263,12 +263,12 @@ class Llama2Adapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            price_data["max-output-tokens"],
+            self.max_output_tokens,
         )
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * price_data["max-output-tokens"],
+            + completion_cost_per_token * self.max_output_tokens,
             8,
         )
 

@@ -120,12 +120,12 @@ class VertexAIAdapter(BaseAdapter):
         logger.info(
             "Final calculation using %d input tokens and %d output tokens",
             len(tokens),
-            price_data["max-output-tokens"],
+            self.max_output_tokens,
         )
 
         cost = round(
             prompt_cost_per_character * len(tokens)
-            + completion_cost_per_character * price_data["max-output-tokens"],
+            + completion_cost_per_character * self.max_output_tokens,
             8,
         )
 

@@ -57,7 +57,7 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
             module = importlib.import_module(module_name)
             model_class = getattr(module, class_name)
 
-            # return dict with class path and models set, with all of the variations/models of that provider
+            # return dict with class path and models set and model cost data, with all of the variations/models of that provider
             available_models[key] = {
                 "adapter_instance": model_class,
                 "models": provider_models,
@@ -108,10 +108,7 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
                             f"{model} is not available, yet!",
                             error_type="UnsupportedModel",
                         )
-                    # Added the max tokens param to be used in load_model_costs()
-                    available_models[model_name]["max-output-tokens"] = provider[
-                        "max_output_tokens"
-                    ]
+
                     # Common params among all models
                     common_parameters = {
                         "max_output_tokens": provider["max_output_tokens"],
@@ -151,20 +148,6 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
         ) from e
 
 
-def load_model_costs(provider_cost_data: Dict[str, Any], model_name: str) -> dict:
-    for model in provider_cost_data["models"]:
-        if model == model_name:
-            return {
-                "max-output-tokens": provider_cost_data["max-output-tokens"],
-                "prompt": provider_cost_data["models_cost_data"][model][
-                    "cost_per_token_input"
-                ],
-                "completion": provider_cost_data["models_cost_data"][model][
-                    "cost_per_token_output"
-                ],
-            }
-
-
 @dataclass
 class CompletionResponse:
     """
@@ -196,14 +179,12 @@ class LLMProxy:
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
         # Setup available models
-        available_models = _setup_available_models(settings=internal_config)
+        self.available_models = _setup_available_models(settings=internal_config)
 
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
-            settings=user_settings, available_models=available_models
+            settings=user_settings, available_models=self.available_models
         )
-
-        self.available_models = available_models
 
     def route(
         self,
@@ -212,24 +193,22 @@ class LLMProxy:
     ) -> CompletionResponse:
         match RouteType(route_type.lower()):
             case RouteType.COST:
-                return self._cost_route(
-                    prompt=prompt,
-                    available_models=self.available_models,
-                )
+                return self._cost_route(prompt=prompt)
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
             case _:
                 raise ValueError("Invalid route type, please try again")
 
-    def _cost_route(self, prompt: str, available_models: None):
+    def _cost_route(self, prompt: str):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             class_name = instance.__class__.__name__
-            key = class_name.replace("Adapter", "").lower()
+            provider_key = class_name.replace("Adapter", "").lower()
             try:
                 logger.info(msg="========Start Cost Estimation===========")
-                provider_cost_data = available_models[key]
-                model_cost_data = load_model_costs(provider_cost_data, model_name)
+                model_cost_data = self._load_model_costs(
+                    key=provider_key, model_name=model_name
+                )
                 cost = instance.get_estimated_max_cost(
                     prompt=prompt, price_data=model_cost_data
                 )
@@ -252,7 +231,6 @@ class LLMProxy:
             instance_data = min_val_instance["data"]
             logger.info("Making request to model: %s\n", instance_data["name"])
             logger.info("ROUTING...\n")
-
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
@@ -274,6 +252,19 @@ class LLMProxy:
         return CompletionResponse(
             response=completion_res, response_model=response_model, errors=errors
         )
+
+    def _load_model_costs(self, key: str, model_name: str) -> dict:
+        provider_cost_data = self.available_models[key]
+        for model in provider_cost_data["models"]:
+            if model == model_name:
+                return {
+                    "prompt": provider_cost_data["models_cost_data"][model][
+                        "cost_per_token_input"
+                    ],
+                    "completion": provider_cost_data["models_cost_data"][model][
+                        "cost_per_token_output"
+                    ],
+                }
 
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
