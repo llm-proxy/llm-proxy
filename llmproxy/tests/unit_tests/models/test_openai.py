@@ -39,10 +39,10 @@ def test_unsupported_model():
 # TODO: Slowing down Unit tests too much, TEST LATER IN INTEGRATION TESTS
 def test_get_estimated_max_cost():
     # Arrange
-    gpt = OpenAIAdapter(api_key=openai_api_key)
+    gpt = OpenAIAdapter(api_key=openai_api_key, max_output_tokens=256)
     expected_cost = 0.00052
     prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 1e-06, "completion": 2e-06, "max-output-tokens": 256}
+    price_data = {"prompt": 1e-06, "completion": 2e-06}
     # Act
     actual_cost = gpt.get_estimated_max_cost(prompt=prompt, price_data=price_data)
 
