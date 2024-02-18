@@ -9,9 +9,7 @@ def main() -> None:
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
 
-    proxy_client = LLMProxy(
-        path_to_user_configuration="llmproxy.config.yml",
-    )
+    proxy_client = LLMProxy()
     output = proxy_client.route(prompt=prompt)
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
