@@ -232,9 +232,7 @@ class LLMProxy:
                 logger.log(
                     msg="==========COST ROUTING COMPLETE! Call to model successful!==========\n",
                 )
-                logger.log(
-                    msg="(• ◡ •)",
-                )
+                logger.log(msg="(• ◡ •)", file_logger_on=False)
             except Exception as e:
                 ## CustomLogger.loading_animation_failure()
                 errors.append({"model_name": instance_data["name"], "error": e})
@@ -246,7 +244,7 @@ class LLMProxy:
                 logger.log(
                     level="ERROR", msg=f"Error when making request to model: {e}"
                 )
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)")
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
 
                 logger.log(
                     level="ERROR",
@@ -314,7 +312,7 @@ class LLMProxy:
                     msg=f"Error when making request to model: {e}",
                 )
 
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)\n")
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)\n", file_logger_on=False)
 
         if not completion_res:
             raise RequestsFailed(
