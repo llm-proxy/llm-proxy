@@ -230,10 +230,10 @@ class LLMProxy:
 
                 response_model = instance_data["name"]
                 logger.log(
-                    msg="==========COST ROUTING COMPLETE! Call to model successful!==========\n",
+                    msg="==========COST ROUTING COMPLETE! Call to model successful!==========",
                     color="GREEN",
                 )
-                logger.log(msg="(• ◡ •)", file_logger_on=False)
+                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 ## CustomLogger.loading_animation_failure()
                 errors.append({"model_name": instance_data["name"], "error": e})
@@ -297,9 +297,9 @@ class LLMProxy:
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 logger.log(
-                    msg="CATEGORY ROUTING COMPLETE! Call to model successful!\n",
+                    msg="CATEGORY ROUTING COMPLETE! Call to model successful!",
                 )
-                logger.log(msg="(• ◡ •)\n", file_logger_on=False)
+                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
 
