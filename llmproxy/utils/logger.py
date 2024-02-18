@@ -110,6 +110,8 @@ def log(
         msg (str, optional): The message to be logged. Defaults to "".
         console_logger_on (bool, optional): Flag indicating whether to log to the console. Defaults to True.
         file_logger_on (bool, optional): Flag indicating whether to log to a file. Defaults to True.
+        color (Literal["PURPLE", "GREEN", "GREY", "YELLOW", "RED", "BOLD_RED", "BLUE", "RESET", "FORMAT"], optional):
+            The color to be applied to the log message. Defaults to "GREY".
     """
     log_type_map = {
         "DEBUG": logging.DEBUG,
