@@ -1,7 +1,5 @@
 import importlib
 import os
-import sys
-import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal
 
@@ -10,7 +8,7 @@ from dotenv import load_dotenv
 
 from llmproxy.config.internal_config import internal_config
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import categorization
+from llmproxy.utils import categorization, logger
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.llmproxy_client import (
     LLMProxyConfigError,
@@ -19,7 +17,6 @@ from llmproxy.utils.exceptions.llmproxy_client import (
     UserConfigError,
 )
 from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.utils.log import CustomLogger, console_logger, file_logger
 from llmproxy.utils.sorting import MinHeap
 
 
@@ -246,21 +243,18 @@ class LLMProxy:
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             try:
-                file_logger.info(msg="========Start Cost Estimation===========")
-                console_logger.info(msg="========Start Cost Estimation===========")
+                logger.log(msg="========Start Cost Estimation===========")
 
                 cost = instance.get_estimated_max_cost(prompt=prompt)
-                file_logger.info(msg="========End Cost Estimation===========\n")
-                console_logger.info(msg="========End Cost Estimation===========\n")
+                logger.log(msg="========End Cost Estimation===========\n")
 
                 item = {"name": model_name, "cost": cost, "instance": instance}
                 min_heap.push(cost, item)
             except Exception as e:
-                file_logger.error(msg=e)
-                console_logger.error(msg=e)
-                console_logger.error("(¬_¬)")
-                file_logger.info(msg="========End Cost Estimation===========\n")
-                console_logger.info(msg="========End Cost Estimation===========\n")
+                logger.log(level="ERROR", msg=str(e))
+                logger.log(level="ERROR", msg="(¬_¬)", file_logger_on=False)
+                logger.log(msg="========End Cost Estimation===========\n")
+
         completion_res = None
         errors = []
         response_model = ""
@@ -271,13 +265,9 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            file_logger.info(msg="========START COST ROUTING===========")
-            console_logger.info(msg="========START COST ROUTING===========")
-            file_logger.info(f"Making request to model:{instance_data['name']}")
-            console_logger.info(f"Making request to model:{instance_data['name']}")
-            file_logger.info("ROUTING...")
-            console_logger.info("ROUTING...")
-            # CustomLogger.loading_animation_sucess()
+            logger.log(msg="========START COST ROUTING===========")
+            logger.log(msg=f"Making request to model:{instance_data['name']}")
+            logger.log(msg="ROUTING...")
 
             # Attempt to make request to model
             try:
@@ -285,30 +275,28 @@ class LLMProxy:
                 # CustomLogger.loading_animation_sucess()
 
                 response_model = instance_data["name"]
-                console_logger.info(
-                    CustomLogger.CustomFormatter.green
-                    + "(• ◡ •)"
-                    + CustomLogger.CustomFormatter.reset
+                logger.log(
+                    msg="==========COST ROUTING COMPLETE! Call to model successful!==========",
+                    color="GREEN",
                 )
-                file_logger.info(
-                    "==========COST ROUTING COMPLETE! Call to model successful!==========\n"
-                )
-                console_logger.info(
-                    "==========COST ROUTING COMPLETE! Call to model successful!==========\n"
-                )
+                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 ## CustomLogger.loading_animation_failure()
                 errors.append({"model_name": instance_data["name"], "error": e})
 
-                file_logger.error(f"Request to model {instance_data['name']} failed!")
-                console_logger.error(
-                    f"Request to model {instance_data['name']} failed!"
+                logger.log(
+                    level="ERROR",
+                    msg=f"Request to model {instance_data['name']} failed!",
                 )
-                file_logger.error(f"Error when making request to model: {e}")
-                console_logger.error(f"Error when making request to model: {e}")
-                console_logger.error("(•᷄ ∩ •᷅)")
-                file_logger.info(msg="========COST ROUTING FAILED!===========\n")
-                console_logger.info(msg="========COST ROUTING FAILED!===========\n")
+                logger.log(
+                    level="ERROR", msg=f"Error when making request to model: {e}"
+                )
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+
+                logger.log(
+                    level="ERROR",
+                    msg="========COST ROUTING FAILED!===========\n",
+                )
 
         # If all model fails raise an Exception to notify user
         if not completion_res:
@@ -323,27 +311,20 @@ class LLMProxy:
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
         best_fit_category = categorization.categorize_text(prompt)
-        for (
-            model_name,
-            instance,
-        ) in self.user_models.items():
-            file_logger.info(
-                msg="========Start fetching model for category routing==========="
-            )
-            console_logger.info(
-                msg="========Start fetching model for category routing==========="
+        for model_name, instance in self.user_models.items():
+            logger.log(
+                msg="========Fetching model for category routing===========",
             )
 
+            logger.log(
+                msg="Sorting fetched models based on proficency...",
+            )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            file_logger.info(msg="Sorting fetched models based on proficency...")
-            console_logger.info(msg="Sorting fetched models based on proficency...")
-            file_logger.info(
-                msg="========Finished fetching model for category routing=============\n"
-            )
-            console_logger.info(
-                msg="========Finished fetching model for category routing=============\n"
+
+            logger.log(
+                msg="========Finished fetching model for category routing=============\n",
             )
 
         completion_res = None
@@ -356,32 +337,31 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            file_logger.info(f"Making request to model: {instance_data['name']}")
-            console_logger.info(f"Making request to model: {instance_data['name']}")
+            logger.log(
+                msg=f"Making request to model: {instance_data['name']}",
+            )
 
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 response_model = instance_data["name"]
-                file_logger.info(
-                    "CATEGORY ROUTING COMPLETE! Call to model successful!\n"
+                logger.log(
+                    msg="CATEGORY ROUTING COMPLETE! Call to model successful!",
                 )
-                console_logger.info(
-                    "CATEGORY ROUTING COMPLETE! Call to model successful!"
-                )
-                console_logger.info(
-                    CustomLogger.CustomFormatter.green
-                    + "(• ◡ •)\n"
-                    + CustomLogger.CustomFormatter.reset
-                )
+                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                file_logger.error("Request to model %s failed!", instance_data["name"])
-                console_logger.error(
-                    "Request to model %s failed!", instance_data["name"]
+
+                logger.log(
+                    level="ERROR",
+                    msg=f"Request to model {instance_data['name']} failed!",
                 )
-                file_logger.error("Error when making request to model: %s\n", e)
-                console_logger.error("Error when making request to model: %s", e)
-                console_logger.error("(•᷄ ∩ •᷅)\n")
+
+                logger.log(
+                    level="ERROR",
+                    msg=f"Error when making request to model: {e}",
+                )
+
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)\n", file_logger_on=False)
 
         if not completion_res:
             raise RequestsFailed(

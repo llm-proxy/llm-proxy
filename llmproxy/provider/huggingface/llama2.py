@@ -1,14 +1,13 @@
 import requests
 
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import tokenizer
+from llmproxy.utils import logger, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import (
     EmptyPrompt,
     Llama2Exception,
     UnsupportedModel,
 )
-from llmproxy.utils.log import CustomLogger, console_logger, file_logger
 
 llama2_price_data = {
     "max-output-tokens": 50,
@@ -298,32 +297,20 @@ class Llama2Adapter(BaseAdapter):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-        file_logger.info(f"MODEL: {self.model}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.purple
-            + f"MODEL: {self.model}"
-            + CustomLogger.CustomFormatter.reset
-        )
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
-        file_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
-        console_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
+        logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
         completion_cost_per_token = llama2_price_data["model-costs"][self.model][
             "completion"
         ]
-        file_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
-        console_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+        logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
-        file_logger.info(f"INPUT TOKENS: {len(tokens)}")
-        console_logger.info(f"INPUT TOKENS: {len(tokens)}")
-
-        file_logger.info(f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
-        console_logger.info(
-            f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}"
-        )
+        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
+        logger.log(msg=f"COMPLETION TOKENS: {llama2_price_data['max-output-tokens']}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
@@ -331,29 +318,16 @@ class Llama2Adapter(BaseAdapter):
             8,
         )
 
-        file_logger.info(f"COST: {cost}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.green
-            + f"COST: {cost}"
-            + CustomLogger.CustomFormatter.reset
-        )
+        logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
 
-    def get_category_rank(self, category: str = "") -> str:
-        file_logger.info(f"MODEL: {self.model}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.purple
-            + f"MODEL: {self.model}"
-            + CustomLogger.CustomFormatter.reset
-        )
-        file_logger.info(f"CATEGORY OF PROMPT: {category}")
-        console_logger.info(f"CATEGORY OF PROMPT: {category}")
+    def get_category_rank(self, category: str = "") -> int:
+        logger.log(msg=f"MODEL: {self.model}")
+        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+
         category_rank = llama2_category_data["model-categories"][self.model][category]
-        file_logger.info(f"RANK OF PROMPT: {category_rank}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.blue
-            + f"RANK OF PROMPT: {category_rank}"
-            + CustomLogger.CustomFormatter.reset
-        )
+
+        logger.log(msg=f"RANK OF PROMPT: {category_rank}")
+
         return category_rank
