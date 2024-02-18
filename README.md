@@ -84,7 +84,7 @@ llmproxy_client = LLMProxy()
 llmproxy_client = LLMProxy(path_to_user_configuration="llmproxy.config.yml")
 ```
 
-Once you have your client setup, to route, simply call the route function with your prompt:
+To use the llmproxy, simply call the route function with your prompt:
 ```python
 output = llmproxy_client.route(prompt=prompt)
 ```
