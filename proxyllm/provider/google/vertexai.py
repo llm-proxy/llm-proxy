@@ -5,10 +5,43 @@ from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, timeout_function, tokenizer
 from proxyllm.utils.exceptions.provider import VertexAIException
 
+# VERTEX IS PER CHARACTER
+vertexai_price_data = {
+    "max-output-tokens": 50,
+    "model-costs": {
+        "text-bison": {
+            "prompt": 0.0005 / 1_000,
+            "completion": 0.0005 / 1_000,
+        },
+        "chat-bison": {
+            "prompt": 0.0005 / 1_000,
+            "completion": 0.0005 / 1_000,
+        },
+        "gemini-pro": {
+            "prompt": 0.0000125 / 1_000,
+            "completion": 0.000375 / 1_000,
+        },
+    },
+}
+>>>>>>> bc76c28 (implement gemini)
+>>>>>>> 0eab6b9 (add text bison):llmproxy/provider/google/vertexai.py
+
 # Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {
     "model-categories": {
         "text-bison": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1,
+        },
+        "chat-bison": {
             "Code Generation Task": 1,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 1,
