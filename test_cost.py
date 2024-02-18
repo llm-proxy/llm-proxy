@@ -9,7 +9,7 @@ def main() -> None:
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
 
-    proxy_client = LLMProxy(route_type="category")
+    proxy_client = LLMProxy(route_type="cost")
     output = proxy_client.route(prompt=prompt)
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)

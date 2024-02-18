@@ -63,7 +63,9 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def _setup_user_models(
-    available_models=None, yml_settings=None, constructor_settings=None
+    available_models: Dict[Any, Any],
+    yml_settings: Dict[Any, Any],
+    constructor_settings: Dict[Any, Any] | None,
 ) -> Dict[str, BaseAdapter]:
     """Setup all available models and return dict of {name: instance_of_model}"""
 
@@ -81,13 +83,12 @@ def _setup_user_models(
         )
 
     try:
-        # optional_config = yml_settings.get("optional_configuration", constructor_settings) or {}
-        optional_config = (
-            constructor_settings
-            or yml_settings.get("optional_configuration", None)
-            or {}
-        )
+        # Return dict
         user_models = {}
+        optional_config = constructor_settings
+        if constructor_settings is None:
+            optional_config = yml_settings.get("optional_configuration", None) or {}
+
         # Compare user models with available_models
         for provider in yml_settings["provider_settings"]:
             model_name = provider["provider"].lower().strip()
@@ -166,17 +167,20 @@ def _get_route_type(
     Raises:
         ValueError: If no route type is specified in either user settings or constructor parameters.
     """
-    route_type = constructor_route_type
-    if route_type is None and isinstance(user_settings, dict):
-        proxy_config = user_settings.get("proxy_configuration", {})
-        route_type = proxy_config.get("route_type", constructor_route_type)
+    if constructor_route_type is not None:
+        return constructor_route_type
 
-    if route_type is None:
-        raise ValueError(
-            "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
-        )
+    if user_settings is not None and isinstance(
+        user_settings.get("proxy_configuration"), dict
+    ):
+        proxy_configuration = user_settings.get("proxy_configuration", {})
+        route_type = proxy_configuration.get("route_type", None)
+        if route_type is not None:
+            return route_type
 
-    return route_type
+    raise ValueError(
+        "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
+    )
 
 
 @dataclass
@@ -202,9 +206,20 @@ class LLMProxy:
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
         route_type: Literal["cost", "category"] | None = None,
-        timeout: int | None = None,
-        force_timeout: bool = False,
+        **kwargs,
     ) -> None:
+        """
+        Initialize YourClass instance.
+
+        Parameters:
+            path_to_user_configuration (str): Path to user configuration YAML file.
+            path_to_env_vars (str): Path to environment variables file.
+            route_type (Literal["cost", "category"] | None): Type of route.
+            timeout (int): Timeout value in seconds (optional).
+            force_timeout (bool): Whether to force timeout (optional).
+            **kwargs: Additional, optional_configuration, keyword arguments for setting up user models.
+                Only pass in optional_configuration paramters settings that you want to override
+        """
         load_dotenv(path_to_env_vars)
         # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
@@ -221,7 +236,7 @@ class LLMProxy:
         self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
             yml_settings=user_settings,
             available_models=available_models,
-            constructor_settings={"timeout": timeout, "force_timeout": force_timeout},
+            constructor_settings=kwargs,
         )
 
         self.available_models = available_models

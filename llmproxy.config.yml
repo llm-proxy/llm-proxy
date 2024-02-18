@@ -1,5 +1,5 @@
 proxy_configuration:
-  route_type: cost
+  route_type: category
 
 optional_configuration:
   timeout: 10 # Timeout for request to models
