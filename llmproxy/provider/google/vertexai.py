@@ -108,7 +108,7 @@ class VertexAIAdapter(BaseAdapter):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
         logger.log(msg=f"PROMPT (COST/CHARACTER): {prompt_cost_per_character}")
@@ -128,12 +128,12 @@ class VertexAIAdapter(BaseAdapter):
             8,
         )
 
-        logger.log(msg=f"COST: {cost}")
+        logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
-        logger.log(msg=f"MODEL: {self.model}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = vertexai_category_data["model-categories"][self.model][category]

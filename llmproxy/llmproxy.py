@@ -231,6 +231,7 @@ class LLMProxy:
                 response_model = instance_data["name"]
                 logger.log(
                     msg="==========COST ROUTING COMPLETE! Call to model successful!==========\n",
+                    color="GREEN",
                 )
                 logger.log(msg="(• ◡ •)", file_logger_on=False)
             except Exception as e:

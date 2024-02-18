@@ -90,6 +90,17 @@ def log(
     msg: str = "",
     console_logger_on: bool = True,
     file_logger_on: bool = True,
+    color: Literal[
+        "PURPLE",
+        "GREEN",
+        "GREY",
+        "YELLOW",
+        "RED",
+        "BOLD_RED",
+        "BLUE",
+        "RESET",
+        "FORMAT",
+    ] = "GREY",
 ):
     """
     Logs a message with the specified logging level.
@@ -108,9 +119,26 @@ def log(
         "CRITICAL": logging.CRITICAL,
     }
 
+    log_color_map = {
+        "PURPLE": CustomFormatter.PURPLE,
+        "GREEN": CustomFormatter.GREEN,
+        "GREY": CustomFormatter.GREY,
+        "YELLOW": CustomFormatter.YELLOW,
+        "RED": CustomFormatter.RED,
+        "BOLD_RED": CustomFormatter.BOLD_RED,
+        "BLUE": CustomFormatter.BLUE,
+        "RESET": CustomFormatter.RESET,
+        "FORMAT": CustomFormatter.FORMAT,
+    }
+
     log_type = log_type_map.get(level, logging.INFO)
+    log_color = log_color_map.get(color, CustomFormatter.GREY)
+
+    formatted_msg = msg
+    if color:
+        formatted_msg = f"{log_color}{msg}{log_color}"
 
     if console_logger_on:
-        console_logger.log(log_type, msg)
+        console_logger.log(log_type, formatted_msg)
     if file_logger_on:
         file_logger.log(log_type, msg)

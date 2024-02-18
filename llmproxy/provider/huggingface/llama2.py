@@ -297,7 +297,7 @@ class Llama2Adapter(BaseAdapter):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         prompt_cost_per_token = llama2_price_data["model-costs"][self.model]["prompt"]
         logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
@@ -318,7 +318,7 @@ class Llama2Adapter(BaseAdapter):
             8,
         )
 
-        logger.log(msg=f"COST: {cost}")
+        logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
 

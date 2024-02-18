@@ -161,7 +161,7 @@ class OpenAIAdapter(BaseAdapter):
         # Assumption, model exists (check should be done at yml load level)
         encoder = tiktoken.encoding_for_model(self.model)
 
-        logger.log(msg=f"MODEL: {self.model}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         prompt_cost_per_token = open_ai_price_data["model-costs"][self.model]["prompt"]
         logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
@@ -179,7 +179,7 @@ class OpenAIAdapter(BaseAdapter):
             + completion_cost_per_token * open_ai_price_data["max-output-tokens"],
             8,
         )
-        logger.log(msg=f"COST: {cost}")
+        logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
 
