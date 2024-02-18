@@ -1,5 +1,7 @@
 import importlib
 import os
+import sys
+import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal
 
@@ -17,7 +19,7 @@ from llmproxy.utils.exceptions.llmproxy_client import (
     UserConfigError,
 )
 from llmproxy.utils.exceptions.provider import UnsupportedModel
-from llmproxy.utils.log import logger
+from llmproxy.utils.log import CustomLogger, console_logger, file_logger
 from llmproxy.utils.sorting import MinHeap
 
 
@@ -208,7 +210,6 @@ class LLMProxy:
         force_timeout: bool = False,
     ) -> None:
         load_dotenv(path_to_env_vars)
-
         # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
@@ -245,15 +246,21 @@ class LLMProxy:
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             try:
-                logger.info(msg="========Start Cost Estimation===========")
+                file_logger.info(msg="========Start Cost Estimation===========")
+                console_logger.info(msg="========Start Cost Estimation===========")
+
                 cost = instance.get_estimated_max_cost(prompt=prompt)
-                logger.info(msg="========End Cost Estimation===========\n")
+                file_logger.info(msg="========End Cost Estimation===========\n")
+                console_logger.info(msg="========End Cost Estimation===========\n")
 
                 item = {"name": model_name, "cost": cost, "instance": instance}
                 min_heap.push(cost, item)
             except Exception as e:
-                logger.error(msg=e)
-
+                file_logger.error(msg=e)
+                console_logger.error(msg=e)
+                console_logger.error("(¬_¬)")
+                file_logger.info(msg="========End Cost Estimation===========\n")
+                console_logger.info(msg="========End Cost Estimation===========\n")
         completion_res = None
         errors = []
         response_model = ""
@@ -264,20 +271,44 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info("Making request to model: %s\n", instance_data["name"])
-            logger.info("ROUTING...\n")
+            file_logger.info(msg="========START COST ROUTING===========")
+            console_logger.info(msg="========START COST ROUTING===========")
+            file_logger.info(f"Making request to model:{instance_data['name']}")
+            console_logger.info(f"Making request to model:{instance_data['name']}")
+            file_logger.info("ROUTING...")
+            console_logger.info("ROUTING...")
+            # CustomLogger.loading_animation_sucess()
 
             # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                # CustomLogger.loading_animation_sucess()
+
                 response_model = instance_data["name"]
-                logger.info(
-                    "==========ROUTING COMPLETE! Call to model successful!==========\n"
+                console_logger.info(
+                    CustomLogger.CustomFormatter.green
+                    + "(• ◡ •)"
+                    + CustomLogger.CustomFormatter.reset
+                )
+                file_logger.info(
+                    "==========COST ROUTING COMPLETE! Call to model successful!==========\n"
+                )
+                console_logger.info(
+                    "==========COST ROUTING COMPLETE! Call to model successful!==========\n"
                 )
             except Exception as e:
+                ## CustomLogger.loading_animation_failure()
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning("Request to model %s failed!\n", instance_data["name"])
-                logger.warning("Error when making request to model: %s\n", e)
+
+                file_logger.error(f"Request to model {instance_data['name']} failed!")
+                console_logger.error(
+                    f"Request to model {instance_data['name']} failed!"
+                )
+                file_logger.error(f"Error when making request to model: {e}")
+                console_logger.error(f"Error when making request to model: {e}")
+                console_logger.error("(•᷄ ∩ •᷅)")
+                file_logger.info(msg="========COST ROUTING FAILED!===========\n")
+                console_logger.info(msg="========COST ROUTING FAILED!===========\n")
 
         # If all model fails raise an Exception to notify user
         if not completion_res:
@@ -296,14 +327,22 @@ class LLMProxy:
             model_name,
             instance,
         ) in self.user_models.items():
-            logger.info(
+            file_logger.info(
                 msg="========Start fetching model for category routing==========="
             )
+            console_logger.info(
+                msg="========Start fetching model for category routing==========="
+            )
+
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
-            logger.info(msg="Sorting fetched models based on proficency...")
-            logger.info(
+            file_logger.info(msg="Sorting fetched models based on proficency...")
+            console_logger.info(msg="Sorting fetched models based on proficency...")
+            file_logger.info(
+                msg="========Finished fetching model for category routing=============\n"
+            )
+            console_logger.info(
                 msg="========Finished fetching model for category routing=============\n"
             )
 
@@ -316,16 +355,31 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.info("Making request to model: %s", instance_data["name"])
-            logger.info("ROUTING...")
+            file_logger.info(f"Making request to model: {instance_data['name']}")
+            console_logger.info(f"Making request to model: {instance_data['name']}")
 
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
-                logger.info("ROUTING COMPLETE! Call to model successful!\n")
+                file_logger.info(
+                    "CATEGORY ROUTING COMPLETE! Call to model successful!\n"
+                )
+                console_logger.info(
+                    "CATEGORY ROUTING COMPLETE! Call to model successful!"
+                )
+                console_logger.info(
+                    CustomLogger.CustomFormatter.green
+                    + "(• ◡ •)\n"
+                    + CustomLogger.CustomFormatter.reset
+                )
             except Exception as e:
                 errors.append({"model_name": instance_data["name"], "error": e})
-                logger.warning("Request to model %s failed!\n", instance_data["name"])
-                logger.warning("Error when making request to model: %s\n", e)
+                file_logger.error("Request to model %s failed!", instance_data["name"])
+                console_logger.error(
+                    "Request to model %s failed!", instance_data["name"]
+                )
+                file_logger.error("Error when making request to model: %s\n", e)
+                console_logger.error("Error when making request to model: %s", e)
+                console_logger.error("(•᷄ ∩ •᷅)\n")
 
         if not completion_res:
             raise RequestsFailed(
