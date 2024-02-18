@@ -177,7 +177,7 @@ def _get_route_type(
         return route_type
 
     raise ValueError(
-        "No route type was specified, please add the rout_type in the yaml config or LLMProxy constructor"
+        "No route type was specified, please add the route_type in the llmproxy yaml config or LLMProxy constructor"
     )
 
 
