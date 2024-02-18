@@ -184,9 +184,11 @@ class OpenAIAdapter(BaseAdapter):
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
-        logger.log(msg=f"MODEL: {self.model}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+
         category_rank = open_ai_category_data["model-categories"][self.model][category]
-        logger.log(msg=f"RANK OF PROMPT: {category_rank}")
+
+        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
 
         return category_rank

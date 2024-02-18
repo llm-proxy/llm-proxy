@@ -83,8 +83,8 @@ def _setup_user_models(
     try:
         # optional_config = yml_settings.get("optional_configuration", constructor_settings) or {}
         optional_config = (
-            yml_settings.get("optional_configuration", None)
-            or constructor_settings
+            constructor_settings
+            or yml_settings.get("optional_configuration", None)
             or {}
         )
         user_models = {}
@@ -153,31 +153,30 @@ def _get_route_type(
     constructor_route_type: Literal["cost", "category"] | None,
 ) -> Literal["cost", "category"]:
     """
-    Get the route type from user settings or constructor parameters.
+    Get the route type from constructor parameters or user settings.
 
     Args:
         user_settings (Optional[Dict[str, Any]]): User settings containing proxy configuration.
             If None, the route type will default to constructor_route_type.
         constructor_route_type (Optional[Literal["cost", "category"]]): Route type specified during object construction.
 
+    Returns:
+        Literal["cost", "category"]: The selected route type.
+
     Raises:
         ValueError: If no route type is specified in either user settings or constructor parameters.
-
     """
-    if user_settings and user_settings.get("proxy_configuration", None):
-        route_type = (
-            user_settings.get("proxy_configuration", None).get("route_type", None)
-            or constructor_route_type
+    route_type = constructor_route_type
+    if route_type is None and isinstance(user_settings, dict):
+        proxy_config = user_settings.get("proxy_configuration", {})
+        route_type = proxy_config.get("route_type", constructor_route_type)
+
+    if route_type is None:
+        raise ValueError(
+            "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
         )
-    else:
-        route_type = constructor_route_type
 
-    if route_type:
-        return route_type
-
-    raise ValueError(
-        "No route type was specified, please add the route_type in the llmproxy yaml config or LLMProxy constructor"
-    )
+    return route_type
 
 
 @dataclass
@@ -361,7 +360,12 @@ class LLMProxy:
                     msg=f"Error when making request to model: {e}",
                 )
 
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)\n", file_logger_on=False)
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+
+                logger.log(
+                    level="ERROR",
+                    msg="========CATEGORY ROUTING FAILED!===========\n",
+                )
 
         if not completion_res:
             raise RequestsFailed(
