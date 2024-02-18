@@ -1,11 +1,11 @@
+from cohere.client import logger
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import timeout, tokenizer
+from llmproxy.utils import logger, timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
-from llmproxy.utils.log import CustomLogger, console_logger, file_logger
 
 # VERTEX IS PER CHARACTER
 vertexai_price_data = {
@@ -108,33 +108,19 @@ class VertexAIAdapter(BaseAdapter):
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-
-        file_logger.info(f"MODEL: {self.model}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.purple
-            + f"MODEL: {self.model}"
-            + CustomLogger.CustomFormatter.reset
-        )
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
-        file_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_character}")
-        console_logger.info(f"PROMPT (COST/TOKEN): {prompt_cost_per_character}")
+        logger.log(msg=f"PROMPT (COST/CHARACTER): {prompt_cost_per_character}")
 
         completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
-        file_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_character}")
-        console_logger.info(f"COMPLETION (COST/TOKEN): {completion_cost_per_character}")
+        logger.log(msg=f"COMPLETION (COST/CHARACTER): {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
 
-        file_logger.info(f"INPUT TOKENS: {len(tokens)}")
-        console_logger.info(f"INPUT TOKENS: {len(tokens)}")
+        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
 
-        file_logger.info(
-            f"COMPLETION TOKENS: {vertexai_price_data['max-output-tokens']}"
-        )
-        console_logger.info(
-            f"COMPLETION TOKENS: {vertexai_price_data['max-output-tokens']}"
-        )
+        logger.log(msg=f"COMPLETION TOKENS: {vertexai_price_data['max-output-tokens']}")
 
         cost = round(
             prompt_cost_per_character * len(tokens)
@@ -142,29 +128,16 @@ class VertexAIAdapter(BaseAdapter):
             8,
         )
 
-        file_logger.info(f"COST: {cost}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.green
-            + f"COST: {cost}"
-            + CustomLogger.CustomFormatter.reset
-        )
+        logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
-        file_logger.info(f"MODEL: {self.model}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.purple
-            + f"MODEL: {self.model}"
-            + CustomLogger.CustomFormatter.reset
-        )
-        file_logger.info(f"CATEGORY OF PROMPT: {category}")
-        console_logger.info(f"CATEGORY OF PROMPT: {category}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
+        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+
         category_rank = vertexai_category_data["model-categories"][self.model][category]
-        file_logger.info(f"RANK OF PROMPT: {category_rank}")
-        console_logger.info(
-            CustomLogger.CustomFormatter.blue
-            + f"RANK OF PROMPT: {category_rank}"
-            + CustomLogger.CustomFormatter.reset
-        )
+
+        logger.log(msg=f"RANK OF PROMPT: {category_rank}")
+
         return category_rank
