@@ -3,12 +3,11 @@
 <h3 align="center">LLM Proxy</h3>
 
   <p align="center">
-    A low code solution to efficiently managing multiple large language models
+    A low-code solution to efficiently manage multiple large language models
     <br />
 <!--     <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a> -->
 <!--     <br />
     <br /> -->
-    <!-- <a href="https://youtube.com">View Demo</a> -->
     <a href="https://youtube.com">View Demo</a>
     ·
     <a href="https://github.com/llm-proxy/llm-proxy/issues">Report Bug</a>
@@ -46,25 +45,25 @@
 
 <!-- ABOUT THE PROJECT -->
 ## What is LLM Proxy?
-LLM Proxy is a tool that sits between your application and the different LLM providers. LLM Proxy's main goal is to simplify the use of multiple LLMs, while providing features such as cost and response optimization. 
+LLM Proxy is a tool that sits between your application and the different LLM providers. LLM Proxy's goal is to simplify the use of multiple LLMs through a TUI while providing cost and response optimization. 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
-There are 2 ways to get started. You can directly clone the repo into your project, or you can install it as a library.
+There are 2 ways to get started. You can directly clone the repo into your project or install it as a library.
 
 ### Prerequisites
 - Python 3.11+
 
 ### Local Installation
-If you want to test the LLM Proxy locally, or set it up for contribution you can use the following steps:
+If you want to test the LLM Proxy you can use the following steps:
 
 1. Clone the repository into the project of your choice
-```shell
+``` shell
 git clone https://github.com/llm-proxy/llm-proxy.git
 ```
-2. Ensure that you have a `llmproxy.config.yaml` file setup in the root directory of your project
+2. Ensure that you have a `llmproxy.config.yaml` file set up in the root directory of your project
 3. Ensure that you have all of your API keys for each respective provider setup (You can utilize the .env.example for reference)
 4. Ensure that you only have providers and API keys for models you want active
 
@@ -80,12 +79,12 @@ After the setup is complete, you only need 1 line of code to get started:
 llmproxy_client = LLMProxy()
 ```
 
-**Note**: You will need to specific your yaml configuration file if you did not use the default name:
+**Note**: You will need to specify your yaml configuration file if you did not use the default name:
 ```python
-client = LLMProxy(path_to_user_configuration="llmproxy.config.yml")
+llmproxy_client = LLMProxy(path_to_user_configuration="llmproxy.config.yml")
 ```
 
-To route you can simply call the route function with your prompt:
+To route, simply call the route function with your prompt:
 ```python
 output = proxy_client.route(prompt=prompt)
 ```
@@ -96,13 +95,13 @@ The route function will return a CompletionResponse
     print("RESPONSE: ", output.response)
     print("ERRORS: ", output.errors)
 ```
-- `response_model:` contains the model that was used for the request
+- `response_model:` contains the model used for the request
 - `response:` contains the string response from the model
 - `errors:` contains an array of models that failed to make a request with their respective errors 
 
-**Important Note:** Although, certain parameters can be programmatically changed, it is best to favour the YAML configuration file, as it is prioritized in the configuration settings
+**Important Note:** Although parameters changed programmatically, it is best to favor the YAML configuration file, as it is prioritized in the configuration settings.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+<!-- _For more examples, please refer to the [Documentation](https://example.com)_ -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -123,7 +122,7 @@ See the [open issues](https://github.com/llm-proxy/llm-proxy/issues) for a full 
 
 <!-- CONTRIBUTING -->
 ## Contributing
-LLM Proxy is open source, so we are open, and grateful, to contributions. Open source communities is what makes software great, so feel fork the repo and create a pull request with the feature tag. Thanks!
+LLM Proxy is open source, so we are open and grateful, for contributions. Open-source communities are what makes software great, so feel fork the repo and create a pull request with the feature tag. Thanks!
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
