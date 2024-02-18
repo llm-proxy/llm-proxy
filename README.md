@@ -91,9 +91,9 @@ output = llmproxy_client.route(prompt=prompt)
 
 The route function will return a CompletionResponse
 ``` python
-    print("RESPONSE MODEL: ", output.response_model)
-    print("RESPONSE: ", output.response)
-    print("ERRORS: ", output.errors)
+print("RESPONSE MODEL: ", output.response_model)
+print("RESPONSE: ", output.response)
+print("ERRORS: ", output.errors)
 ```
 - `response_model:` contains the model used for the request
 - `response:` contains the string response from the model
