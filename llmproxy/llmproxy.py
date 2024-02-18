@@ -348,6 +348,7 @@ class LLMProxy:
 
         completion_res = None
         errors = []
+        response_model = ""
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -360,6 +361,7 @@ class LLMProxy:
 
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                response_model = instance_data["name"]
                 file_logger.info(
                     "CATEGORY ROUTING COMPLETE! Call to model successful!\n"
                 )
@@ -386,4 +388,6 @@ class LLMProxy:
                 "Requests to all models failed! Please check your configuration!"
             )
 
-        return CompletionResponse(response=completion_res, errors=errors)
+        return CompletionResponse(
+            response=completion_res, response_model=response_model, errors=errors
+        )
