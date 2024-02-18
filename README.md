@@ -86,7 +86,7 @@ llmproxy_client = LLMProxy(path_to_user_configuration="llmproxy.config.yml")
 
 To route, simply call the route function with your prompt:
 ```python
-output = proxy_client.route(prompt=prompt)
+output = llmproxy_client.route(prompt=prompt)
 ```
 
 The route function will return a CompletionResponse
