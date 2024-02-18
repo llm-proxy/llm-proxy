@@ -3,11 +3,12 @@
 <h3 align="center">LLM Proxy</h3>
 
   <p align="center">
-    A low code solution to managing multiple Large Language Models
+    A low code solution to efficiently managing multiple large language models
     <br />
 <!--     <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a> -->
 <!--     <br />
     <br /> -->
+    <!-- <a href="https://youtube.com">View Demo</a> -->
     <a href="https://youtube.com">View Demo</a>
     ·
     <a href="https://github.com/llm-proxy/llm-proxy/issues">Report Bug</a>
@@ -63,8 +64,9 @@ If you want to test the LLM Proxy locally, or set it up for contribution you can
 ```shell
 git clone https://github.com/llm-proxy/llm-proxy.git
 ```
-2. Ensure that you have a `llmproxy.config.yaml` file setup
+2. Ensure that you have a `llmproxy.config.yaml` file setup in the root directory of your project
 3. Ensure that you have all of your API keys for each respective provider setup (You can utilize the .env.example for reference)
+4. Ensure that you only have providers and API keys for models you want active
 
 **Note:** For Google's models, you will need the path to application credentials, and the project ID inside of the .env
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -75,8 +77,9 @@ git clone https://github.com/llm-proxy/llm-proxy.git
 Currently, the LLM Proxy provides 2 different route types: Cost and Category.
 After the setup is complete, you only need 1 line of code to get started:
 ```python
-proxy_client = LLMProxy()
+llmproxy_client = LLMProxy()
 ```
+
 **Note**: You will need to specific your yaml configuration file if you did not use the default name:
 ```python
 client = LLMProxy(path_to_user_configuration="llmproxy.config.yml")
@@ -120,11 +123,7 @@ See the [open issues](https://github.com/llm-proxy/llm-proxy/issues) for a full 
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+LLM Proxy is open source, so we are open, and grateful, to contributions. Open source communities is what makes software great, so feel fork the repo and create a pull request with the feature tag. Thanks!
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -146,21 +145,21 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 
 <!-- CONTACT -->
-## Contact
+<!-- ## Contact
 
 Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
 
 Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
 <!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
+<!-- ## Acknowledgments
 
 * []()
 * []()
 * []()
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
