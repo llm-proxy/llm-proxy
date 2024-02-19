@@ -73,12 +73,6 @@ class VertexAIAdapter(BaseAdapter):
             result["exception"] = e
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.model not in VertexAIModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported. Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
-                error_type="ValueError",
-            )
-
         result = {"output": None, "exception": None}
 
         if not self.force_timeout:
