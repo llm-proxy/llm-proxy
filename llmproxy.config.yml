@@ -1,5 +1,5 @@
 proxy_configuration:
-  route_type: category
+  route_type: sdafasdfsdf
 
 optional_configuration:
   timeout: 10 # Timeout for request to models

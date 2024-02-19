@@ -20,6 +20,23 @@ from llmproxy.utils.exceptions.provider import UnsupportedModel
 from llmproxy.utils.sorting import MinHeap
 
 
+@dataclass
+class CompletionResponse:
+    """
+    response: Data on successful response else ""
+    errors: List of all models and exceptions - if raised
+    """
+
+    response: str = ""
+    response_model: str = ""
+    errors: List = field(default_factory=list)
+
+
+class RouteType(str, BaseEnum):
+    COST = "cost"
+    CATEGORY = "category"
+
+
 def _get_settings_from_yml(
     path_to_yml: str = "",
 ) -> Dict[str, Any]:
@@ -65,7 +82,7 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 def _setup_user_models(
     available_models: Dict[Any, Any],
     yml_settings: Dict[Any, Any],
-    constructor_settings: Dict[Any, Any] | None,
+    constructor_settings: Dict[Any, Any] | None = None,
 ) -> Dict[str, BaseAdapter]:
     """Setup all available models and return dict of {name: instance_of_model}"""
 
@@ -167,37 +184,26 @@ def _get_route_type(
     Raises:
         ValueError: If no route type is specified in either user settings or constructor parameters.
     """
+    route_type = None
     if constructor_route_type is not None:
-        return constructor_route_type
-
-    if user_settings is not None and isinstance(
+        route_type = constructor_route_type
+    elif user_settings is not None and isinstance(
         user_settings.get("proxy_configuration"), dict
     ):
         proxy_configuration = user_settings.get("proxy_configuration", {})
         route_type = proxy_configuration.get("route_type", None)
-        if route_type is not None:
-            return route_type
 
-    raise ValueError(
-        "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
-    )
+    else:
+        raise ValueError(
+            "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
+        )
 
+    if route_type not in RouteType.list_values():
+        raise ValueError(
+            f"Invalid route type, please try ensure you have configured one of the follow routes: {', '.join(RouteType.list_values())}"
+        )
 
-@dataclass
-class CompletionResponse:
-    """
-    response: Data on successful response else ""
-    errors: List of all models and exceptions - if raised
-    """
-
-    response: str = ""
-    response_model: str = ""
-    errors: List = field(default_factory=list)
-
-
-class RouteType(str, BaseEnum):
-    COST = "cost"
-    CATEGORY = "category"
+    return route_type
 
 
 class LLMProxy:
