@@ -16,7 +16,3 @@ def bpe_tokenize_encode(prompt: str = "") -> Encoding:
 
 def vertexai_encode(prompt: str = "") -> str:
     return prompt.replace(" ", "")
-
-
-def vertexai_encode(prompt: str = "") -> str:
-    return prompt.replace(" ", "")
