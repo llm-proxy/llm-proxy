@@ -34,18 +34,12 @@ vertexai_category_data = {
 }
 
 
-class VertexAIModel(str, BaseEnum):
-    # Add other models
-    PALM_TEXT = "text-bison"
-    PALM_CHAT = "chat-bison"
-
-
 class VertexAIAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
         temperature: float = 0,
-        model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
+        model: str = "",
         project_id: str | None = "",
         location: str | None = "us-central1",
         max_output_tokens: int | None = None,

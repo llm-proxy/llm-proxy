@@ -66,17 +66,11 @@ mistral_category_data = {
 }
 
 
-class MistralModel(str, BaseEnum):
-    Mistral_7B_V01 = "Mistral-7B-v0.1"
-    Mistral_7B_Instruct_V02 = "Mistral-7B-Instruct-v0.2"
-    Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
-
-
 class MistralAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
-        model: MistralModel = MistralModel.Mistral_7B_V01.value,
+        model: str = "",
         api_key: str | None = "",
         temperature: float = 1.0,
         max_output_tokens: int | None = None,
@@ -90,12 +84,6 @@ class MistralAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str:
-        if self.model not in MistralModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
-                error_type="UnsupportedModel",
-            )
-
         if not self.api_key:
             raise ValueError("No Hugging Face API Key Provided")
 

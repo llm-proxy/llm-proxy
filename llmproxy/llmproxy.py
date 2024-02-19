@@ -108,20 +108,19 @@ def _setup_user_models(
 
         # Compare user models with available_models
         for provider in yml_settings["provider_settings"]:
-            model_name = provider["provider"].lower().strip()
-            # Check if user model in available models
+            provider_name = provider["provider"].lower().strip()
 
-            if model_name in available_models:
+            # Check if provider is in available models
+            if provider_name in available_models:
                 # If the user providers NO variations then raise error
                 if "models" not in provider or provider["models"] is None:
                     raise LLMProxyConfigError(
-                        f"No models provided in llmproxy.config.yml for the following model: {model_name}"
+                        f"No models provided in llmproxy.config.yml for the following model: {provider_name}"
                     )
 
-                # Loop through and set up instance of model
+                # Loop through user's provider's models and set up instance of model if available
                 for model in provider["models"]:
-                    # Different setup for vertexai
-                    if model not in available_models[model_name]["models"]:
+                    if model not in available_models[provider_name]["models"]:
                         raise UnsupportedModel(
                             f"{model} is not available, yet!",
                             error_type="UnsupportedModel",
@@ -136,7 +135,7 @@ def _setup_user_models(
                     }
 
                     # Different setup for vertexai
-                    if model_name == "vertexai":
+                    if provider_name == "vertexai":
                         common_parameters.update(
                             {
                                 # Project ID required for VertexAI
@@ -152,9 +151,9 @@ def _setup_user_models(
                             provider["api_key_var"]
                         )
 
-                    model_instance = available_models[model_name]["adapter_instance"](
-                        **common_parameters
-                    )
+                    model_instance = available_models[provider_name][
+                        "adapter_instance"
+                    ](**common_parameters)
                     user_models[model] = model_instance
 
         return user_models
