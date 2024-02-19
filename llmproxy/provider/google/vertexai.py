@@ -1,6 +1,6 @@
-from cohere.client import logger
 from typing import Any, Dict
 
+from cohere.client import logger
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 

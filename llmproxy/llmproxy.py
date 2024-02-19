@@ -247,7 +247,7 @@ class LLMProxy:
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
             yml_settings=user_settings,
-            available_models=available_models,
+            available_models=self.available_models,
             constructor_settings=kwargs,
         )
 
