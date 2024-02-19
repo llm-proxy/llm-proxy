@@ -20,6 +20,23 @@ from llmproxy.utils.exceptions.provider import UnsupportedModel
 from llmproxy.utils.sorting import MinHeap
 
 
+@dataclass
+class CompletionResponse:
+    """
+    response: Data on successful response else ""
+    errors: List of all models and exceptions - if raised
+    """
+
+    response: str = ""
+    response_model: str = ""
+    errors: List = field(default_factory=list)
+
+
+class RouteType(str, BaseEnum):
+    COST = "cost"
+    CATEGORY = "category"
+
+
 def _get_settings_from_yml(
     path_to_yml: str = "",
 ) -> Dict[str, Any]:
@@ -62,27 +79,35 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAdapter]:
+def _setup_user_models(
+    available_models: Dict[Any, Any],
+    yml_settings: Dict[Any, Any],
+    constructor_settings: Dict[Any, Any] | None = None,
+) -> Dict[str, BaseAdapter]:
     """Setup all available models and return dict of {name: instance_of_model}"""
 
     if not available_models:
         raise UserConfigError(
             "Available models not found, please ensure you have the latest version of LLM Proxy."
         )
-    if not settings:
+    if not yml_settings:
         raise UserConfigError(
             "Configuration not found, please ensure that you the correct path and format of configuration file"
         )
-    if not settings["provider_settings"]:
+    if not yml_settings["provider_settings"]:
         raise UserConfigError(
             "No models found in user settings. Please ensure the format of the configuration file is correct."
         )
 
     try:
-        optional_config = settings.get("optional_configuration", {})
+        # Return dict
         user_models = {}
+        optional_config = constructor_settings
+        if constructor_settings is None:
+            optional_config = yml_settings.get("optional_configuration", None) or {}
+
         # Compare user models with available_models
-        for provider in settings["provider_settings"]:
+        for provider in yml_settings["provider_settings"]:
             model_name = provider["provider"].lower().strip()
             # Check if user model in available models
 
@@ -141,21 +166,44 @@ def _setup_user_models(available_models=None, settings=None) -> Dict[str, BaseAd
         ) from e
 
 
-@dataclass
-class CompletionResponse:
+def _get_route_type(
+    user_settings: Dict[str, Any] | None,
+    constructor_route_type: Literal["cost", "category"] | None,
+) -> Literal["cost", "category"]:
     """
-    response: Data on successful response else ""
-    errors: List of all models and exceptions - if raised
+    Get the route type from constructor parameters or user settings.
+
+    Args:
+        user_settings (Optional[Dict[str, Any]]): User settings containing proxy configuration.
+            If None, the route type will default to constructor_route_type.
+        constructor_route_type (Optional[Literal["cost", "category"]]): Route type specified during object construction.
+
+    Returns:
+        Literal["cost", "category"]: The selected route type.
+
+    Raises:
+        ValueError: If no route type is specified in either user settings or constructor parameters.
     """
+    route_type = None
+    if constructor_route_type is not None:
+        route_type = constructor_route_type
+    elif user_settings is not None and isinstance(
+        user_settings.get("proxy_configuration"), dict
+    ):
+        proxy_configuration = user_settings.get("proxy_configuration", {})
+        route_type = proxy_configuration.get("route_type", None)
 
-    response: str = ""
-    response_model: str = ""
-    errors: List = field(default_factory=list)
+    else:
+        raise UserConfigError(
+            "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
+        )
 
+    if route_type not in RouteType.list_values():
+        raise UserConfigError(
+            f"Invalid route type, please try ensure you have configured one of the follow routes: {', '.join(RouteType.list_values())}"
+        )
 
-class RouteType(str, BaseEnum):
-    COST = "cost"
-    CATEGORY = "category"
+    return route_type
 
 
 class LLMProxy:
@@ -163,29 +211,47 @@ class LLMProxy:
         self,
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
+        route_type: Literal["cost", "category"] | None = None,
+        **kwargs,
     ) -> None:
-        self.route_type = "cost"
+        """
+        Initialize YourClass instance.
 
+        Parameters:
+            path_to_user_configuration (str): Path to user configuration YAML file.
+            path_to_env_vars (str): Path to environment variables file.
+            route_type (Literal["cost", "category"] | None): Type of route.
+            timeout (int): Timeout value in seconds (optional).
+            force_timeout (bool): Whether to force timeout (optional).
+            **kwargs: Additional, optional_configuration, keyword arguments for setting up user models.
+                Only pass in optional_configuration paramters settings that you want to override
+        """
         load_dotenv(path_to_env_vars)
-        # Read YML and see which models the user wants
+        # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
+
+        # Setup user cost
+        self.route_type = _get_route_type(
+            user_settings=user_settings, constructor_route_type=route_type
+        )
 
         # Setup available models
         available_models = _setup_available_models(settings=internal_config)
 
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
-            settings=user_settings, available_models=available_models
+            yml_settings=user_settings,
+            available_models=available_models,
+            constructor_settings=kwargs,
         )
 
         self.available_models = available_models
 
     def route(
         self,
-        route_type: Literal["cost", "category"] = RouteType.COST.value,
         prompt: str = "",
     ) -> CompletionResponse:
-        match RouteType(route_type.lower()):
+        match RouteType(self.route_type):
             case RouteType.COST:
                 return self._cost_route(prompt=prompt)
             case RouteType.CATEGORY:
@@ -283,6 +349,7 @@ class LLMProxy:
 
         completion_res = None
         errors = []
+        response_model = ""
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -296,6 +363,7 @@ class LLMProxy:
 
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                response_model = instance_data["name"]
                 logger.log(
                     msg="CATEGORY ROUTING COMPLETE! Call to model successful!",
                 )
@@ -313,11 +381,18 @@ class LLMProxy:
                     msg=f"Error when making request to model: {e}",
                 )
 
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)\n", file_logger_on=False)
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+
+                logger.log(
+                    level="ERROR",
+                    msg="========CATEGORY ROUTING FAILED!===========\n",
+                )
 
         if not completion_res:
             raise RequestsFailed(
                 "Requests to all models failed! Please check your configuration!"
             )
 
-        return CompletionResponse(response=completion_res, errors=errors)
+        return CompletionResponse(
+            response=completion_res, response_model=response_model, errors=errors
+        )

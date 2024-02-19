@@ -138,6 +138,5 @@ class VertexAIAdapter(BaseAdapter):
 
         category_rank = vertexai_category_data["model-categories"][self.model][category]
 
-        logger.log(msg=f"RANK OF PROMPT: {category_rank}")
-
+        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
         return category_rank

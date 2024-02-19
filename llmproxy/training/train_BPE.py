@@ -17,5 +17,3 @@ tokenizer.train(
 tokenizer.save("llmproxy/data/tokenizer-wiki-new.json")
 tokenizer = Tokenizer.from_file("llmproxy/data/tokenizer-wiki-new.json")
 output = tokenizer.encode("Hello, y'all! How are you  ?")
-
-print(output.tokens)
