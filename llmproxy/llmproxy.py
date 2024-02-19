@@ -194,12 +194,12 @@ def _get_route_type(
         route_type = proxy_configuration.get("route_type", None)
 
     else:
-        raise ValueError(
+        raise UserConfigError(
             "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
         )
 
     if route_type not in RouteType.list_values():
-        raise ValueError(
+        raise UserConfigError(
             f"Invalid route type, please try ensure you have configured one of the follow routes: {', '.join(RouteType.list_values())}"
         )
 

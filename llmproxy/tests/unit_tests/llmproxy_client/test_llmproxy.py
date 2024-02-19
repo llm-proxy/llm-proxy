@@ -10,6 +10,7 @@ from llmproxy.llmproxy import (
     _setup_available_models,
     _setup_user_models,
 )
+from llmproxy.utils.exceptions.provider import UnsupportedModel
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 PATH_TO_ENV_TEST = ".env.test"
@@ -58,7 +59,7 @@ def test_no_model_in_user_setting(tmp_path) -> None:
 
 
 def test_invalid_model() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(UnsupportedModel):
         LLMProxy(
             path_to_user_configuration=f"{CURRENT_DIRECTORY}/invalid_model_test.yml",
             path_to_env_vars=".env.test",
@@ -165,7 +166,7 @@ def test_setup_user_models_no_variation() -> None:
 
 def test_invalid_route_type_constructor() -> None:
     prompt = "what's 9+10?"
-    with pytest.raises(ValueError):
+    with pytest.raises(UserConfigError):
         test = LLMProxy(
             route_type="bad_route_type",
             path_to_user_configuration=f"{CURRENT_DIRECTORY}/test.yml",
@@ -194,7 +195,7 @@ def test_llmproxy_invalid_route_type_in_yaml_config(tmp_path):
     with open(yml_path, "w", encoding="utf-8") as file:
         file.write(yml_content)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(UserConfigError):
         proxy = LLMProxy(
             path_to_user_configuration=yml_path,
             path_to_env_vars=PATH_TO_ENV_TEST,
