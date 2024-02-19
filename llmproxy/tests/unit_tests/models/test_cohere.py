@@ -30,15 +30,6 @@ def test_cohere_invalid_api_key() -> None:
         cohere_llm.get_completion(prompt)
 
 
-def test_cohere_invalid_model() -> None:
-    # Arrange
-    cohere_model = "fake model"
-
-    with pytest.raises(UnsupportedModel):
-        model = CohereAdapter(model=cohere_model, api_key=cohere_api_key or "")
-        model.get_completion()
-
-
 # TODO: More so integration tests as it seems to make the API call, save for later
 # def test_cohere_negative_max_token() -> None:
 #     # Arrange

@@ -67,19 +67,11 @@ cohere_category_data = {
 }
 
 
-# These are the "Models" only for chat/command
-class CohereModel(str, BaseEnum):
-    COMMAND = "command"
-    COMMAND_LIGHT = "command-light"
-    COMMAND_NIGHTLY = "command-nightly"
-    COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
-
-
 class CohereAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
-        model: CohereModel = CohereModel.COMMAND.value,
+        model: str = "",
         temperature: float = 0.0,
         api_key: str = "",
         max_output_tokens: int | None = None,
@@ -93,12 +85,6 @@ class CohereAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.model not in CohereModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
-                error_type="UnsupportedModel",
-            )
-
         try:
             co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
