@@ -1,3 +1,6 @@
+proxy_configuration:
+  route_type: cost
+
 optional_configuration:
   timeout: 10 # Timeout for request to models
   force_timeout: true # WARNING: This can cause additonal costs!

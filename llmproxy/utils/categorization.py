@@ -1,6 +1,6 @@
 from transformers import pipeline
 
-from llmproxy.utils.log import logger
+from llmproxy.utils import logger
 
 
 def categorize_text(prompt: str) -> str:
@@ -17,9 +17,10 @@ def categorize_text(prompt: str) -> str:
         "Financial Task",
         "Content Recommendation Task",
     ]
-    logger.info(msg="Classification model is classifying the user prompt")
+    logger.log(msg="Classification model is classifying the user prompt")
     classifier = pipeline(task="zero-shot-classification", model=model)
-    logger.info(msg="The prompt has been classified\n")
+    logger.log(msg="The prompt has been classified\n")
+
     results = classifier(prompt, candidate_labels)
     best_category = results["labels"][0]
     return best_category

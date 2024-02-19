@@ -1,13 +1,13 @@
+from cohere.client import logger
 from typing import Any, Dict
 
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import timeout, tokenizer
+from llmproxy.utils import logger, timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
-from llmproxy.utils.log import logger
 
 vertexai_category_data = {
     "model-categories": {
@@ -100,28 +100,22 @@ class VertexAIAdapter(BaseAdapter):
         self, prompt: str = "", price_data: Dict[str, Any] = None
     ) -> float:
         if not self.prompt and not prompt:
-            logger.info("No prompt provided.")
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
-
-        logger.info("Tokenizing model: %s", self.model)
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         prompt_cost_per_character = price_data["prompt"]
-        logger.info("Prompt Cost per token: %s", prompt_cost_per_character)
+        logger.log(msg=f"PROMPT (COST/CHARACTER): {prompt_cost_per_character}")
 
         completion_cost_per_character = price_data["completion"]
-        logger.info("Output cost per token: %s", completion_cost_per_character)
+        logger.log(msg=f"COMPLETION (COST/CHARACTER): {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
 
-        logger.info("Number of input tokens found: %d", len(tokens))
+        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
 
-        logger.info(
-            "Final calculation using %d input tokens and %d output tokens",
-            len(tokens),
-            self.max_output_tokens,
-        )
+        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_character * len(tokens)
@@ -129,13 +123,15 @@ class VertexAIAdapter(BaseAdapter):
             8,
         )
 
-        logger.info("Calculated Cost: %s", cost)
+        logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
-        logger.info(msg=f"Current model: {self.model}")
-        logger.info(msg=f"Category of prompt: {category}")
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
+        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+
         category_rank = vertexai_category_data["model-categories"][self.model][category]
-        logger.info(msg=f"Rank of category: {category_rank}")
+
+        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
         return category_rank
