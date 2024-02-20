@@ -30,31 +30,6 @@ def test_cohere_invalid_api_key() -> None:
         cohere_llm.get_completion(prompt)
 
 
-def test_cohere_invalid_model() -> None:
-    # Arrange
-    cohere_model = "fake model"
-
-    with pytest.raises(UnsupportedModel):
-        model = CohereAdapter(model=cohere_model, api_key=cohere_api_key or "")
-        model.get_completion()
-
-
-# TODO: Slowing down Unit tests too much, TEST LATER IN INTEGRATION TESTS
-def test_cohere_get_estimated_max_cost():
-    # Arrange
-    cohere = CohereAdapter(api_key=cohere_api_key, max_output_tokens=256)
-    expected_cost = 0.000524
-    prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 1.5e-06, "completion": 2e-06}
-    # Act
-    actual_cost = cohere.get_estimated_max_cost(prompt=prompt, price_data=price_data)
-
-    # Assert
-    assert (
-        actual_cost == expected_cost
-    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"
-
-
 # TODO: More so integration tests as it seems to make the API call, save for later
 # def test_cohere_negative_max_token() -> None:
 #     # Arrange

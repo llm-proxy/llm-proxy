@@ -161,21 +161,6 @@ llama2_category_data = {
 }
 
 
-class Llama2Model(str, BaseEnum):
-    LLAMA_2_7B_CHAT_HF = "Llama-2-7b-chat-hf"
-    LLAMA_2_7B_CHAT = "Llama-2-7b-chat"
-    LLAMA_2_7B_HF = "Llama-2-7b-hf"
-    LLAMA_2_7B = "Llama-2-7b"
-    LLAMA_2_13B_CHAT_HF = "Llama-2-13b-chat-hf"
-    LLAMA_2_13B_CHAT = "Llama-2-13b-chat"
-    LLAMA_2_13B_HF = "Llama-2-13b-hf"
-    LLAMA_2_13B = "Llama-2-13b"
-    LLAMA_2_70B_CHAT_HF = "Llama-2-70b-chat-hf"
-    LLAMA_2_70B_CHAT = "Llama-2-70b-chat"
-    LLAMA_2_70B_HF = "Llama-2-70b-hf"
-    LLAMA_2_70B = "Llama-2-70b"
-
-
 class Llama2Adapter(BaseAdapter):
     def __init__(
         self,
@@ -183,7 +168,7 @@ class Llama2Adapter(BaseAdapter):
         system_prompt: str = "Answer politely",
         api_key: str | None = "",
         temperature: float = 1.0,
-        model: Llama2Model = Llama2Model.LLAMA_2_7B_CHAT_HF.value,
+        model: str = "",
         max_output_tokens: int | None = None,
         timeout: int | None = None,
     ) -> None:
@@ -202,11 +187,6 @@ class Llama2Adapter(BaseAdapter):
         if self.prompt == "" and prompt == "":
             raise EmptyPrompt("Empty prompt detected")
 
-        if self.model not in Llama2Model:
-            raise UnsupportedModel(
-                exception=f"Invalid Model. Please use one of the following model: {', '.join(Llama2Model.list_values())}",
-                error_type="ValueError",
-            )
         try:
             api_url = (
                 f"https://api-inference.huggingface.co/models/meta-llama/{self.model}"

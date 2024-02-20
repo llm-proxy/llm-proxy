@@ -27,15 +27,6 @@ def test_invalid_project_id() -> None:
         vertexai.get_completion()
 
 
-def test_unsupported_model() -> None:
-    # Assert
-    with pytest.raises(UnsupportedModel):
-        # Arrange
-        vertexai = VertexAIAdapter(project_id=project_id, model="test")
-        # Act
-        vertexai.get_completion()
-
-
 def test_get_estimated_max_cost():
     # Arrange
     vertex = VertexAIAdapter(project_id=project_id, max_output_tokens=256)

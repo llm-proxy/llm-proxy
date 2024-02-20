@@ -27,18 +27,12 @@ vertexai_category_data = {
 }
 
 
-class VertexAIModel(str, BaseEnum):
-    # Add other models
-    PALM_TEXT = "text-bison"
-    PALM_CHAT = "chat-bison"
-
-
 class VertexAIAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
         temperature: float = 0,
-        model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
+        model: str = "",
         project_id: str | None = "",
         location: str | None = "us-central1",
         max_output_tokens: int | None = None,
@@ -72,12 +66,6 @@ class VertexAIAdapter(BaseAdapter):
             result["exception"] = e
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.model not in VertexAIModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported. Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
-                error_type="ValueError",
-            )
-
         result = {"output": None, "exception": None}
 
         if not self.force_timeout:
