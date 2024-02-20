@@ -63,10 +63,6 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
             model_costs = {}
             for model in provider.get("models", []):
                 provider_models.add(model["name"])
-                model_costs[model["name"]] = {
-                    "cost_per_token_input": model["cost_per_token_input"],
-                    "cost_per_token_output": model["cost_per_token_output"],
-                }
 
             module_name, class_name = import_path.rsplit(".", 1)
 
@@ -77,7 +73,6 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
             available_models[key] = {
                 "adapter_instance": model_class,
                 "models": provider_models,
-                "models_cost_data": model_costs,
             }
 
         return available_models
@@ -172,6 +167,24 @@ def _setup_user_models(
         ) from e
 
 
+def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Returns list of all the models_cost_data"""
+    try:
+        models_cost_data = {}
+        # Loop through all the "models" in settings
+        for provider in settings:
+            # Loop through and save the cost data for each model
+            for model in provider.get("models", []):
+                models_cost_data[model["name"]] = {
+                    "cost_per_token_input": model["cost_per_token_input"],
+                    "cost_per_token_output": model["cost_per_token_output"],
+                }
+        # return dict with model names and the associated cost of the input token cost(prompt) and ouput token cost(completion of each model
+        return models_cost_data
+    except Exception as e:
+        raise e
+
+
 def _get_route_type(
     user_settings: Dict[str, Any] | None,
     constructor_route_type: Literal["cost", "category"] | None,
@@ -251,6 +264,9 @@ class LLMProxy:
             constructor_settings=kwargs,
         )
 
+        # Setup the cost data of each model
+        self.models_cost_data = _setup_models_cost_data(setting=internal_config)
+
     def route(
         self,
         prompt: str = "",
@@ -266,17 +282,13 @@ class LLMProxy:
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
-            class_name = instance.__class__.__name__
-            provider_key = class_name.replace("Adapter", "").lower()
             try:
                 logger.log(msg="========Start Cost Estimation===========")
-                model_cost_data = self._load_model_costs(
-                    key=provider_key, model_name=model_name
+                price_data = self._load_model_costs(model_name=model_name)
+                cost = instance.get_estimated_max_cost(
+                    prompt=prompt, price_data=price_data
                 )
 
-                cost = instance.get_estimated_max_cost(
-                    prompt=prompt, price_data=model_cost_data
-                )
                 logger.log(msg="========End Cost Estimation===========\n")
 
                 item = {"name": model_name, "cost": cost, "instance": instance}
