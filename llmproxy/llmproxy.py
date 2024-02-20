@@ -179,7 +179,7 @@ def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
                     "cost_per_token_input": model["cost_per_token_input"],
                     "cost_per_token_output": model["cost_per_token_output"],
                 }
-        # return dict with model names and the associated cost of the input(prompt) and ouput(completion) of each model
+        # return dict with model names and the associated cost of the input(prompt) and ouput(LLM response) of each model
         return models_cost_data
     except Exception as e:
         raise e
