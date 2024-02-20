@@ -171,15 +171,15 @@ def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Returns list of all the models_cost_data"""
     try:
         models_cost_data = {}
-        # Loop through all the "models" in settings
+        # Loop through all the providers in settings
         for provider in settings:
-            # Loop through and save the cost data for each model
+            # Loop through the "models" and save the cost data for each model
             for model in provider.get("models", []):
                 models_cost_data[model["name"]] = {
                     "cost_per_token_input": model["cost_per_token_input"],
                     "cost_per_token_output": model["cost_per_token_output"],
                 }
-        # return dict with model names and the associated cost of the input token cost(prompt) and ouput token cost(completion of each model
+        # return dict with model names and the associated cost of the input(prompt) and ouput(completion) of each model
         return models_cost_data
     except Exception as e:
         raise e
@@ -282,6 +282,7 @@ class LLMProxy:
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
+            # Load the cost data of the current model to get the estimate routing cost
             try:
                 logger.log(msg="========Start Cost Estimation===========")
                 price_data = self._load_model_costs(model_name=model_name)
