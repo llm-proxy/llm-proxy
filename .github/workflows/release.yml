@@ -26,11 +26,13 @@ jobs:
         run: git checkout release-from-${{ github.sha }}
 
       # extract the version from pyproject.toml
-      - name: get-poetry-version
-        id: poetry-version
+      - name: get-npm-version
+        id: package-version
         run: |
-          VERSION=$(toml get pyproject.toml tool.poetry.version)
-          echo "current-version=$VERSION" >> "$GITHUB_OUTPUT"
+          LF_VERSION=$(cat package.json | jq -r '.version')
+          echo "current-version=$LF_VERSION" >> "$GITHUB_OUTPUT"
+      - name: update app config
+        run: sed -i 's/0.0.0/${{ steps.package-version.outputs.current-version}}/g' config/app.json
 
       # create release info and push it upstream
       - name: conventional Changelog Action
@@ -59,11 +61,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # release info is now in main so we can continue as before
-      # - name: create release with last commit
-      #   if: steps.changelog.outputs.skipped == 'false'
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     token: ${{ secrets.CHANGELOG_RELEASE }}
-      #     tag: ${{ steps.changelog.outputs.tag }}
-      #     name: ${{ steps.changelog.outputs.tag }}
-      #     body: ${{ steps.changelog.outputs.clean_changelog }}
+      - name: create release with last commit
+        if: steps.changelog.outputs.skipped == 'false'
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.CHANGELOG_RELEASE }}
+          tag: ${{ steps.changelog.outputs.tag }}
+          name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
