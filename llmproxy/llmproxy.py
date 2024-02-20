@@ -265,7 +265,7 @@ class LLMProxy:
         )
 
         # Setup the cost data of each model
-        self.models_cost_data = _setup_models_cost_data(setting=internal_config)
+        self.models_cost_data = _setup_models_cost_data(settings=internal_config)
 
     def route(
         self,
@@ -351,18 +351,18 @@ class LLMProxy:
             response=completion_res, response_model=response_model, errors=errors
         )
 
-    def _load_model_costs(self, key: str, model_name: str) -> dict:
-        provider_cost_data = self.available_models[key]
-        for model in provider_cost_data["models"]:
-            if model == model_name:
-                return {
-                    "prompt": provider_cost_data["models_cost_data"][model][
-                        "cost_per_token_input"
-                    ],
-                    "completion": provider_cost_data["models_cost_data"][model][
-                        "cost_per_token_output"
-                    ],
-                }
+    def _load_model_costs(self, model_name: str) -> dict:
+        try:
+            return {
+                "prompt": self.models_cost_data[model_name]["cost_per_token_input"],
+                "completion": self.models_cost_data[model_name][
+                    "cost_per_token_output"
+                ],
+            }
+        except KeyError:
+            raise UserConfigError(
+                f"Unable to locate cost data for the model '{model_name}'. Please check the configuration file."
+            )
 
     def _category_route(self, prompt: str):
         min_heap = MinHeap()
