@@ -22,7 +22,6 @@ openai = "^1.11.1"
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 isort = "^5.13.2"
-pre-commit = "^3.6.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"
