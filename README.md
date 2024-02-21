@@ -34,8 +34,8 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#contributors">Contributors</a></li>
+    <!--  <li><a href="#contact">Contact</a></li>-->
+   <!--  <li><a href="#contributors">Contributors</a></li>-->
   </ol>
 </details>
 
@@ -164,10 +164,6 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- ACKNOWLEDGMENTS -->
-## Contributors
+<!-- ## Acknowledgments -->
 
-<a href="https://github.com/llm-proxy/llm-proxy/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=llm-proxy/llm-proxy" />
-</a>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p>-->
