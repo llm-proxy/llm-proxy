@@ -124,6 +124,7 @@ class OpenAIAdapter(BaseAdapter):
 
         completion_cost_per_token = price_data["completion"]
         logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+
         tokens = encoder.encode(prompt or self.prompt)
         logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
         logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")

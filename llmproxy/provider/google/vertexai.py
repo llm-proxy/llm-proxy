@@ -100,9 +100,7 @@ class VertexAIAdapter(BaseAdapter):
         logger.log(msg=f"COMPLETION (COST/CHARACTER): {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
-
         logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-
         logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
