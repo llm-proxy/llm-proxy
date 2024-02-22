@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict
 
 
 class BaseAdapter(ABC):
@@ -20,7 +21,9 @@ class BaseAdapter(ABC):
         """
 
     @abstractmethod
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         """
         Abstract method to retrieve estimated for a given prompt.
 
