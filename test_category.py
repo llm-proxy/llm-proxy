@@ -1,5 +1,3 @@
-import time
-
 from llmproxy.llmproxy import LLMProxy
 
 # NOTE: Temp Test file, will be removed in future in favour of unit/integration tests
@@ -11,16 +9,11 @@ def main() -> None:
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
 
-    start = time.time()
     proxy_client = LLMProxy(route_type="category")
     output = proxy_client.route(prompt=prompt)
-    end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    # print("ERRORS: ", output.errors)
-    print(f"\nCategory route total time taken: {end-start}")
-    assert output.response_model
-    assert output.response
+    print("ERRORS: ", output.errors)
 
 
 if __name__ == "__main__":

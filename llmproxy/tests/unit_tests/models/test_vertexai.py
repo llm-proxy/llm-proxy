@@ -29,13 +29,12 @@ def test_invalid_project_id() -> None:
 
 def test_get_estimated_max_cost():
     # Arrange
-    vertex = VertexAIAdapter(project_id=project_id, max_output_tokens=256)
-    expected_cost = 0.000533
+    vertex = VertexAIAdapter(project_id=project_id)
+    expected_cost = 0.000032
     prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 1.5e-06, "completion": 2e-06}
 
     # Act
-    actual_cost = vertex.get_estimated_max_cost(prompt=prompt, price_data=price_data)
+    actual_cost = vertex.get_estimated_max_cost(prompt=prompt)
 
     # Assert
     assert (
