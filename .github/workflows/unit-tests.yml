@@ -3,22 +3,25 @@ name: Unit Tests
 on: push
 
 jobs:
-    
   run-unit-tests:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
-    
+      contents: "read"
+      id-token: "write"
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      
+        uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
+          cache: "poetry"
 
       - name: Setup poetry
         uses: snok/install-poetry@v1
@@ -41,8 +44,8 @@ jobs:
         name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/806914350455/locations/global/workloadIdentityPools/llm-proxy/providers/github'
-          service_account: 'github-actions@poised-elf-400922.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/806914350455/locations/global/workloadIdentityPools/llm-proxy/providers/github"
+          service_account: "github-actions@poised-elf-400922.iam.gserviceaccount.com"
 
       - name: Run test suite
         run: poetry run pytest
