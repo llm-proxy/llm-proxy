@@ -167,18 +167,29 @@ def _setup_user_models(
 
 
 def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Returns list of all the models_cost_data"""
+    """
+    Extracts cost data for each model from the given list of settings dictionaries.
+
+    Args:
+    - settings: A list of dictionaries, each containing information about models and their costs.
+
+    Returns:
+    A dictionary containing model names as keys and their associated cost data as values.
+
+    Raises:
+    Exception: If there's any error during processing.
+    """
     try:
         models_cost_data = {}
         # Loop through all the providers in settings
         for provider in settings:
             # Loop through the "models" and save the cost data for each model
-            for model in provider.get("models", []):
-                models_cost_data[model["name"]] = {
-                    "prompt": model["cost_per_token_input"],
-                    "completion": model["cost_per_token_output"],
+            for model_data in provider.get("models", []):
+                model_name, prompt_cost, completion_cost = model_data.values()
+                models_cost_data[model_name] = {
+                    "prompt": prompt_cost,
+                    "completion": completion_cost,
                 }
-        # return dict with model names and the associated cost of the input(prompt) and ouput(LLM response) of each model
         return models_cost_data
     except Exception as e:
         raise e
