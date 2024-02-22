@@ -248,11 +248,6 @@ class LLMProxy:
         # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
-        # Setup user cost
-        self.route_type = _get_route_type(
-            user_settings=user_settings, constructor_route_type=route_type
-        )
-
         # Setup available models
         self.available_models = _setup_available_models(settings=internal_config)
 
@@ -263,8 +258,14 @@ class LLMProxy:
             constructor_settings=kwargs,
         )
 
-        # Setup the cost data of each model
-        self.models_cost_data = _setup_models_cost_data(settings=internal_config)
+        # Setup user cost
+        self.route_type = _get_route_type(
+            user_settings=user_settings, constructor_route_type=route_type
+        )
+
+        if self.route_type == RouteType.COST:
+            # Setup the cost data of each model
+            self.models_cost_data = _setup_models_cost_data(settings=internal_config)
 
     def route(
         self,

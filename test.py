@@ -17,8 +17,8 @@ def category_routing() -> None:
     end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    print("ERRORS: ", output.errors)
-    print(f"\n Category route total time taken: {end-start}")
+    # print("ERRORS: ", output.errors)
+    print(f"\nCategory route total time taken: {end-start}")
 
 
 def cost_routing() -> None:
@@ -33,8 +33,8 @@ def cost_routing() -> None:
     end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    print("ERRORS: ", output.errors)
-    print(f"\n Cost route total time taken: {end-start}")
+    # print("ERRORS: ", output.errors)
+    print(f"\nCost route total time taken: {end-start}")
     assert output.response_model
     assert output.response
 
