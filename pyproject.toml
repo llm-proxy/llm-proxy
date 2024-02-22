@@ -18,7 +18,6 @@ pyyaml = "^6.0.1"
 datasets = "^2.14.7"
 evaluate = "^0.4.1"
 openai = "^1.11.1"
-tqdm = "^4.66.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
