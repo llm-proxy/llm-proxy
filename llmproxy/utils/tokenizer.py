@@ -1,6 +1,7 @@
-from tokenizers import Encoding, Tokenizer
-import os
 import json
+import os
+
+from tokenizers import Encoding, Tokenizer
 
 """" Model current does not handle all special tokens: ["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"]"""
 
