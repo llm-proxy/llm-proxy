@@ -7,8 +7,7 @@ from llmproxy.config.internal_config import internal_config
 from llmproxy.llmproxy import (
     LLMProxy,
     UserConfigError,
-    _setup_available_models,
-    _setup_user_models,
+    Config
 )
 from llmproxy.utils.exceptions.provider import UnsupportedModel
 
@@ -100,7 +99,12 @@ def test_get_settings_from_invalid_yml() -> None:
 
 
 def test_setup_available_models() -> None:
-    _setup_available_models(settings=internal_config)
+    config = Config(
+            internal_settings=internal_config,
+            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_yml="llmproxy.config.yml",
+        )
+    config._setup_available_models()
 
 
 def test_setup_user_models() -> None:
