@@ -122,7 +122,16 @@ def test_no_available_model_UserConfigError() -> None:
         UserConfigError,
         match=text,
     ):
-        _setup_user_models(available_models={}, yml_settings={})
+        config = Config(
+            internal_settings=internal_config,
+            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_yml="llmproxy.config.yml",
+        )
+
+        config.config_cache[config.path_to_yml] = {}
+        config.config_cache[config.path_to_internal_settings] = {}
+
+        config._setup_user_models()
 
 
 def test_setup_user_models_no_setting_UserConfigError():
