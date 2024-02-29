@@ -79,6 +79,7 @@ class OpenAIAdapter(BaseAdapter):
         max_output_tokens (int): Maximum number of tokens for the response.
         timeout (int): Timeout for the API request in seconds.
     """
+
     def __init__(
         self,
         prompt: str = "",
