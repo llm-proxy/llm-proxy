@@ -9,6 +9,7 @@ from llmproxy.utils import logger, timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 
+# Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {
     "model-categories": {
         "text-bison": {
@@ -28,6 +29,21 @@ vertexai_category_data = {
 
 
 class VertexAIAdapter(BaseAdapter):
+    """
+       Adapter class for the Vertex AI language models API.
+
+       Manages API requests, responses, error handling, and cost estimation for token usage in the context of the LLM Proxy application.
+
+       Attributes:
+           prompt (str): Default text prompt for model requests.
+           temperature (float): Temperature for response generation, affecting creativity.
+           model (str): Identifier for the selected Vertex AI model.
+           project_id (str): Google Cloud project ID.
+           location (str): Google Cloud location for the AI Platform.
+           max_output_tokens (int): Maximum number of tokens for the response.
+           timeout (int): Timeout for the API request.
+           force_timeout (bool): Whether to enforce a timeout for the request.
+       """
     def __init__(
         self,
         prompt: str = "",
@@ -49,6 +65,13 @@ class VertexAIAdapter(BaseAdapter):
         self.force_timeout = force_timeout
 
     def _make_request(self, prompt, result):
+        """
+         Private method to make a request to the Vertex AI API.
+
+         Args:
+             prompt (str): The text prompt to send to the model.
+             result (Dict[str, Any]): Dictionary to store the output or exception.
+         """
         try:
             aiplatform.init(project=self.project_id, location=self.location)
             parameters = {
@@ -66,6 +89,18 @@ class VertexAIAdapter(BaseAdapter):
             result["exception"] = e
 
     def get_completion(self, prompt: str = "") -> str | None:
+        """
+        Fetches text completion from the Vertex AI model.
+
+        Args:
+            prompt (str): Text prompt for generating completion.
+
+        Returns:
+            str | None: The model's text response, or None if an error occurred.
+
+        Raises:
+            VertexAIException: If an error occurs during the API request.
+        """
         result = {"output": None, "exception": None}
 
         if not self.force_timeout:
@@ -87,6 +122,19 @@ class VertexAIAdapter(BaseAdapter):
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
     ) -> float:
+        """
+        Estimates the maximum cost for processing a given prompt based on character pricing.
+
+        Args:
+            prompt (str): Text prompt for which to estimate the cost.
+            price_data (Dict[str, Any]): Pricing data per character for prompt and completion.
+
+        Returns:
+            float: Estimated cost for processing the prompt.
+
+        Raises:
+            ValueError: If no prompt is provided.
+        """
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
@@ -114,6 +162,15 @@ class VertexAIAdapter(BaseAdapter):
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
+        """
+        Retrieves the model's performance rank for a specified task category.
+
+        Args:
+            category (str): The task category to check.
+
+        Returns:
+            int: Rank of the model in the specified category.
+        """
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
