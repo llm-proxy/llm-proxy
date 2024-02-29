@@ -222,13 +222,15 @@ def _get_route_type(
     return route_type
 
 class Config:
-    def __init__(self, path_to_yml: str = "",):
+    def __init__(self, settings: List[Dict[str, Any]], path_to_yml: str = "", path_to_settings: str = ""):
         self.path_to_yml = path_to_yml
+        self.path_to_settings = path_to_settings
+        self.settings = settings
 
         self.config_cache = {}
         self.mod_times = {}
     
-    def _get_settings_from_yml(self) -> Dict[str, Any]:
+    def _get_settings_from_yml(self,) -> Dict[str, Any]:
         """Returns all of the data in the yaml file"""
 
         try:
@@ -243,33 +245,40 @@ class Config:
         except (FileNotFoundError, yaml.YAMLError) as e:
             raise e
     
-    def _setup_available_models(self, settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _setup_available_models(self,) -> Dict[str, Any]:
         """Returns classname with list of available_models for provider"""
+
         try:
-            available_models = {}
-            # Loop through each provider
-            for provider in settings:
-                key = provider["provider"].lower()
-                import_path = provider["adapter_path"]
+            mod_time = os.path.getmtime(self.path_to_settings)
 
-                # Loop through and aggregate all of the variations of "models" of each provider
-                provider_models = set()
-                model_costs = {}
-                for model in provider.get("models", []):
-                    provider_models.add(model["name"])
+            if self.path_to_settings not in self.mod_times or self.mod_times[self.path_to_settings] != mod_time:
+                available_models = {}
 
-                module_name, class_name = import_path.rsplit(".", 1)
+                # Loop through each provider
+                for provider in self.settings:
+                    key = provider["provider"].lower()
+                    import_path = provider["adapter_path"]
 
-                module = importlib.import_module(module_name)
-                model_class = getattr(module, class_name)
+                    # Loop through and aggregate all of the variations of "models" of each provider
+                    provider_models = set()
+                    model_costs = {}
+                    for model in provider.get("models", []):
+                        provider_models.add(model["name"])
 
-                # return dict with class path and models set and model cost data, with all of the variations/models of that provider
-                available_models[key] = {
-                    "adapter_instance": model_class,
-                    "models": provider_models,
-                }
+                    module_name, class_name = import_path.rsplit(".", 1)
 
-            return available_models
+                    module = importlib.import_module(module_name)
+                    model_class = getattr(module, class_name)
+
+                    # return dict with class path and models set and model cost data, with all of the variations/models of that provider
+                    available_models[key] = {
+                        "adapter_instance": model_class,
+                        "models": provider_models,
+                    }
+
+                self.config_cache[self.path_to_settings] = available_models
+                self.mod_times[self.path_to_settings] = mod_time
+            return self.config_cache[self.path_to_settings]
         except Exception as e:
             raise e
     
@@ -297,12 +306,12 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML for user settings
-        config = Config(path_to_yml=path_to_user_configuration)
+        config = Config(path_to_yml=path_to_user_configuration, path_to_settings='llmproxy/config/internal.config.py', settings=internal_config)
 
         user_settings = config._get_settings_from_yml()
 
         # Setup available models
-        self.available_models = _setup_available_models(settings=internal_config)
+        self.available_models = _setup_available_models()
 
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
