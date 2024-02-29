@@ -1,28 +1,11 @@
+from typing import Any, Dict
+
 import requests
 
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import logger, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
-
-mistral_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "Mistral-7B-v0.1": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Mistral-7B-Instruct-v0.2": {
-            "prompt": 0.05 / 1_000_000,
-            "completion": 0.25 / 1_000_000,
-        },
-        "Mistral-8x7B-Instruct-v0.1": {
-            "prompt": 0.30 / 1_000_000,
-            "completion": 1.0 / 1_000_000,
-        },
-    },
-}
 
 mistral_category_data = {
     "model-categories": {
@@ -66,17 +49,11 @@ mistral_category_data = {
 }
 
 
-class MistralModel(str, BaseEnum):
-    Mistral_7B_V01 = "Mistral-7B-v0.1"
-    Mistral_7B_Instruct_V02 = "Mistral-7B-Instruct-v0.2"
-    Mistral_8x7B_Instruct_V01 = "Mistral-8x7B-Instruct-v0.1"
-
-
 class MistralAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
-        model: MistralModel = MistralModel.Mistral_7B_V01.value,
+        model: str = "",
         api_key: str | None = "",
         temperature: float = 1.0,
         max_output_tokens: int | None = None,
@@ -90,12 +67,6 @@ class MistralAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str:
-        if self.model not in MistralModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported, please use one of the following: {', '.join(MistralModel.list_values())}",
-                error_type="UnsupportedModel",
-            )
-
         if not self.api_key:
             raise ValueError("No Hugging Face API Key Provided")
 
@@ -136,29 +107,28 @@ class MistralAdapter(BaseAdapter):
         # Output will be a List[dict] if there is no error
         return output[0]["generated_text"]
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
-        prompt_cost_per_token = mistral_price_data["model-costs"][self.model]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
-        completion_cost_per_token = mistral_price_data["model-costs"][self.model][
-            "completion"
-        ]
+        completion_cost_per_token = price_data["completion"]
         logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
-
         logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {mistral_price_data['max-output-tokens']}")
+        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * mistral_price_data["max-output-tokens"],
+            + completion_cost_per_token * self.max_output_tokens,
             8,
         )
 

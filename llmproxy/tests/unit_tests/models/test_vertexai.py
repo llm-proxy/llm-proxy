@@ -27,23 +27,15 @@ def test_invalid_project_id() -> None:
         vertexai.get_completion()
 
 
-def test_unsupported_model() -> None:
-    # Assert
-    with pytest.raises(UnsupportedModel):
-        # Arrange
-        vertexai = VertexAIAdapter(project_id=project_id, model="test")
-        # Act
-        vertexai.get_completion()
-
-
 def test_get_estimated_max_cost():
     # Arrange
-    vertex = VertexAIAdapter(project_id=project_id)
-    expected_cost = 0.000032
+    vertex = VertexAIAdapter(project_id=project_id, max_output_tokens=256)
+    expected_cost = 0.000533
     prompt = "I am a cat in a hat!"
+    price_data = {"prompt": 1.5e-06, "completion": 2e-06}
 
     # Act
-    actual_cost = vertex.get_estimated_max_cost(prompt=prompt)
+    actual_cost = vertex.get_estimated_max_cost(prompt=prompt, price_data=price_data)
 
     # Assert
     assert (

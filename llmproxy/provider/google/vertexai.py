@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from cohere.client import logger
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
@@ -6,15 +8,6 @@ from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import logger, timeout, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
-
-# VERTEX IS PER CHARACTER
-vertexai_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        "prompt": 0.0005 / 1_000,
-        "completion": 0.0005 / 1_000,
-    },
-}
 
 vertexai_category_data = {
     "model-categories": {
@@ -34,18 +27,12 @@ vertexai_category_data = {
 }
 
 
-class VertexAIModel(str, BaseEnum):
-    # Add other models
-    PALM_TEXT = "text-bison"
-    PALM_CHAT = "chat-bison"
-
-
 class VertexAIAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
         temperature: float = 0,
-        model: VertexAIModel = VertexAIModel.PALM_TEXT.value,
+        model: str = "",
         project_id: str | None = "",
         location: str | None = "us-central1",
         max_output_tokens: int | None = None,
@@ -79,12 +66,6 @@ class VertexAIAdapter(BaseAdapter):
             result["exception"] = e
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.model not in VertexAIModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported. Please use one of the following models: {', '.join(VertexAIModel.list_values())}",
-                error_type="ValueError",
-            )
-
         result = {"output": None, "exception": None}
 
         if not self.force_timeout:
@@ -103,28 +84,28 @@ class VertexAIAdapter(BaseAdapter):
 
         return result.get("output")
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
-        prompt_cost_per_character = vertexai_price_data["model-costs"]["prompt"]
+        prompt_cost_per_character = price_data["prompt"]
         logger.log(msg=f"PROMPT (COST/CHARACTER): {prompt_cost_per_character}")
 
-        completion_cost_per_character = vertexai_price_data["model-costs"]["completion"]
+        completion_cost_per_character = price_data["completion"]
         logger.log(msg=f"COMPLETION (COST/CHARACTER): {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
-
         logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-
-        logger.log(msg=f"COMPLETION TOKENS: {vertexai_price_data['max-output-tokens']}")
+        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_character * len(tokens)
-            + completion_cost_per_character * vertexai_price_data["max-output-tokens"],
+            + completion_cost_per_character * self.max_output_tokens,
             8,
         )
 

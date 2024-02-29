@@ -60,6 +60,7 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 
             # Loop through and aggregate all of the variations of "models" of each provider
             provider_models = set()
+            model_costs = {}
             for model in provider.get("models", []):
                 provider_models.add(model["name"])
 
@@ -68,7 +69,7 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
             module = importlib.import_module(module_name)
             model_class = getattr(module, class_name)
 
-            # return dict with class path and models set, with all of the variations/models of that provider
+            # return dict with class path and models set and model cost data, with all of the variations/models of that provider
             available_models[key] = {
                 "adapter_instance": model_class,
                 "models": provider_models,
@@ -108,20 +109,19 @@ def _setup_user_models(
 
         # Compare user models with available_models
         for provider in yml_settings["provider_settings"]:
-            model_name = provider["provider"].lower().strip()
-            # Check if user model in available models
+            provider_name = provider["provider"].lower().strip()
 
-            if model_name in available_models:
+            # Check if provider is in available models
+            if provider_name in available_models:
                 # If the user providers NO variations then raise error
                 if "models" not in provider or provider["models"] is None:
                     raise LLMProxyConfigError(
-                        f"No models provided in llmproxy.config.yml for the following model: {model_name}"
+                        f"No models provided in llmproxy.config.yml for the following model: {provider_name}"
                     )
 
-                # Loop through and set up instance of model
+                # Loop through user's provider's models and set up instance of model if available
                 for model in provider["models"]:
-                    # Different setup for vertexai
-                    if model not in available_models[model_name]["models"]:
+                    if model not in available_models[provider_name]["models"]:
                         raise UnsupportedModel(
                             f"{model} is not available, yet!",
                             error_type="UnsupportedModel",
@@ -136,7 +136,7 @@ def _setup_user_models(
                     }
 
                     # Different setup for vertexai
-                    if model_name == "vertexai":
+                    if provider_name == "vertexai":
                         common_parameters.update(
                             {
                                 # Project ID required for VertexAI
@@ -152,9 +152,9 @@ def _setup_user_models(
                             provider["api_key_var"]
                         )
 
-                    model_instance = available_models[model_name]["adapter_instance"](
-                        **common_parameters
-                    )
+                    model_instance = available_models[provider_name][
+                        "adapter_instance"
+                    ](**common_parameters)
                     user_models[model] = model_instance
 
         return user_models
@@ -164,6 +164,35 @@ def _setup_user_models(
         raise UserConfigError(
             f"Unknown error occured during llmproxy.config setup:{e}"
         ) from e
+
+
+def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Extracts cost data for each model from the given list of settings dictionaries.
+
+    Args:
+    - settings: A list of dictionaries, each containing information about models and their costs.
+
+    Returns:
+    A dictionary containing model names as keys and their associated cost data as values.
+
+    Raises:
+    Exception: If there's any error during processing.
+    """
+    try:
+        models_cost_data = {}
+        # Loop through all the providers in settings
+        for provider in settings:
+            # Loop through the "models" and save the cost data for each model
+            for model_data in provider.get("models", []):
+                model_name, prompt_cost, completion_cost = model_data.values()
+                models_cost_data[model_name] = {
+                    "prompt": prompt_cost,
+                    "completion": completion_cost,
+                }
+        return models_cost_data
+    except Exception as e:
+        raise e
 
 
 def _get_route_type(
@@ -230,22 +259,24 @@ class LLMProxy:
         # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
+        # Setup available models
+        self.available_models = _setup_available_models(settings=internal_config)
+
+        # Setup user models
+        self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
+            yml_settings=user_settings,
+            available_models=self.available_models,
+            constructor_settings=kwargs,
+        )
+
         # Setup user cost
         self.route_type = _get_route_type(
             user_settings=user_settings, constructor_route_type=route_type
         )
 
-        # Setup available models
-        available_models = _setup_available_models(settings=internal_config)
-
-        # Setup user models
-        self.user_models: Dict[str, BaseAdapter] = _setup_user_models(
-            yml_settings=user_settings,
-            available_models=available_models,
-            constructor_settings=kwargs,
-        )
-
-        self.available_models = available_models
+        if self.route_type == RouteType.COST:
+            # Setup the cost data of each model
+            self.models_cost_data = _setup_models_cost_data(settings=internal_config)
 
     def route(
         self,
@@ -262,10 +293,14 @@ class LLMProxy:
     def _cost_route(self, prompt: str):
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
+            # Load the cost data of the current model to get the estimate routing cost
             try:
                 logger.log(msg="========Start Cost Estimation===========")
+                model_price_data = self.models_cost_data[model_name]
+                cost = instance.get_estimated_max_cost(
+                    prompt=prompt, price_data=model_price_data
+                )
 
-                cost = instance.get_estimated_max_cost(prompt=prompt)
                 logger.log(msg="========End Cost Estimation===========\n")
 
                 item = {"name": model_name, "cost": cost, "instance": instance}

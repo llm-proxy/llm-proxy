@@ -1,17 +1,11 @@
+from typing import Any, Dict
+
 import cohere
 
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import logger, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
-
-cohere_price_data_summarize_generate_chat = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        "prompt": 1.50 / 1_000_000,
-        "completion": 2.00 / 1_000_000,
-    },
-}
 
 cohere_category_data = {
     "model-categories": {
@@ -67,19 +61,11 @@ cohere_category_data = {
 }
 
 
-# These are the "Models" only for chat/command
-class CohereModel(str, BaseEnum):
-    COMMAND = "command"
-    COMMAND_LIGHT = "command-light"
-    COMMAND_NIGHTLY = "command-nightly"
-    COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
-
-
 class CohereAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
-        model: CohereModel = CohereModel.COMMAND.value,
+        model: str = "",
         temperature: float = 0.0,
         api_key: str = "",
         max_output_tokens: int | None = None,
@@ -93,12 +79,6 @@ class CohereAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.model not in CohereModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported. Please use one of the following models: {', '.join(CohereModel.list_values())}",
-                error_type="UnsupportedModel",
-            )
-
         try:
             co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
@@ -115,37 +95,31 @@ class CohereAdapter(BaseAdapter):
                 exception=str(e), error_type="Unknown Cohere Error"
             ) from e
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
         # Assumption, model exists (check should be done at yml load level)
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
-        prompt_cost_per_token = cohere_price_data_summarize_generate_chat[
-            "model-costs"
-        ]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
-        completion_cost_per_token = cohere_price_data_summarize_generate_chat[
-            "model-costs"
-        ]["completion"]
+        completion_cost_per_token = price_data["completion"]
 
         logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         # Note: Avoiding costs for now
         # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
-
         logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(
-            msg=f"COMPLETION TOKENS: {cohere_price_data_summarize_generate_chat['max-output-tokens']}"
-        )
+        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token
-            * cohere_price_data_summarize_generate_chat["max-output-tokens"],
+            + completion_cost_per_token * self.max_output_tokens,
             8,
         )
 

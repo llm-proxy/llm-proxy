@@ -29,22 +29,17 @@ def test_invalid_api_key():
         chatbot.get_completion()
 
 
-def test_unsupported_model():
-    chatbot = OpenAIAdapter(api_key=openai_api_key, model="unsupported_model")
-
-    with pytest.raises(UnsupportedModel):
-        chatbot.get_completion()
-
-
 # TODO: Slowing down Unit tests too much, TEST LATER IN INTEGRATION TESTS
 def test_get_estimated_max_cost():
     # Arrange
-    gpt = OpenAIAdapter(api_key=openai_api_key)
-    expected_cost = 0.000108
+    gpt = OpenAIAdapter(
+        api_key=openai_api_key, max_output_tokens=256, model="gpt-3.5-turbo-1106"
+    )
+    expected_cost = 0.00052
     prompt = "I am a cat in a hat!"
-
+    price_data = {"prompt": 1e-06, "completion": 2e-06}
     # Act
-    actual_cost = gpt.get_estimated_max_cost(prompt=prompt)
+    actual_cost = gpt.get_estimated_max_cost(prompt=prompt, price_data=price_data)
 
     # Assert
     assert (

@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import openai
 import tiktoken
 
@@ -5,39 +7,6 @@ from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import logger
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
-
-# This should be available later from the yaml file
-# Cost is converted into whole numbers to avoid inconsistent floats
-open_ai_price_data = {
-    "max-output-tokens": 50,
-    "model-costs": {
-        # Cost per 1k tokens * 1000
-        "gpt-3.5-turbo-1106": {
-            "prompt": 0.0010 / 1000,
-            "completion": 0.0020 / 1000,
-        },
-        "gpt-3.5-turbo-instruct": {
-            "prompt": 0.0015 / 1000,
-            "completion": 0.0020 / 1000,
-        },
-        "gpt-4": {
-            "prompt": 0.03 / 1000,
-            "completion": 0.06 / 1000,
-        },
-        "gpt-4-32k": {
-            "prompt": 0.06 / 1000,
-            "completion": 0.12 / 1000,
-        },
-        "gpt-4-1106-preview": {
-            "prompt": 0.01 / 1000,
-            "completion": 0.03 / 1000,
-        },
-        "gpt-4-1106-vision-preview": {
-            "prompt": 0.01 / 1000,
-            "completion": 0.03 / 1000,
-        },
-    },
-}
 
 open_ai_category_data = {
     "model-categories": {
@@ -93,20 +62,11 @@ open_ai_category_data = {
 }
 
 
-class OpenAIModel(str, BaseEnum):
-    GPT_4_1106_PREVIEW = "gpt-4-1106-preview"
-    GPT_4_1106_VISION_PREVIEW = "gpt-4-1106-vision-preview"
-    GPT_4 = "gpt-4"
-    GPT_4_32K = "gpt-4-32k"
-    GPT_3_5_TURBO_1106 = "gpt-3.5-turbo-1106"
-    GPT_3_5_TURBO_INSTRUCT = "gpt-3.5-turbo-instruct"
-
-
 class OpenAIAdapter(BaseAdapter):
     def __init__(
         self,
         prompt: str = "",
-        model: OpenAIModel = OpenAIModel.GPT_3_5_TURBO_1106.value,
+        model: str = "",
         temperature: float = 0,
         api_key: str = "",
         max_output_tokens: int | None = None,
@@ -120,12 +80,6 @@ class OpenAIAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.model not in OpenAIModel:
-            raise UnsupportedModel(
-                exception=f"Model not supported. Please use one of the following models: {', '.join(OpenAIModel.list_values())}",
-                error_type="UnsupportedModel",
-            )
-
         # Prevent API Connection Error with empty API KEY
         if self.api_key == "":
             raise OpenAIException(
@@ -154,7 +108,9 @@ class OpenAIAdapter(BaseAdapter):
 
         return response.choices[0].message.content or None
 
-    def get_estimated_max_cost(self, prompt: str = "") -> float:
+    def get_estimated_max_cost(
+        self, prompt: str = "", price_data: Dict[str, Any] = None
+    ) -> float:
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
@@ -163,20 +119,19 @@ class OpenAIAdapter(BaseAdapter):
 
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
-        prompt_cost_per_token = open_ai_price_data["model-costs"][self.model]["prompt"]
+        prompt_cost_per_token = price_data["prompt"]
         logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
 
-        completion_cost_per_token = open_ai_price_data["model-costs"][self.model][
-            "completion"
-        ]
+        completion_cost_per_token = price_data["completion"]
         logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
+
         tokens = encoder.encode(prompt or self.prompt)
         logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {open_ai_price_data['max-output-tokens']}")
+        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * open_ai_price_data["max-output-tokens"],
+            + completion_cost_per_token * self.max_output_tokens,
             8,
         )
         logger.log(msg=f"COST: {cost}", color="GREEN")
