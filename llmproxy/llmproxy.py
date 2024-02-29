@@ -234,6 +234,11 @@ def _get_route_type(
 
     return route_type
 
+class Config:
+    def __init__(self):
+        self.config_cache = {}
+        self.mod_times = {}
+
 
 class LLMProxy:
     def __init__(
