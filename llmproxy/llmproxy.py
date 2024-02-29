@@ -65,45 +65,6 @@ def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         raise e
 
 
-def _get_route_type(
-    user_settings: Dict[str, Any] | None,
-    constructor_route_type: Literal["cost", "category"] | None,
-) -> Literal["cost", "category"]:
-    """
-    Get the route type from constructor parameters or user settings.
-
-    Args:
-        user_settings (Optional[Dict[str, Any]]): User settings containing proxy configuration.
-            If None, the route type will default to constructor_route_type.
-        constructor_route_type (Optional[Literal["cost", "category"]]): Route type specified during object construction.
-
-    Returns:
-        Literal["cost", "category"]: The selected route type.
-
-    Raises:
-        ValueError: If no route type is specified in either user settings or constructor parameters.
-    """
-    route_type = None
-    if constructor_route_type is not None:
-        route_type = constructor_route_type
-    elif user_settings is not None and isinstance(
-        user_settings.get("proxy_configuration"), dict
-    ):
-        proxy_configuration = user_settings.get("proxy_configuration", {})
-        route_type = proxy_configuration.get("route_type", None)
-
-    else:
-        raise UserConfigError(
-            "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
-        )
-
-    if route_type not in RouteType.list_values():
-        raise UserConfigError(
-            f"Invalid route type, please try ensure you have configured one of the follow routes: {', '.join(RouteType.list_values())}"
-        )
-
-    return route_type
-
 class Config:
     def __init__(self, internal_settings: List[Dict[str, Any]], path_to_yml: str = "", path_to_internal_settings: str = ""):
         self.path_to_yml = path_to_yml
@@ -249,6 +210,45 @@ class Config:
                 f"Unknown error occured during llmproxy.config setup:{e}"
             ) from e
     
+    def _get_route_type(self, constructor_route_type: Literal["cost", "category"] | None, ) -> Literal["cost", "category"]:
+        """
+        Get the route type from constructor parameters or user settings.
+
+        Args:
+            user_settings (Optional[Dict[str, Any]]): User settings containing proxy configuration.
+                If None, the route type will default to constructor_route_type.
+            constructor_route_type (Optional[Literal["cost", "category"]]): Route type specified during object construction.
+
+        Returns:
+            Literal["cost", "category"]: The selected route type.
+
+        Raises:
+            ValueError: If no route type is specified in either user settings or constructor parameters.
+        """
+
+        user_settings = self.config_cache[self.path_to_yml]
+
+        route_type = None
+        if constructor_route_type is not None:
+            route_type = constructor_route_type
+        elif user_settings is not None and isinstance(
+            user_settings.get("proxy_configuration"), dict
+        ):
+            proxy_configuration = user_settings.get("proxy_configuration", {})
+            route_type = proxy_configuration.get("route_type", None)
+
+        else:
+            raise UserConfigError(
+                "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
+            )
+
+        if route_type not in RouteType.list_values():
+            raise UserConfigError(
+                f"Invalid route type, please try ensure you have configured one of the follow routes: {', '.join(RouteType.list_values())}"
+            )
+
+        return route_type
+    
 
 class LLMProxy:
     def __init__(
@@ -282,20 +282,11 @@ class LLMProxy:
 
 
 
-
-
-        ######
-
-
-
-
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(constructor_settings=kwargs, )
 
         # Setup user cost
-        self.route_type = _get_route_type(
-            user_settings=user_settings, constructor_route_type=route_type
-        )
+        self.route_type = config._get_route_type(constructor_route_type=route_type, )
 
         if self.route_type == RouteType.COST:
             # Setup the cost data of each model
