@@ -105,10 +105,10 @@ def _get_route_type(
     return route_type
 
 class Config:
-    def __init__(self, settings: List[Dict[str, Any]], path_to_yml: str = "", path_to_settings: str = ""):
+    def __init__(self, internal_settings: List[Dict[str, Any]], path_to_yml: str = "", path_to_internal_settings: str = ""):
         self.path_to_yml = path_to_yml
-        self.path_to_settings = path_to_settings
-        self.settings = settings
+        self.path_to_internal_settings = path_to_internal_settings
+        self.internal_settings = internal_settings
 
         self.config_cache = {}
         self.mod_times = {}
@@ -132,13 +132,13 @@ class Config:
         """Returns classname with list of available_models for provider"""
 
         try:
-            mod_time = os.path.getmtime(self.path_to_settings)
+            mod_time = os.path.getmtime(self.path_to_internal_settings)
 
-            if self.path_to_settings not in self.mod_times or self.mod_times[self.path_to_settings] != mod_time:
+            if self.path_to_internal_settings not in self.mod_times or self.mod_times[self.path_to_internal_settings] != mod_time:
                 available_models = {}
 
                 # Loop through each provider
-                for provider in self.settings:
+                for provider in self.internal_settings:
                     key = provider["provider"].lower()
                     import_path = provider["adapter_path"]
 
@@ -159,9 +159,9 @@ class Config:
                         "models": provider_models,
                     }
 
-                self.config_cache[self.path_to_settings] = available_models
-                self.mod_times[self.path_to_settings] = mod_time
-            return self.config_cache[self.path_to_settings]
+                self.config_cache[self.path_to_internal_settings] = available_models
+                self.mod_times[self.path_to_internal_settings] = mod_time
+            return self.config_cache[self.path_to_internal_settings]
         except Exception as e:
             raise e
     
@@ -274,12 +274,12 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML for user settings
-        config = Config(path_to_yml=path_to_user_configuration, path_to_settings='llmproxy/config/internal.config.py', settings=internal_config)
+        config = Config(internal_settings=internal_config, path_to_internal_settings='llmproxy/config/internal.config.py', path_to_yml=path_to_user_configuration, )
 
         user_settings = config._get_settings_from_yml()
 
         # Setup available models
-        self.available_models = _setup_available_models()
+        self.available_models = config._setup_available_models()
 
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(
