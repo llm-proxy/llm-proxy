@@ -165,12 +165,11 @@ class Config:
         except Exception as e:
             raise e
     
-    def _setup_user_models(
-    available_models: Dict[Any, Any],
-    yml_settings: Dict[Any, Any],
-    constructor_settings: Dict[Any, Any] | None = None,
-) -> Dict[str, BaseAdapter]:
+    def _setup_user_models(self, constructor_settings: Dict[Any, Any] | None = None, ) -> Dict[str, BaseAdapter]:
         """Setup all available models and return dict of {name: instance_of_model}"""
+
+        yml_settings = self.config_cache[self.path_to_yml]
+        available_models = self.config_cache[self.path_to_internal_settings]
 
         if not available_models:
             raise UserConfigError(
@@ -281,12 +280,17 @@ class LLMProxy:
         # Setup available models
         self.available_models = config._setup_available_models()
 
+
+
+
+
+        ######
+
+
+
+
         # Setup user models
-        self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(
-            yml_settings=user_settings,
-            available_models=self.available_models,
-            constructor_settings=kwargs,
-        )
+        self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(constructor_settings=kwargs, )
 
         # Setup user cost
         self.route_type = _get_route_type(
