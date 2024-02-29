@@ -67,92 +67,6 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         raise e
 
 
-def _setup_user_models(
-    available_models: Dict[Any, Any],
-    yml_settings: Dict[Any, Any],
-    constructor_settings: Dict[Any, Any] | None = None,
-) -> Dict[str, BaseAdapter]:
-    """Setup all available models and return dict of {name: instance_of_model}"""
-
-    if not available_models:
-        raise UserConfigError(
-            "Available models not found, please ensure you have the latest version of LLM Proxy."
-        )
-    if not yml_settings:
-        raise UserConfigError(
-            "Configuration not found, please ensure that you the correct path and format of configuration file"
-        )
-    if not yml_settings["provider_settings"]:
-        raise UserConfigError(
-            "No models found in user settings. Please ensure the format of the configuration file is correct."
-        )
-
-    try:
-        # Return dict
-        user_models = {}
-        optional_config = constructor_settings
-        if constructor_settings is None:
-            optional_config = yml_settings.get("optional_configuration", None) or {}
-
-        # Compare user models with available_models
-        for provider in yml_settings["provider_settings"]:
-            provider_name = provider["provider"].lower().strip()
-
-            # Check if provider is in available models
-            if provider_name in available_models:
-                # If the user providers NO variations then raise error
-                if "models" not in provider or provider["models"] is None:
-                    raise LLMProxyConfigError(
-                        f"No models provided in llmproxy.config.yml for the following model: {provider_name}"
-                    )
-
-                # Loop through user's provider's models and set up instance of model if available
-                for model in provider["models"]:
-                    if model not in available_models[provider_name]["models"]:
-                        raise UnsupportedModel(
-                            f"{model} is not available, yet!",
-                            error_type="UnsupportedModel",
-                        )
-
-                    # Common params among all models
-                    common_parameters = {
-                        "max_output_tokens": provider["max_output_tokens"],
-                        "temperature": provider["temperature"],
-                        "model": model,
-                        "timeout": optional_config.get("timeout", None),
-                    }
-
-                    # Different setup for vertexai
-                    if provider_name == "vertexai":
-                        common_parameters.update(
-                            {
-                                # Project ID required for VertexAI
-                                "project_id": os.getenv(provider["project_id_var"]),
-                                # No internal timeout flag provided
-                                "force_timeout": optional_config.get(
-                                    "force_timeout", False
-                                ),
-                            }
-                        )
-                    else:
-                        common_parameters["api_key"] = os.getenv(
-                            provider["api_key_var"]
-                        )
-
-                    model_instance = available_models[provider_name][
-                        "adapter_instance"
-                    ](**common_parameters)
-                    user_models[model] = model_instance
-
-        return user_models
-    except UnsupportedModel as e:
-        raise e
-    except Exception as e:
-        raise UserConfigError(
-            f"Unknown error occured during llmproxy.config setup:{e}"
-        ) from e
-
-
 def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Extracts cost data for each model from the given list of settings dictionaries.
@@ -281,6 +195,91 @@ class Config:
             return self.config_cache[self.path_to_settings]
         except Exception as e:
             raise e
+    
+    def _setup_user_models(
+    available_models: Dict[Any, Any],
+    yml_settings: Dict[Any, Any],
+    constructor_settings: Dict[Any, Any] | None = None,
+) -> Dict[str, BaseAdapter]:
+        """Setup all available models and return dict of {name: instance_of_model}"""
+
+        if not available_models:
+            raise UserConfigError(
+                "Available models not found, please ensure you have the latest version of LLM Proxy."
+            )
+        if not yml_settings:
+            raise UserConfigError(
+                "Configuration not found, please ensure that you the correct path and format of configuration file"
+            )
+        if not yml_settings["provider_settings"]:
+            raise UserConfigError(
+                "No models found in user settings. Please ensure the format of the configuration file is correct."
+            )
+
+        try:
+            # Return dict
+            user_models = {}
+            optional_config = constructor_settings
+            if constructor_settings is None:
+                optional_config = yml_settings.get("optional_configuration", None) or {}
+
+            # Compare user models with available_models
+            for provider in yml_settings["provider_settings"]:
+                provider_name = provider["provider"].lower().strip()
+
+                # Check if provider is in available models
+                if provider_name in available_models:
+                    # If the user providers NO variations then raise error
+                    if "models" not in provider or provider["models"] is None:
+                        raise LLMProxyConfigError(
+                            f"No models provided in llmproxy.config.yml for the following model: {provider_name}"
+                        )
+
+                    # Loop through user's provider's models and set up instance of model if available
+                    for model in provider["models"]:
+                        if model not in available_models[provider_name]["models"]:
+                            raise UnsupportedModel(
+                                f"{model} is not available, yet!",
+                                error_type="UnsupportedModel",
+                            )
+
+                        # Common params among all models
+                        common_parameters = {
+                            "max_output_tokens": provider["max_output_tokens"],
+                            "temperature": provider["temperature"],
+                            "model": model,
+                            "timeout": optional_config.get("timeout", None),
+                        }
+
+                        # Different setup for vertexai
+                        if provider_name == "vertexai":
+                            common_parameters.update(
+                                {
+                                    # Project ID required for VertexAI
+                                    "project_id": os.getenv(provider["project_id_var"]),
+                                    # No internal timeout flag provided
+                                    "force_timeout": optional_config.get(
+                                        "force_timeout", False
+                                    ),
+                                }
+                            )
+                        else:
+                            common_parameters["api_key"] = os.getenv(
+                                provider["api_key_var"]
+                            )
+
+                        model_instance = available_models[provider_name][
+                            "adapter_instance"
+                        ](**common_parameters)
+                        user_models[model] = model_instance
+
+            return user_models
+        except UnsupportedModel as e:
+            raise e
+        except Exception as e:
+            raise UserConfigError(
+                f"Unknown error occured during llmproxy.config setup:{e}"
+            ) from e
     
 
 class LLMProxy:
