@@ -243,6 +243,36 @@ class Config:
         except (FileNotFoundError, yaml.YAMLError) as e:
             raise e
     
+    def _setup_available_models(self, settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Returns classname with list of available_models for provider"""
+        try:
+            available_models = {}
+            # Loop through each provider
+            for provider in settings:
+                key = provider["provider"].lower()
+                import_path = provider["adapter_path"]
+
+                # Loop through and aggregate all of the variations of "models" of each provider
+                provider_models = set()
+                model_costs = {}
+                for model in provider.get("models", []):
+                    provider_models.add(model["name"])
+
+                module_name, class_name = import_path.rsplit(".", 1)
+
+                module = importlib.import_module(module_name)
+                model_class = getattr(module, class_name)
+
+                # return dict with class path and models set and model cost data, with all of the variations/models of that provider
+                available_models[key] = {
+                    "adapter_instance": model_class,
+                    "models": provider_models,
+                }
+
+            return available_models
+        except Exception as e:
+            raise e
+    
 
 class LLMProxy:
     def __init__(
