@@ -32,19 +32,25 @@ jobs:
           VERSION=$(toml get pyproject.toml tool.poetry.version)
           echo "current-version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      # Fetch pull request titles and append them to release notes
+      # Fetch pull request titles and append only new titles to release notes
       - name: Fetch Pull Request Titles
         id: pr-titles
         run: |
-          gh pr list --json title -L 100 | jq -r '.[].title' > pull_request_titles.txt
+          gh pr list --json title -L 100 | jq -r '.[].title' > .github/pull_request_titles.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Append pull request titles to release notes
-      - name: Append Pull Request Titles to Release Notes
+      # Compare with existing titles and append only new titles
+      - name: Append New Pull Request Titles to Release Notes
         run: |
-          cat pull_request_titles.txt >> "$GITHUB_OUTPUT"
-        continue-on-error: true # Allow this step to fail if no pull request titles are found
+          comm -23 <(sort -u .github/pull_request_titles.txt) <(sort -u .github/existing_titles.txt) >> "$GITHUB_OUTPUT"
+        continue-on-error: true # Allow this step to fail if no new pull request titles are found
+
+      # Update the existing titles file with the new titles
+      - name: Update Existing Titles
+        run: |
+          cat .github/pull_request_titles.txt >> .github/existing_titles.txt
+        continue-on-error: true # Allow this step to fail if the existing titles file is not found
 
       # create PR using GitHub CLI
       - name: create PR with release info
