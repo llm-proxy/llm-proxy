@@ -11,6 +11,7 @@ from llmproxy.utils.exceptions.provider import (
     UnsupportedModel,
 )
 
+# Mapping of Llama-2 model categories to their respective task performance ratings.
 llama2_category_data = {
     "model-categories": {
         "Llama-2-7b-chat-hf": {
@@ -162,6 +163,22 @@ llama2_category_data = {
 
 
 class Llama2Adapter(BaseAdapter):
+    """
+    Adapter class for interacting with the Llama-2 API.
+
+    This adapter encapsulates the logic for sending requests to and handling responses from Llama-2 language models.
+    It supports setting system-level prompts, handling API keys, and managing request parameters like temperature
+    and token limits.
+
+    Attributes:
+        system_prompt (str): System-level instruction to guide the model's responses.
+        prompt (str): Default user-provided text prompt for generating responses.
+        api_key (str): API key for authenticating requests to the Llama-2 API.
+        temperature (float): Controls the randomness of the generated text.
+        model (str): Identifier for the Llama-2 model being used.
+        max_output_tokens (int): Maximum number of tokens in the generated text.
+        timeout (int): Time limit in seconds for the API response.
+    """
     def __init__(
         self,
         prompt: str = "",
@@ -181,6 +198,19 @@ class Llama2Adapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
+        """
+        Requests a text completion from the specified Llama-2 model.
+
+        Args:
+            prompt (str): Text prompt for generating completion.
+
+        Returns:
+            str | None: The text completion from the model, or None if an error occurs.
+
+        Raises:
+            Llama2Exception: If an API or internal error occurs during request processing.
+            EmptyPrompt: If no prompt is provided and the instance has no default prompt.
+        """
         if not self.api_key:
             raise Llama2Exception(exception="No API Provided", error_type="ValueError")
 
@@ -222,6 +252,19 @@ class Llama2Adapter(BaseAdapter):
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
     ) -> float:
+        """
+        Estimates the cost for a given prompt based on predefined pricing data.
+
+        Args:
+            prompt (str): Text prompt for cost estimation.
+            price_data (Dict[str, Any]): Cost per token for prompt and completion.
+
+        Returns:
+            float: Estimated cost for processing the given prompt.
+
+        Raises:
+            ValueError: If no prompt is provided and no default prompt is set.
+        """
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
@@ -249,6 +292,15 @@ class Llama2Adapter(BaseAdapter):
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
+        """
+        Retrieves the performance rank of the current model for a specified category.
+
+        Args:
+            category (str): Task category for which to retrieve the model's rank.
+
+        Returns:
+            int: Performance rank of the model in the specified category.
+        """
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
