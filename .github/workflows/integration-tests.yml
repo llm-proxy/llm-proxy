@@ -12,16 +12,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Poetry
-        run: pipx install poetry
+        uses: actions/checkout@v2
 
       - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
-          # cache: "poetry"
 
       - name: Setup poetry
         uses: snok/install-poetry@v1
