@@ -139,8 +139,16 @@ def test_setup_user_models_no_setting_UserConfigError():
         UserConfigError,
         match="Configuration not found, please ensure that you the correct path and format of configuration file",
     ):
-        test_available_model = _setup_available_models(settings=internal_config)
-        _setup_user_models(available_models=test_available_model, yml_settings={})
+        config = Config(
+            internal_settings=internal_config,
+            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_yml="llmproxy.config.yml",
+        )
+
+        test_available_model = config._setup_available_models()
+
+        config.config_cache[config.path_to_yml] = {}
+        config._setup_user_models()
 
 
 def test_setup_user_models_empty_user_settings():
