@@ -32,15 +32,19 @@ jobs:
           VERSION=$(toml get pyproject.toml tool.poetry.version)
           echo "current-version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      # create release info and push it upstream
-      - name: conventional Changelog Action
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          version-file: "./package.json,./package-lock.json,./config/app.json"
-          git-branch: "release-from-${{ github.sha }}"
-          skip-git-pull: true
+      # Fetch pull request titles and append them to release notes
+      - name: Fetch Pull Request Titles
+        id: pr-titles
+        run: |
+          gh pr list --json title -L 100 | jq -r '.[].title' > pull_request_titles.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Append pull request titles to release notes
+      - name: Append Pull Request Titles to Release Notes
+        run: |
+          cat pull_request_titles.txt >> "$GITHUB_OUTPUT"
+        continue-on-error: true # Allow this step to fail if no pull request titles are found
 
       # create PR using GitHub CLI
       - name: create PR with release info
