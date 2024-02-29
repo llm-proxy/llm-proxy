@@ -4,11 +4,7 @@ import pytest
 import yaml
 
 from llmproxy.config.internal_config import internal_config
-from llmproxy.llmproxy import (
-    LLMProxy,
-    UserConfigError,
-    Config
-)
+from llmproxy.llmproxy import Config, LLMProxy, UserConfigError
 from llmproxy.utils.exceptions.provider import UnsupportedModel
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -100,10 +96,10 @@ def test_get_settings_from_invalid_yml() -> None:
 
 def test_setup_available_models() -> None:
     config = Config(
-            internal_settings=internal_config,
-            path_to_internal_settings="llmproxy/config/internal.config.py",
-            path_to_yml="llmproxy.config.yml",
-        )
+        internal_settings=internal_config,
+        path_to_internal_settings="llmproxy/config/internal_config.py",
+        path_to_yml="llmproxy.config.yml",
+    )
     config._setup_available_models()
 
 
@@ -124,7 +120,7 @@ def test_no_available_model_UserConfigError() -> None:
     ):
         config = Config(
             internal_settings=internal_config,
-            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_internal_settings="llmproxy/config/internal_config.py",
             path_to_yml="llmproxy.config.yml",
         )
 
@@ -141,7 +137,7 @@ def test_setup_user_models_no_setting_UserConfigError():
     ):
         config = Config(
             internal_settings=internal_config,
-            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_internal_settings="llmproxy/config/internal_config.py",
             path_to_yml="llmproxy.config.yml",
         )
 
@@ -158,7 +154,7 @@ def test_setup_user_models_empty_user_settings():
     ):
         config = Config(
             internal_settings=internal_config,
-            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_internal_settings="llmproxy/config/internal_config.py",
             path_to_yml="llmproxy.config.yml",
         )
 
@@ -174,22 +170,22 @@ def test_setup_user_models_no_variation() -> None:
     ):
         config = Config(
             internal_settings=internal_config,
-            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_internal_settings="llmproxy/config/internal_config.py",
             path_to_yml="llmproxy.config.yml",
         )
 
         config._setup_available_models()
         config.config_cache[config.path_to_yml] = {
-                "provider_settings": [
-                    {
-                        "provider": "OpenAI",
-                        "api_key_var": "OPENAI_API_KEY",
-                        "max_output_tokens": 256,
-                        "temperature": 0.1,
-                        "models": None,
-                    }
-                ]
-            }
+            "provider_settings": [
+                {
+                    "provider": "OpenAI",
+                    "api_key_var": "OPENAI_API_KEY",
+                    "max_output_tokens": 256,
+                    "temperature": 0.1,
+                    "models": None,
+                }
+            ]
+        }
 
         config._setup_user_models()
 
