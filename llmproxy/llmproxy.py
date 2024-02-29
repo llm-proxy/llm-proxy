@@ -306,7 +306,7 @@ class LLMProxy:
         """
         Initialize YourClass instance.
 
-        Parameters:
+        Args:
             path_to_user_configuration (str): Path to user configuration YAML file.
             path_to_env_vars (str): Path to environment variables file.
             route_type (Literal["cost", "category"] | None): Type of route.
