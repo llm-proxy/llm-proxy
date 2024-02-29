@@ -46,7 +46,7 @@ class Config:
         self.config_cache = {}
         self.mod_times = {}
     
-    def _get_settings_from_yml(self,) -> Dict[str, Any]:
+    def _get_settings_from_yml(self) -> Dict[str, Any]:
         """Returns all of the data in the yaml file"""
 
         try:
@@ -61,7 +61,7 @@ class Config:
         except (FileNotFoundError, yaml.YAMLError) as e:
             raise e
     
-    def _setup_available_models(self,) -> Dict[str, Any]:
+    def _setup_available_models(self) -> Dict[str, Any]:
         """Returns classname with list of available_models for provider"""
 
         try:
@@ -232,7 +232,7 @@ class Config:
 
         return route_type
     
-    def _setup_models_cost_data(self, internal_settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _setup_models_cost_data(self) -> Dict[str, Any]:
         """
         Extracts cost data for each model from the given list of settings dictionaries.
 
@@ -247,18 +247,24 @@ class Config:
         """
 
         try:
-            models_cost_data = {}
-            # Loop through all the providers in settings
-            for provider in internal_settings:
-                # Loop through the "models" and save the cost data for each model
-                for model_data in provider.get("models", []):
-                    model_name, prompt_cost, completion_cost = model_data.values()
-                    models_cost_data[model_name] = {
-                        "prompt": prompt_cost,
-                        "completion": completion_cost,
-                    }
+            internal_settings_mod_time = os.path.getmtime(self.path_to_internal_settings)
+
+            if 'models_cost_data' not in self.mod_times or self.mod_times['models_cost_data'] != internal_settings_mod_time:
+                models_cost_data = {}
+                # Loop through all the providers in settings
+                for provider in self.internal_settings:
+                    # Loop through the "models" and save the cost data for each model
+                    for model_data in provider.get("models", []):
+                        model_name, prompt_cost, completion_cost = model_data.values()
+                        models_cost_data[model_name] = {
+                            "prompt": prompt_cost,
+                            "completion": completion_cost,
+                        }
+                
+                self.config_cache['models_cost_data'] = models_cost_data
+                self.mod_times['models_cost_data'] = internal_settings_mod_time
                     
-            return models_cost_data
+            return self.config_cache['models_cost_data']
         except Exception as e:
             raise e
     
@@ -301,7 +307,7 @@ class LLMProxy:
 
         if self.route_type == RouteType.COST:
             # Setup the cost data of each model
-            self.models_cost_data = config._setup_models_cost_data(internal_settings=internal_config)
+            self.models_cost_data = config._setup_models_cost_data()
 
     def route(
         self,
