@@ -36,34 +36,6 @@ class RouteType(str, BaseEnum):
     COST = "cost"
     CATEGORY = "category"
 
-def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Extracts cost data for each model from the given list of settings dictionaries.
-
-    Args:
-    - settings: A list of dictionaries, each containing information about models and their costs.
-
-    Returns:
-    A dictionary containing model names as keys and their associated cost data as values.
-
-    Raises:
-    Exception: If there's any error during processing.
-    """
-    try:
-        models_cost_data = {}
-        # Loop through all the providers in settings
-        for provider in settings:
-            # Loop through the "models" and save the cost data for each model
-            for model_data in provider.get("models", []):
-                model_name, prompt_cost, completion_cost = model_data.values()
-                models_cost_data[model_name] = {
-                    "prompt": prompt_cost,
-                    "completion": completion_cost,
-                }
-        return models_cost_data
-    except Exception as e:
-        raise e
-
 
 class Config:
     def __init__(self, internal_settings: List[Dict[str, Any]], path_to_yml: str = "", path_to_internal_settings: str = ""):
@@ -248,7 +220,6 @@ class Config:
         ):
             proxy_configuration = user_settings.get("proxy_configuration", {})
             route_type = proxy_configuration.get("route_type", None)
-
         else:
             raise UserConfigError(
                 "No route type was specified. Please add the route_type in the llmproxy yaml config or LLMProxy constructor."
@@ -260,6 +231,36 @@ class Config:
             )
 
         return route_type
+    
+    def _setup_models_cost_data(self, internal_settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Extracts cost data for each model from the given list of settings dictionaries.
+
+        Args:
+        - settings: A list of dictionaries, each containing information about models and their costs.
+
+        Returns:
+        A dictionary containing model names as keys and their associated cost data as values.
+
+        Raises:
+        Exception: If there's any error during processing.
+        """
+
+        try:
+            models_cost_data = {}
+            # Loop through all the providers in settings
+            for provider in internal_settings:
+                # Loop through the "models" and save the cost data for each model
+                for model_data in provider.get("models", []):
+                    model_name, prompt_cost, completion_cost = model_data.values()
+                    models_cost_data[model_name] = {
+                        "prompt": prompt_cost,
+                        "completion": completion_cost,
+                    }
+                    
+            return models_cost_data
+        except Exception as e:
+            raise e
     
 
 class LLMProxy:
@@ -292,8 +293,6 @@ class LLMProxy:
         # Setup available models
         self.available_models = config._setup_available_models()
 
-
-
         # Setup user models
         self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(constructor_settings=kwargs, )
 
@@ -302,7 +301,7 @@ class LLMProxy:
 
         if self.route_type == RouteType.COST:
             # Setup the cost data of each model
-            self.models_cost_data = _setup_models_cost_data(settings=internal_config)
+            self.models_cost_data = config._setup_models_cost_data(internal_settings=internal_config)
 
     def route(
         self,
