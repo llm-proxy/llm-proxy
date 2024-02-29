@@ -36,19 +36,6 @@ class RouteType(str, BaseEnum):
     COST = "cost"
     CATEGORY = "category"
 
-
-def _get_settings_from_yml(
-    path_to_yml: str = "",
-) -> Dict[str, Any]:
-    """Returns all of the data in the yaml file"""
-    try:
-        with open(path_to_yml, "r", encoding="utf-8") as file:
-            result = yaml.safe_load(file)
-            return result
-    except (FileNotFoundError, yaml.YAMLError) as e:
-        raise e
-
-
 def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Returns classname with list of available_models for provider"""
     try:
@@ -238,7 +225,18 @@ class Config:
     def __init__(self):
         self.config_cache = {}
         self.mod_times = {}
-
+    
+    def _get_settings_from_yml(
+    path_to_yml: str = "",
+) -> Dict[str, Any]:
+        """Returns all of the data in the yaml file"""
+        try:
+            with open(path_to_yml, "r", encoding="utf-8") as file:
+                result = yaml.safe_load(file)
+                return result
+        except (FileNotFoundError, yaml.YAMLError) as e:
+            raise e
+    
 
 class LLMProxy:
     def __init__(
