@@ -1,6 +1,6 @@
 name: Releases
 on:
-  push:
+  workflow_dispatch:
     branches:
       - main
     paths-ignore:
