@@ -36,7 +36,7 @@ jobs:
       - name: Fetch Pull Request Titles
         id: pr-titles
         run: |
-          gh pr list --json title -L 100 | jq -r '.[].title' > .github/pull_request_titles.txt
+         gh pr list --json title,user.login,url -L 100 | jq -r '.[] | "\(.title). (@\(.user.login) in \(.url))"' > .github/pull_request_titles.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
