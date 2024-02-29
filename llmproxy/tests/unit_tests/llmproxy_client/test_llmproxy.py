@@ -172,11 +172,14 @@ def test_setup_user_models_no_variation() -> None:
     with pytest.raises(
         UserConfigError,
     ):
-        test_available_model = _setup_available_models(settings=internal_config)
+        config = Config(
+            internal_settings=internal_config,
+            path_to_internal_settings="llmproxy/config/internal.config.py",
+            path_to_yml="llmproxy.config.yml",
+        )
 
-        _setup_user_models(
-            available_models=test_available_model,
-            yml_settings={
+        config._setup_available_models()
+        config.config_cache[config.path_to_yml] = {
                 "provider_settings": [
                     {
                         "provider": "OpenAI",
@@ -186,8 +189,9 @@ def test_setup_user_models_no_variation() -> None:
                         "models": None,
                     }
                 ]
-            },
-        )
+            }
+
+        config._setup_user_models()
 
 
 def test_invalid_route_type_constructor() -> None:
