@@ -222,18 +222,24 @@ def _get_route_type(
     return route_type
 
 class Config:
-    def __init__(self):
+    def __init__(self, path_to_yml: str = "",):
+        self.path_to_yml = path_to_yml
+
         self.config_cache = {}
         self.mod_times = {}
     
-    def _get_settings_from_yml(
-    path_to_yml: str = "",
-) -> Dict[str, Any]:
+    def _get_settings_from_yml(self) -> Dict[str, Any]:
         """Returns all of the data in the yaml file"""
+
         try:
-            with open(path_to_yml, "r", encoding="utf-8") as file:
-                result = yaml.safe_load(file)
-                return result
+            mod_time = os.path.getmtime(self.path_to_yml)
+
+            if self.path_to_yml not in self.mod_times or self.mod_times[self.path_to_yml] != mod_time:
+                with open(self.path_to_yml, 'r', encoding="utf-8") as file:
+                    self.config_cache[self.path_to_yml] = yaml.safe_load(file)
+                    self.mod_times[self.path_to_yml] = mod_time
+
+            return self.config_cache[self.path_to_yml]
         except (FileNotFoundError, yaml.YAMLError) as e:
             raise e
     
@@ -259,8 +265,11 @@ class LLMProxy:
                 Only pass in optional_configuration paramters settings that you want to override
         """
         load_dotenv(path_to_env_vars)
+
         # Read YML for user settings
-        user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
+        config = Config(path_to_yml=path_to_user_configuration)
+
+        user_settings = config._get_settings_from_yml()
 
         # Setup available models
         self.available_models = _setup_available_models(settings=internal_config)
