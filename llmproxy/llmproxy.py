@@ -122,6 +122,7 @@ class Config:
 
                 self.config_cache[self.path_to_internal_settings] = available_models
                 self.mod_times[self.path_to_internal_settings] = mod_time
+                
             return self.config_cache[self.path_to_internal_settings]
         except Exception as e:
             raise e
@@ -146,63 +147,74 @@ class Config:
             )
 
         try:
-            # Return dict
-            user_models = {}
-            optional_config = constructor_settings
-            if constructor_settings is None:
-                optional_config = yml_settings.get("optional_configuration", None) or {}
+            yml_mod_time = os.path.getmtime(self.path_to_yml)
+            internal_settings_mod_time = os.path.getmtime(self.path_to_internal_settings)
 
-            # Compare user models with available_models
-            for provider in yml_settings["provider_settings"]:
-                provider_name = provider["provider"].lower().strip()
+            if (('yml_mod_time' not in self.mod_times and 'internal_settings_mod_time' not in self.mod_times) or 
+                (self.mod_times['yml_mod_time'] == yml_mod_time or self.mod_times['internal_settings_mod_time'] == internal_settings_mod_time)):
+                
+                # Return dict
+                user_models = {}
+                optional_config = constructor_settings
+                if constructor_settings is None:
+                    optional_config = yml_settings.get("optional_configuration", None) or {}
 
-                # Check if provider is in available models
-                if provider_name in available_models:
-                    # If the user providers NO variations then raise error
-                    if "models" not in provider or provider["models"] is None:
-                        raise LLMProxyConfigError(
-                            f"No models provided in llmproxy.config.yml for the following model: {provider_name}"
-                        )
+                # Compare user models with available_models
+                for provider in yml_settings["provider_settings"]:
+                    provider_name = provider["provider"].lower().strip()
 
-                    # Loop through user's provider's models and set up instance of model if available
-                    for model in provider["models"]:
-                        if model not in available_models[provider_name]["models"]:
-                            raise UnsupportedModel(
-                                f"{model} is not available, yet!",
-                                error_type="UnsupportedModel",
+                    # Check if provider is in available models
+                    if provider_name in available_models:
+                        # If the user providers NO variations then raise error
+                        if "models" not in provider or provider["models"] is None:
+                            raise LLMProxyConfigError(
+                                f"No models provided in llmproxy.config.yml for the following model: {provider_name}"
                             )
 
-                        # Common params among all models
-                        common_parameters = {
-                            "max_output_tokens": provider["max_output_tokens"],
-                            "temperature": provider["temperature"],
-                            "model": model,
-                            "timeout": optional_config.get("timeout", None),
-                        }
+                        # Loop through user's provider's models and set up instance of model if available
+                        for model in provider["models"]:
+                            if model not in available_models[provider_name]["models"]:
+                                raise UnsupportedModel(
+                                    f"{model} is not available, yet!",
+                                    error_type="UnsupportedModel",
+                                )
 
-                        # Different setup for vertexai
-                        if provider_name == "vertexai":
-                            common_parameters.update(
-                                {
-                                    # Project ID required for VertexAI
-                                    "project_id": os.getenv(provider["project_id_var"]),
-                                    # No internal timeout flag provided
-                                    "force_timeout": optional_config.get(
-                                        "force_timeout", False
-                                    ),
-                                }
-                            )
-                        else:
-                            common_parameters["api_key"] = os.getenv(
-                                provider["api_key_var"]
-                            )
+                            # Common params among all models
+                            common_parameters = {
+                                "max_output_tokens": provider["max_output_tokens"],
+                                "temperature": provider["temperature"],
+                                "model": model,
+                                "timeout": optional_config.get("timeout", None),
+                            }
 
-                        model_instance = available_models[provider_name][
-                            "adapter_instance"
-                        ](**common_parameters)
-                        user_models[model] = model_instance
+                            # Different setup for vertexai
+                            if provider_name == "vertexai":
+                                common_parameters.update(
+                                    {
+                                        # Project ID required for VertexAI
+                                        "project_id": os.getenv(provider["project_id_var"]),
+                                        # No internal timeout flag provided
+                                        "force_timeout": optional_config.get(
+                                            "force_timeout", False
+                                        ),
+                                    }
+                                )
+                            else:
+                                common_parameters["api_key"] = os.getenv(
+                                    provider["api_key_var"]
+                                )
 
-            return user_models
+                            model_instance = available_models[provider_name][
+                                "adapter_instance"
+                            ](**common_parameters)
+                            user_models[model] = model_instance
+                
+                self.config_cache['user_models'] = user_models
+
+                self.mod_times['yml_mod_time'] = yml_mod_time
+                self.mod_times['internal_settings_mod_time'] = internal_settings_mod_time
+
+            return self.config_cache['user_models']
         except UnsupportedModel as e:
             raise e
         except Exception as e:
