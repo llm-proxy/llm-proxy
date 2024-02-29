@@ -8,6 +8,7 @@ from llmproxy.utils import logger
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import OpenAIException, UnsupportedModel
 
+# Mapping of OpenAI model categories to their respective task performance ratings.
 open_ai_category_data = {
     "model-categories": {
         "gpt-3.5-turbo-1106": {
@@ -63,6 +64,21 @@ open_ai_category_data = {
 
 
 class OpenAIAdapter(BaseAdapter):
+    """
+    Adapter class for interacting with OpenAI's language models.
+
+    Facilitates the sending of requests to and the handling of responses from OpenAI's API,
+    including authentication, setting request parameters, and parsing responses. This adapter
+    is part of the LLM Proxy application, enabling seamless integration with OpenAI's services.
+
+    Attributes:
+        prompt (str): Default text prompt for generating responses.
+        model (str): Identifier for the selected OpenAI model.
+        temperature (float): Temperature parameter controlling the creativity of the response.
+        api_key (str): API key for authenticating requests to OpenAI.
+        max_output_tokens (int): Maximum number of tokens for the response.
+        timeout (int): Timeout for the API request in seconds.
+    """
     def __init__(
         self,
         prompt: str = "",
@@ -80,6 +96,19 @@ class OpenAIAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
+        """
+        Requests a text completion from the specified OpenAI model.
+
+        Args:
+            prompt (str): The text prompt for generating completion.
+
+        Returns:
+            str | None: The model's text response, or None if an error occurs.
+
+        Raises:
+            OpenAIException: If an API or internal error occurs during request processing.
+        """
+
         # Prevent API Connection Error with empty API KEY
         if self.api_key == "":
             raise OpenAIException(
@@ -111,6 +140,19 @@ class OpenAIAdapter(BaseAdapter):
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
     ) -> float:
+        """
+        Estimates the maximum cost for processing a given prompt based on token pricing.
+
+        Args:
+            prompt (str): The text prompt for which to estimate the cost.
+            price_data (Dict[str, Any]): Pricing data for tokens.
+
+        Returns:
+            float: The estimated cost for processing the prompt.
+
+        Raises:
+            ValueError: If no prompt is provided and no default prompt is set.
+        """
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
@@ -139,6 +181,15 @@ class OpenAIAdapter(BaseAdapter):
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
+        """
+        Retrieves the performance rank of the current model for a specified task category.
+
+        Args:
+            category (str): The task category for which to retrieve the model's rank.
+
+        Returns:
+            int: The performance rank of the model in the specified category.
+        """
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
