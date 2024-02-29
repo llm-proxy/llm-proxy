@@ -179,6 +179,7 @@ class Llama2Adapter(BaseAdapter):
         max_output_tokens (int): Maximum number of tokens in the generated text.
         timeout (int): Time limit in seconds for the API response.
     """
+
     def __init__(
         self,
         prompt: str = "",

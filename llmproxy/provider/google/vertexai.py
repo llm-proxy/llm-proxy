@@ -30,20 +30,21 @@ vertexai_category_data = {
 
 class VertexAIAdapter(BaseAdapter):
     """
-       Adapter class for the Vertex AI language models API.
+    Adapter class for the Vertex AI language models API.
 
-       Manages API requests, responses, error handling, and cost estimation for token usage in the context of the LLM Proxy application.
+    Manages API requests, responses, error handling, and cost estimation for token usage in the context of the LLM Proxy application.
 
-       Attributes:
-           prompt (str): Default text prompt for model requests.
-           temperature (float): Temperature for response generation, affecting creativity.
-           model (str): Identifier for the selected Vertex AI model.
-           project_id (str): Google Cloud project ID.
-           location (str): Google Cloud location for the AI Platform.
-           max_output_tokens (int): Maximum number of tokens for the response.
-           timeout (int): Timeout for the API request.
-           force_timeout (bool): Whether to enforce a timeout for the request.
-       """
+    Attributes:
+        prompt (str): Default text prompt for model requests.
+        temperature (float): Temperature for response generation, affecting creativity.
+        model (str): Identifier for the selected Vertex AI model.
+        project_id (str): Google Cloud project ID.
+        location (str): Google Cloud location for the AI Platform.
+        max_output_tokens (int): Maximum number of tokens for the response.
+        timeout (int): Timeout for the API request.
+        force_timeout (bool): Whether to enforce a timeout for the request.
+    """
+
     def __init__(
         self,
         prompt: str = "",
@@ -66,12 +67,12 @@ class VertexAIAdapter(BaseAdapter):
 
     def _make_request(self, prompt, result):
         """
-         Private method to make a request to the Vertex AI API.
+        Private method to make a request to the Vertex AI API.
 
-         Args:
-             prompt (str): The text prompt to send to the model.
-             result (Dict[str, Any]): Dictionary to store the output or exception.
-         """
+        Args:
+            prompt (str): The text prompt to send to the model.
+            result (Dict[str, Any]): Dictionary to store the output or exception.
+        """
         try:
             aiplatform.init(project=self.project_id, location=self.location)
             parameters = {
