@@ -38,36 +38,47 @@ class RouteType(str, BaseEnum):
 
 
 class Config:
-    def __init__(self, internal_settings: List[Dict[str, Any]], path_to_yml: str = "", path_to_internal_settings: str = ""):
+    def __init__(
+        self,
+        internal_settings: List[Dict[str, Any]],
+        path_to_yml: str = "",
+        path_to_internal_settings: str = "",
+    ):
         self.path_to_yml = path_to_yml
         self.path_to_internal_settings = path_to_internal_settings
         self.internal_settings = internal_settings
 
         self.config_cache = {}
         self.mod_times = {}
-    
+
     def _get_settings_from_yml(self) -> Dict[str, Any]:
         """Returns all of the data in the yaml file"""
 
         try:
             mod_time = os.path.getmtime(self.path_to_yml)
 
-            if self.path_to_yml not in self.mod_times or self.mod_times[self.path_to_yml] != mod_time:
-                with open(self.path_to_yml, 'r', encoding="utf-8") as file:
+            if (
+                self.path_to_yml not in self.mod_times
+                or self.mod_times[self.path_to_yml] != mod_time
+            ):
+                with open(self.path_to_yml, "r", encoding="utf-8") as file:
                     self.config_cache[self.path_to_yml] = yaml.safe_load(file)
                     self.mod_times[self.path_to_yml] = mod_time
 
             return self.config_cache[self.path_to_yml]
         except (FileNotFoundError, yaml.YAMLError) as e:
             raise e
-    
+
     def _setup_available_models(self) -> Dict[str, Any]:
         """Returns classname with list of available_models for provider"""
 
         try:
             mod_time = os.path.getmtime(self.path_to_internal_settings)
 
-            if self.path_to_internal_settings not in self.mod_times or self.mod_times[self.path_to_internal_settings] != mod_time:
+            if (
+                self.path_to_internal_settings not in self.mod_times
+                or self.mod_times[self.path_to_internal_settings] != mod_time
+            ):
                 available_models = {}
 
                 # Loop through each provider
@@ -94,12 +105,15 @@ class Config:
 
                 self.config_cache[self.path_to_internal_settings] = available_models
                 self.mod_times[self.path_to_internal_settings] = mod_time
-                
+
             return self.config_cache[self.path_to_internal_settings]
         except Exception as e:
             raise e
-    
-    def _setup_user_models(self, constructor_settings: Dict[Any, Any] | None = None, ) -> Dict[str, BaseAdapter]:
+
+    def _setup_user_models(
+        self,
+        constructor_settings: Dict[Any, Any] | None = None,
+    ) -> Dict[str, BaseAdapter]:
         """Setup all available models and return dict of {name: instance_of_model}"""
 
         yml_settings = self.config_cache[self.path_to_yml]
@@ -120,16 +134,25 @@ class Config:
 
         try:
             yml_mod_time = os.path.getmtime(self.path_to_yml)
-            internal_settings_mod_time = os.path.getmtime(self.path_to_internal_settings)
+            internal_settings_mod_time = os.path.getmtime(
+                self.path_to_internal_settings
+            )
 
-            if (('yml_mod_time' not in self.mod_times and 'internal_settings_mod_time' not in self.mod_times) or 
-                (self.mod_times['yml_mod_time'] == yml_mod_time or self.mod_times['internal_settings_mod_time'] == internal_settings_mod_time)):
-                
+            if (
+                "yml_mod_time" not in self.mod_times
+                and "internal_settings_mod_time" not in self.mod_times
+            ) or (
+                self.mod_times["yml_mod_time"] == yml_mod_time
+                or self.mod_times["internal_settings_mod_time"]
+                == internal_settings_mod_time
+            ):
                 # Return dict
                 user_models = {}
                 optional_config = constructor_settings
                 if constructor_settings is None:
-                    optional_config = yml_settings.get("optional_configuration", None) or {}
+                    optional_config = (
+                        yml_settings.get("optional_configuration", None) or {}
+                    )
 
                 # Compare user models with available_models
                 for provider in yml_settings["provider_settings"]:
@@ -164,7 +187,9 @@ class Config:
                                 common_parameters.update(
                                     {
                                         # Project ID required for VertexAI
-                                        "project_id": os.getenv(provider["project_id_var"]),
+                                        "project_id": os.getenv(
+                                            provider["project_id_var"]
+                                        ),
                                         # No internal timeout flag provided
                                         "force_timeout": optional_config.get(
                                             "force_timeout", False
@@ -180,21 +205,26 @@ class Config:
                                 "adapter_instance"
                             ](**common_parameters)
                             user_models[model] = model_instance
-                
-                self.config_cache['user_models'] = user_models
 
-                self.mod_times['yml_mod_time'] = yml_mod_time
-                self.mod_times['internal_settings_mod_time'] = internal_settings_mod_time
+                self.config_cache["user_models"] = user_models
 
-            return self.config_cache['user_models']
+                self.mod_times["yml_mod_time"] = yml_mod_time
+                self.mod_times[
+                    "internal_settings_mod_time"
+                ] = internal_settings_mod_time
+
+            return self.config_cache["user_models"]
         except UnsupportedModel as e:
             raise e
         except Exception as e:
             raise UserConfigError(
                 f"Unknown error occured during llmproxy.config setup:{e}"
             ) from e
-    
-    def _get_route_type(self, constructor_route_type: Literal["cost", "category"] | None, ) -> Literal["cost", "category"]:
+
+    def _get_route_type(
+        self,
+        constructor_route_type: Literal["cost", "category"] | None,
+    ) -> Literal["cost", "category"]:
         """
         Get the route type from constructor parameters or user settings.
 
@@ -231,7 +261,7 @@ class Config:
             )
 
         return route_type
-    
+
     def _setup_models_cost_data(self) -> Dict[str, Any]:
         """
         Extracts cost data for each model from the given list of settings dictionaries.
@@ -247,9 +277,14 @@ class Config:
         """
 
         try:
-            internal_settings_mod_time = os.path.getmtime(self.path_to_internal_settings)
+            internal_settings_mod_time = os.path.getmtime(
+                self.path_to_internal_settings
+            )
 
-            if 'models_cost_data' not in self.mod_times or self.mod_times['models_cost_data'] != internal_settings_mod_time:
+            if (
+                "models_cost_data" not in self.mod_times
+                or self.mod_times["models_cost_data"] != internal_settings_mod_time
+            ):
                 models_cost_data = {}
                 # Loop through all the providers in settings
                 for provider in self.internal_settings:
@@ -260,14 +295,14 @@ class Config:
                             "prompt": prompt_cost,
                             "completion": completion_cost,
                         }
-                
-                self.config_cache['models_cost_data'] = models_cost_data
-                self.mod_times['models_cost_data'] = internal_settings_mod_time
-                    
-            return self.config_cache['models_cost_data']
+
+                self.config_cache["models_cost_data"] = models_cost_data
+                self.mod_times["models_cost_data"] = internal_settings_mod_time
+
+            return self.config_cache["models_cost_data"]
         except Exception as e:
             raise e
-    
+
 
 class LLMProxy:
     def __init__(
@@ -292,18 +327,26 @@ class LLMProxy:
         load_dotenv(path_to_env_vars)
 
         # Read YML for user settings
-        config = Config(internal_settings=internal_config, path_to_internal_settings='llmproxy/config/internal.config.py', path_to_yml=path_to_user_configuration, )
+        config = Config(
+            internal_settings=internal_config,
+            path_to_internal_settings="llmproxy/config/internal_config.py",
+            path_to_yml=path_to_user_configuration,
+        )
 
-        user_settings = config._get_settings_from_yml()
+        config._get_settings_from_yml()
 
         # Setup available models
         self.available_models = config._setup_available_models()
 
         # Setup user models
-        self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(constructor_settings=kwargs, )
+        self.user_models: Dict[str, BaseAdapter] = config._setup_user_models(
+            constructor_settings=kwargs,
+        )
 
         # Setup user cost
-        self.route_type = config._get_route_type(constructor_route_type=route_type, )
+        self.route_type = config._get_route_type(
+            constructor_route_type=route_type,
+        )
 
         if self.route_type == RouteType.COST:
             # Setup the cost data of each model
