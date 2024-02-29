@@ -1,6 +1,6 @@
 """
-Data for the internal configuration
-Used to compare User inputs to supported providers/models
+Defines internal configuration for mapping user inputs to supported LLM providers and models.
+This configuration helps in estimating costs by detailing the per-token price for inputs and outputs across different models.
 
 Format: 
     {
@@ -15,8 +15,6 @@ Format:
         ],
     }
 ]
-
-
 """
 
 from typing import Any, Dict, List
