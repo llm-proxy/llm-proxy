@@ -4,6 +4,19 @@ from llmproxy.utils import logger
 
 
 def categorize_text(prompt: str) -> str:
+    """
+    Categorizes the given text prompt into predefined categories using a zero-shot classification approach.
+
+    Utilizes the 'facebook/bart-large-mnli' model to classify the prompt into one of several predefined task categories.
+    This function is intended to aid in determining the most appropriate model for handling a given prompt based on
+    its content.
+
+    Args:
+        prompt (str): The text prompt to be categorized.
+
+    Returns:
+        str: The category that best fits the prompt from the predefined set.
+    """
     model = "facebook/bart-large-mnli"
     candidate_labels = [
         "Code Generation Task",
