@@ -77,16 +77,20 @@ class CohereAdapter(BaseAdapter):
         self.api_key = api_key
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
+        self.chat_history = []
 
     def get_completion(self, prompt: str = "") -> str | None:
         try:
+            self.chat_history.append({"role": "USER", "message": prompt or self.prompt})
             co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
                 max_tokens=self.max_output_tokens,
                 message=prompt or self.prompt,
                 model=self.model,
                 temperature=self.temperature,
+                chat_history=self.chat_history,
             )
+            self.chat_history.append({"role": "CHATBOT", "message": response.text})
             return response.text
         except cohere.CohereError as e:
             raise CohereException(exception=str(e), error_type="CohereError") from e
