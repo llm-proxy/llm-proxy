@@ -65,6 +65,7 @@ class MistralAdapter(BaseAdapter):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
+        self.chat_history = []
 
     def get_completion(self, prompt: str = "") -> str:
         if not self.api_key:
@@ -80,6 +81,10 @@ class MistralAdapter(BaseAdapter):
                 response = requests.post(api_url, headers=headers, json=payload)
                 return response.json()
 
+            # Llama2 prompt template
+            prompt_template = f"<s> [INST] {prompt or self.prompt} [/INST]"
+            
+            self.chat_history.append(prompt_template)
             output = query(
                 {
                     "inputs": prompt or self.prompt,
@@ -105,6 +110,7 @@ class MistralAdapter(BaseAdapter):
             raise MistralException(f"{output['error']}", error_type="MistralError")
 
         # Output will be a List[dict] if there is no error
+        self.chat_history.append(f"{output[0]["generated_text"]}</s>")
         return output[0]["generated_text"]
 
     def get_estimated_max_cost(
