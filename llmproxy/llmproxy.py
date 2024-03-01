@@ -248,7 +248,7 @@ def _get_route_type(
     constructor_route_type: Literal["cost", "category"] | None,
 ) -> Literal["cost", "category"]:
     """
-    Determine the routing type based on user settings and constructor arguments.
+    Determine the routing type based on user settings or constructor arguments.
 
     Args:
         user_settings (Dict[str, Any] | None): Configuration from the user settings.
@@ -284,7 +284,7 @@ def _get_route_type(
 
 class LLMProxy:
     """
-    Main class for LLM Proxy to route requests based on cost or category.
+    Main class for LLM Proxy to route requests.
 
     This class initializes the proxy with user-defined settings, sets up model adapters,
     and routes requests to the most suitable models based on the selected routing strategy.
