@@ -13,6 +13,7 @@ class MinHeap:
         heap (List[Tuple]): The underlying data structure, a list used to represent the heap.
         counter (int): A counter used to maintain the insertion order of elements.
     """
+
     def __init__(self):
         self.heap = []
         self.counter = 0
