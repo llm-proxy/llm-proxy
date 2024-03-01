@@ -5,7 +5,13 @@ from typing import Literal
 
 
 class CustomFormatter(logging.Formatter):
-    """Custom Formatter incorporating color coding for console logs."""
+    """
+    Custom logging Formatter class that adds color coding to log messages for console output,
+    enhancing the visibility and differentiation of log levels.
+
+    Attributes:
+        Format strings for different logging levels with ANSI color codes.
+    """
 
     PURPLE = "\x1b[35;1m"
     GREEN = "\x1b[32;1m"
@@ -26,29 +32,55 @@ class CustomFormatter(logging.Formatter):
     }
 
     def format(self, record):
+        """
+        Formats the log messages based on log level.
+
+        Args:
+            record (logging.LogRecord): Log record to be formatted.
+
+        Returns:
+            str: Formatted log message with color codes based on the level of the log.
+        """
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
 
 
 class CustomLogger:
+    """
+    Facilitates the creation and retrieval of customized console and file loggers.
+
+    This class ensures that there is only one instance of console and file loggers
+    throughout the application, following the singleton pattern.
+    """
+
     _console_logger = None
     _file_logger = None
 
     @staticmethod
     def console_formatter():
-        """Formatter for console logger"""
+        """
+        Returns a custom logging formatter for console outputs with color coding.
+        """
         return CustomFormatter()
 
     @staticmethod
     def file_formatter():
-        """Formatter for file logger"""
+        """
+        Returns a logging formatter for file outputs including timestamps, log level, and message details.
+        """
         log_format = "%(asctime)s [%(levelname)s] %(filename)s/%(funcName)s:%(lineno)s >> %(message)s"
         formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter
 
     @staticmethod
     def get_console_logger():
+        """
+        Retrieves the singleton instance of the console logger.
+
+        Returns:
+            logging.Logger: The singleton console logger instance.
+        """
         if CustomLogger._console_logger is not None:
             return CustomLogger._console_logger
 
@@ -65,6 +97,12 @@ class CustomLogger:
 
     @staticmethod
     def get_file_logger():
+        """
+        Retrieves the singleton instance of the file logger.
+
+        Returns:
+            logging.Logger: The singleton file logger instance with configured file handler and formatter.
+        """
         if CustomLogger._file_logger is not None:
             return CustomLogger._file_logger
 
@@ -111,7 +149,7 @@ def log(
         console_logger_on (bool, optional): Flag indicating whether to log to the console. Defaults to True.
         file_logger_on (bool, optional): Flag indicating whether to log to a file. Defaults to True.
         color (Literal["PURPLE", "GREEN", "GREY", "YELLOW", "RED", "BOLD_RED", "BLUE", "RESET", "FORMAT"], optional):
-            The color to be applied to the log message. Defaults to "GREY".
+        The color to be applied to the log message. Defaults to "GREY".
     """
     log_type_map = {
         "DEBUG": logging.DEBUG,

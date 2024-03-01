@@ -7,6 +7,7 @@ from llmproxy.utils import logger, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import MistralException, UnsupportedModel
 
+# Mapping of Mistral model categories to their task performance ratings.
 mistral_category_data = {
     "model-categories": {
         "Mistral-7B-v0.1": {
@@ -50,6 +51,21 @@ mistral_category_data = {
 
 
 class MistralAdapter(BaseAdapter):
+    """
+    Adapter class for the Mistral language models API.
+
+    Encapsulates the logic for sending requests to and handling responses from Mistral language models,
+    including API authentication, parameter management, and response parsing.
+
+    Attributes:
+        prompt (str): Default text prompt for generating responses.
+        model (str): Identifier for the Mistral model being used.
+        api_key (str): API key for authenticating requests to Mistral.
+        temperature (float): Temperature for controlling the creativity of the response.
+        max_output_tokens (int): Maximum number of tokens for the generated response.
+        timeout (int): Timeout for the API request in seconds.
+    """
+
     def __init__(
         self,
         prompt: str = "",
@@ -67,6 +83,19 @@ class MistralAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str:
+        """
+        Requests a text completion from the specified Mistral model.
+
+        Args:
+            prompt (str): Text prompt for generating completion.
+
+        Returns:
+            str: The text completion from the model.
+
+        Raises:
+            MistralException: If an API or internal error occurs during request processing.
+            ValueError: If no API key is provided.
+        """
         if not self.api_key:
             raise ValueError("No Hugging Face API Key Provided")
 
@@ -110,6 +139,19 @@ class MistralAdapter(BaseAdapter):
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
     ) -> float:
+        """
+        Estimates the cost for a given prompt based on predefined pricing data.
+
+        Args:
+            prompt (str): Text prompt for cost estimation.
+            price_data (Dict[str, Any]): Cost per token for prompt and completion.
+
+        Returns:
+            float: Estimated cost for processing the given prompt.
+
+        Raises:
+            ValueError: If no prompt is provided and no default prompt is set.
+        """
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
@@ -137,6 +179,15 @@ class MistralAdapter(BaseAdapter):
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
+        """
+        Retrieves the performance rank of the current model for a specified category.
+
+        Args:
+            category (str): Task category to retrieve the model's rank.
+
+        Returns:
+            int: Performance rank of the model in the specified category.
+        """
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 

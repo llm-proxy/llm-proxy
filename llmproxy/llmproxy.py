@@ -23,8 +23,12 @@ from llmproxy.utils.sorting import MinHeap
 @dataclass
 class CompletionResponse:
     """
-    response: Data on successful response else ""
-    errors: List of all models and exceptions - if raised
+    Data structure to store the response from a model completion request.
+
+    Attributes:
+        response (str): The response text from the model, if successful; otherwise, an empty string.
+        response_model (str): The model that successfully responded to the request.
+        errors (List): A list of error messages from models that failed to respond.
     """
 
     response: str = ""
@@ -33,6 +37,14 @@ class CompletionResponse:
 
 
 class RouteType(str, BaseEnum):
+    """
+    Enumeration for route types supported by LLM Proxy.
+
+    Attributes:
+        COST: Route requests based on cost efficiency.
+        CATEGORY: Route requests based on category proficiency.
+    """
+
     COST = "cost"
     CATEGORY = "category"
 
@@ -52,7 +64,16 @@ class Config:
         self.mod_times = {}
 
     def _get_settings_from_yml(self) -> Dict[str, Any]:
-        """Returns all of the data in the yaml file"""
+        """
+        Load and return settings from a YAML file.
+
+        Returns:
+            Dict[str, Any]: Configuration settings from the YAML file.
+
+        Raises:
+            FileNotFoundError: If the YAML file does not exist.
+            yaml.YAMLError: If there is an error parsing the YAML file.
+        """
 
         try:
             mod_time = os.path.getmtime(self.path_to_yml)
@@ -70,7 +91,15 @@ class Config:
             raise e
 
     def _setup_available_models(self) -> Dict[str, Any]:
-        """Returns classname with list of available_models for provider"""
+        """
+        Create a mapping of available models from settings.
+
+        Returns:
+            Dict[str, Any]: A dictionary mapping model names to their corresponding adapter instances and model data.
+
+        Raises:
+            ImportError: If there is an error importing the adapter module or class.
+        """
 
         try:
             mod_time = os.path.getmtime(self.path_to_internal_settings)
@@ -114,7 +143,18 @@ class Config:
         self,
         constructor_settings: Dict[Any, Any] | None = None,
     ) -> Dict[str, BaseAdapter]:
-        """Setup all available models and return dict of {name: instance_of_model}"""
+        """
+        Setup and return user-specified models based on configuration.
+
+        Args:
+            constructor_settings (Dict[Any, Any]): Additional settings provided at runtime.
+
+        Returns:
+            Dict[str, BaseAdapter]: A dictionary mapping model names to their instantiated adapter objects.
+
+        Raises:
+            UserConfigError: If there is a misconfiguration in user settings.
+        """
 
         yml_settings = self.config_cache[self.path_to_yml]
         available_models = self.config_cache[self.path_to_internal_settings]
@@ -226,18 +266,16 @@ class Config:
         constructor_route_type: Literal["cost", "category"] | None,
     ) -> Literal["cost", "category"]:
         """
-        Get the route type from constructor parameters or user settings.
+        Determine the routing type based on user settings or constructor arguments.
 
         Args:
-            user_settings (Optional[Dict[str, Any]]): User settings containing proxy configuration.
-                If None, the route type will default to constructor_route_type.
-            constructor_route_type (Optional[Literal["cost", "category"]]): Route type specified during object construction.
+            constructor_route_type (Literal["cost", "category"] | None): Routing type specified at object construction.
 
         Returns:
-            Literal["cost", "category"]: The selected route type.
+            Literal["cost", "category"]: The determined route type.
 
         Raises:
-            ValueError: If no route type is specified in either user settings or constructor parameters.
+            UserConfigError: If the route type is not specified or invalid.
         """
 
         user_settings = self.config_cache[self.path_to_yml]
@@ -264,18 +302,17 @@ class Config:
 
     def _setup_models_cost_data(self) -> Dict[str, Any]:
         """
-        Extracts cost data for each model from the given list of settings dictionaries.
+        Extract and return the cost data for each model from configuration settings.
 
         Args:
-        - settings: A list of dictionaries, each containing information about models and their costs.
+            settings (List[Dict[str, Any]]): List of configuration settings for each model.
 
         Returns:
-        A dictionary containing model names as keys and their associated cost data as values.
+            Dict[str, Any]: A dictionary mapping model names to their cost data.
 
         Raises:
-        Exception: If there's any error during processing.
+            KeyError: If expected keys are missing from the settings.
         """
-
         try:
             internal_settings_mod_time = os.path.getmtime(
                 self.path_to_internal_settings
@@ -305,6 +342,19 @@ class Config:
 
 
 class LLMProxy:
+    """
+    Main class for LLM Proxy to route requests.
+
+    This class initializes the proxy with user-defined settings, sets up model adapters,
+    and routes requests to the most suitable models based on the selected routing strategy.
+
+    Attributes:
+        user_models (Dict[str, BaseAdapter]): Models configured by the user, ready for use.
+        available_models (Dict[str, Any]): All models available within the proxy.
+        route_type (Literal["cost", "category"]): Selected routing strategy.
+        models_cost_data (Dict[str, Any]): Cost data for each model used in cost-based routing.
+    """
+
     def __init__(
         self,
         path_to_user_configuration: str = "llmproxy.config.yml",
@@ -315,7 +365,7 @@ class LLMProxy:
         """
         Initialize YourClass instance.
 
-        Parameters:
+        Args:
             path_to_user_configuration (str): Path to user configuration YAML file.
             path_to_env_vars (str): Path to environment variables file.
             route_type (Literal["cost", "category"] | None): Type of route.
@@ -356,6 +406,15 @@ class LLMProxy:
         self,
         prompt: str = "",
     ) -> CompletionResponse:
+        """
+        Routes the request to the appropriate models based on the routing strategy.
+
+        Args:
+            prompt (str): The input prompt to generate text for.
+
+        Returns:
+            CompletionResponse: The generated text response along with any errors encountered.
+        """
         match RouteType(self.route_type):
             case RouteType.COST:
                 return self._cost_route(prompt=prompt)
@@ -365,6 +424,15 @@ class LLMProxy:
                 raise ValueError("Invalid route type, please try again")
 
     def _cost_route(self, prompt: str):
+        """
+        Routes requests based on cost efficiency.
+
+        Args:
+            prompt (str): The input prompt for the text generation.
+
+        Returns:
+            CompletionResponse: The response from the most cost-effective model.
+        """
         min_heap = MinHeap()
         for model_name, instance in self.user_models.items():
             # Load the cost data of the current model to get the estimate routing cost
@@ -438,6 +506,15 @@ class LLMProxy:
         )
 
     def _category_route(self, prompt: str):
+        """
+        Routes requests based on the category proficiency of available models.
+
+        Args:
+            prompt (str): The input prompt for the text generation.
+
+        Returns:
+            CompletionResponse: The response from the model best suited for the prompt's category.
+        """
         min_heap = MinHeap()
         best_fit_category = categorization.categorize_text(prompt)
         for model_name, instance in self.user_models.items():

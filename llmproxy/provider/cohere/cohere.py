@@ -7,6 +7,7 @@ from llmproxy.utils import logger, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import CohereException, UnsupportedModel
 
+# Dictionary mapping Cohere model categories to task performance ratings.
 cohere_category_data = {
     "model-categories": {
         "command": {
@@ -62,6 +63,21 @@ cohere_category_data = {
 
 
 class CohereAdapter(BaseAdapter):
+    """
+    Adapter class for the Cohere language model API.
+
+    This adapter facilitates communication between the LLM Proxy application and the Cohere API,
+    managing API requests and responses, error handling, and cost estimation based on token usage.
+
+    Attributes:
+        prompt (str): Default prompt to use for requests.
+        model (str): Model identifier for the Cohere API.
+        temperature (float): Temperature setting for text generation (creativity).
+        api_key (str): API key for authenticating with the Cohere service.
+        max_output_tokens (int | None): Maximum number of tokens for the model response.
+        timeout (int): Timeout for API requests in seconds.
+    """
+
     def __init__(
         self,
         prompt: str = "",
@@ -79,6 +95,18 @@ class CohereAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
+        """
+        Requests a text completion from the Cohere model.
+
+        Args:
+            prompt (str): Input text prompt for the model.
+
+        Returns:
+            str | None: The text completion result from the model, or None if an error occurs.
+
+        Raises:
+            CohereException: If an error occurs during the API request.
+        """
         try:
             co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
@@ -98,6 +126,19 @@ class CohereAdapter(BaseAdapter):
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
     ) -> float:
+        """
+        Estimates the maximum cost for a given prompt based on token pricing.
+
+        Args:
+            prompt (str): Text prompt for which to estimate cost.
+            price_data (Dict[str, Any]): Pricing data for tokens.
+
+        Returns:
+            float: Estimated maximum cost for the prompt.
+
+        Raises:
+            ValueError: If no prompt is provided.
+        """
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
@@ -128,6 +169,15 @@ class CohereAdapter(BaseAdapter):
         return cost
 
     def get_category_rank(self, category: str = "") -> int:
+        """
+        Retrieves the performance rank of the current model for a specified task category.
+
+        Args:
+            category (str): The task category to retrieve the rank for.
+
+        Returns:
+            int: Rank of the model in the specified category.
+        """
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
