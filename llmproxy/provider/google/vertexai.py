@@ -47,10 +47,13 @@ class VertexAIAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
         self.force_timeout = force_timeout
+        # currently unsupported as chat-bison isn't working
+        # self.chat_history = []
 
     def _make_request(self, prompt, result):
         try:
             aiplatform.init(project=self.project_id, location=self.location)
+            # self.chat_history.append({"author": "user", "content": self.prompt or prompt})
             parameters = {
                 "prompt": prompt or self.prompt,
                 "temperature": self.temperature,
