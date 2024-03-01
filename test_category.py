@@ -7,7 +7,7 @@ from llmproxy.llmproxy import LLMProxy
 
 def main() -> None:
     # prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
-    prompt = "what is 1+1?"
+    prompt = "who discovered gravity?"
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
 
@@ -19,6 +19,14 @@ def main() -> None:
     print("RESPONSE: ", output.response)
     # print("ERRORS: ", output.errors)
     print(f"\nCategory route total time taken: {end-start}")
+
+    prompt = "how old was each person when they died?"
+    output = proxy_client.route(prompt=prompt)
+    print("RESPONSE MODEL: ", output.response_model)
+    print("RESPONSE: ", output.response)
+    # print("ERRORS: ", output.errors)
+    print(f"\nCategory route total time taken: {end-start}")
+
     assert output.response_model
     assert output.response
 
