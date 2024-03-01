@@ -78,6 +78,7 @@ class OpenAIAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.api_key = api_key
         self.timeout = timeout
+        self.chat_history = []
 
     def get_completion(self, prompt: str = "") -> str | None:
         # Prevent API Connection Error with empty API KEY
@@ -89,12 +90,16 @@ class OpenAIAdapter(BaseAdapter):
 
         try:
             client = openai.OpenAI(api_key=self.api_key)
+            self.chat_history.append({"role": "user", "content": prompt or self.prompt})
             response = client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt or self.prompt}],
+                messages=self.chat_history,
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
                 timeout=self.timeout,
+            )
+            self.chat_history.append(
+                {"role": "assistant", "content": response.choices[0].message.content}
             )
 
         except openai.OpenAIError as e:
