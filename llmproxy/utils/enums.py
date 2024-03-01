@@ -8,6 +8,7 @@ class MetaEnum(EnumMeta):
     This metaclass enhances standard Enum functionality by allowing one to check
     if a given item is a valid value of the enum associated with this metaclass.
     """
+
     def __contains__(cls, item):
         """
         Check if the enum contains a given item.
@@ -32,6 +33,7 @@ class BaseEnum(Enum, metaclass=MetaEnum):
     Provides additional methods to list the values, names, or enum instances.
     Inherits from Enum and uses MetaEnum to allow for enhanced functionality.
     """
+
     @classmethod
     def list_values(cls):
         """
