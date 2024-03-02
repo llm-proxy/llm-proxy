@@ -189,7 +189,7 @@ class Config:
                 # Return dict
                 user_models = {}
                 optional_config = constructor_settings
-                if constructor_settings is None:
+                if not constructor_settings:
                     optional_config = (
                         yml_settings.get("optional_configuration", None) or {}
                     )
@@ -249,9 +249,9 @@ class Config:
                 self.config_cache["user_models"] = user_models
 
                 self.mod_times["yml_mod_time"] = yml_mod_time
-                self.mod_times[
-                    "internal_settings_mod_time"
-                ] = internal_settings_mod_time
+                self.mod_times["internal_settings_mod_time"] = (
+                    internal_settings_mod_time
+                )
 
             return self.config_cache["user_models"]
         except UnsupportedModel as e:
