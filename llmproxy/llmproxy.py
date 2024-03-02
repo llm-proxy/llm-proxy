@@ -77,7 +77,6 @@ class Config:
 
         try:
             mod_time = os.path.getmtime(self.path_to_yml)
-            print(mod_time)
 
             if (
                 self.path_to_yml not in self.mod_times
