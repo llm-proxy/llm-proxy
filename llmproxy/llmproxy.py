@@ -152,7 +152,7 @@ def _setup_user_models(
         # Return dict
         user_models = {}
         optional_config = constructor_settings
-        if constructor_settings is None:
+        if not constructor_settings:
             optional_config = yml_settings.get("optional_configuration", None) or {}
 
         # Compare user models with available_models
