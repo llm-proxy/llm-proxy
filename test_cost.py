@@ -12,13 +12,13 @@ def main() -> None:
     # print(output)
 
     start = time.time()
-    proxy_client = LLMProxy()
+    proxy_client = LLMProxy(route_type="cost")
     output = proxy_client.route(prompt=prompt)
     end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
     # print("ERRORS: ", output.errors)
-    print(f"\nCategory route total time taken: {end-start}")
+    print(f"\nCost route total time taken: {end-start}")
     assert output.response_model
     assert output.response
 

@@ -1,11 +1,10 @@
 from typing import Any, Dict
 
-from cohere.client import logger
 from google.cloud import aiplatform
 from vertexai.language_models import TextGenerationModel
 
 from llmproxy.provider.base import BaseAdapter
-from llmproxy.utils import logger, timeout, tokenizer
+from llmproxy.utils import logger, timeout_function, tokenizer
 from llmproxy.utils.enums import BaseEnum
 from llmproxy.utils.exceptions.provider import UnsupportedModel, VertexAIException
 
@@ -107,7 +106,7 @@ class VertexAIAdapter(BaseAdapter):
         if not self.force_timeout:
             self._make_request(prompt, result)
         else:
-            timeout.timeout_wrapper(
+            timeout_function.timeout_wrapper(
                 self._make_request, self.timeout, prompt=prompt, result=result
             )
 
