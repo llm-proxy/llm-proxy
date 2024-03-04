@@ -40,5 +40,5 @@ class MinHeap:
         if self.heap:
             _, _, data = heapq.heappop(self.heap)
             return {"data": data}
-        else:
-            return None
+
+        return None
