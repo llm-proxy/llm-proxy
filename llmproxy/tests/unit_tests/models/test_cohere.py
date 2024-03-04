@@ -30,48 +30,17 @@ def test_cohere_invalid_api_key() -> None:
         cohere_llm.get_completion(prompt)
 
 
-# TODO: More so integration tests as it seems to make the API call, save for later
-# def test_cohere_negative_max_token() -> None:
-#     # Arrange
-#     num_tokens = -100
-#     cohere_llm = CohereAdapter(api_key=cohere_api_key, max_output_tokens=num_tokens)
-#     # Act + Assert
-#     with pytest.raises(CohereException):
-#         cohere_llm = CohereAdapter(
-#             api_key=cohere_api_key,
-#             max_output_tokens=num_tokens,
-#         )
-#
-#         cohere_llm.get_completion()
-#
-#
-# def test_cohere_negative_temperature() -> None:
-#     # Arrange
-#     prompt = "whats 1+1?"
-#     temperature = -5
-#     # Act + Assert
-#     with pytest.raises(CohereException):
-#         cohere_llm = CohereAdapter(
-#             prompt=prompt,
-#             api_key=cohere_api_key,
-#             max_output_tokens=1000,
-#             temperature=temperature,
-#         )
-#
-#         cohere_llm.get_completion()
-#
-#
-# def test_cohere_temperature_above_five() -> None:
-#     # Arrange
-#     prompt = "whats 1+1?"
-#     temperature = 6
-#     # Act + Assert
-#     with pytest.raises(CohereException):
-#         cohere_llm = CohereAdapter(
-#             prompt=prompt,
-#             api_key=cohere_api_key,
-#             max_output_tokens=1000,
-#             temperature=temperature,
-#         )
-#
-#         cohere_llm.get_completion()
+# TODO: Slowing down Unit tests, TEST LATER IN INTEGRATION TESTS
+def test_mistral_get_estimated_max_cost():
+    # Arrange
+    cohere = CohereAdapter(api_key=cohere_api_key, max_output_tokens=256)
+    expected_cost = 6.44e-05
+    prompt = "I am a cat in a hat!"
+    price_data = {"prompt": 5e-08, "completion": 2.5e-07}
+    # Act
+    actual_cost = cohere.get_estimated_max_cost(prompt=prompt, price_data=price_data)
+
+    # Assert
+    assert (
+        actual_cost == expected_cost
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

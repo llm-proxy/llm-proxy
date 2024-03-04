@@ -230,3 +230,29 @@ def test_llmproxy_constructor_route_type_override(tmp_path):
     )
 
     assert proxy.route_type == "category"
+
+
+def test_no_route_type_specified_throws_error(tmp_path):
+    yml_content = """
+    provider_settings:
+      - provider: OpenAI
+        api_key_var: OPENAI_API_KEY
+        max_output_tokens: 256
+        temperature: 0.1
+        models:
+            - gpt-3.5-turbo-instruct
+            - gpt-3.5-turbo-1106
+            - gpt-4
+            - gpt-4-32k
+    """
+    yml_path = tmp_path / "test_settings.yml"
+    with open(yml_path, "w", encoding="utf-8") as file:
+        file.write(yml_content)
+
+    with pytest.raises(UserConfigError):
+        proxy = LLMProxy(
+            path_to_user_configuration=yml_path,
+            path_to_env_vars=PATH_TO_ENV_TEST,
+        )
+
+        proxy.route(prompt="what is 1 + 1")
