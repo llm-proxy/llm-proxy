@@ -1,11 +1,7 @@
-import os
-import shutil
-
 import click
 import requests
-import yaml
 
-link_to_proxy_config = (
+LINK_TO_CONFIG = (
     "https://raw.githubusercontent.com/llm-proxy/llm-proxy/main/llmproxy.config.yml"
 )
 
@@ -20,7 +16,7 @@ FILE_NAME = "llmproxy.config.yml"
 )
 def cli(default_config):
     if default_config:
-        res = requests.get(link_to_proxy_config, allow_redirects=True)
+        res = requests.get(LINK_TO_CONFIG, allow_redirects=True)
 
         if res.status_code == 200:
             with open(FILE_NAME, "wb") as file:
