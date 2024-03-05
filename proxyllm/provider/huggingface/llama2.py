@@ -14,7 +14,7 @@ from proxyllm.utils.exceptions.provider import (
 # Mapping of Llama-2 model categories to their respective task performance ratings.
 llama2_category_data = {
     "model-categories": {
-        "Llama-2-7b-chat-hf": {
+        "llama-2-7b-chat-hf": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
@@ -26,7 +26,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
-        "Llama-2-13b-chat-hf": {
+        "llama-2-13b-chat-hf": {
             "Code Generation Task": 1,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 1,
@@ -38,7 +38,7 @@ llama2_category_data = {
             "Financial Task": 2,
             "Content Recommendation Task": 1,
         },
-        "Llama-2-70b-chat-hf": {
+        "llama-2-70b-chat-hf": {
             "Code Generation Task": 1,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 1,
@@ -50,7 +50,7 @@ llama2_category_data = {
             "Financial Task": 1,
             "Content Recommendation Task": 1,
         },
-        "Llama-2-7b-chat": {
+        "llama-2-7b-chat": {
             "Code Generation Task": 4,
             "Text Generation Task": 5,
             "Translation and Multilingual Applications Task": 4,
@@ -62,7 +62,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 4,
         },
-        "Llama-2-7b-hf": {
+        "llama-2-7b-hf": {
             "Code Generation Task": 4,
             "Text Generation Task": 5,
             "Translation and Multilingual Applications Task": 4,
@@ -74,7 +74,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 4,
         },
-        "Llama-2-7b": {
+        "llama-2-7b": {
             "Code Generation Task": 4,
             "Text Generation Task": 5,
             "Translation and Multilingual Applications Task": 4,
@@ -86,7 +86,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 4,
         },
-        "Llama-2-13b-chat": {
+        "llama-2-13b-chat": {
             "Code Generation Task": 3,
             "Text Generation Task": 3,
             "Translation and Multilingual Applications Task": 3,
@@ -98,7 +98,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 3,
         },
-        "Llama-2-13b-hf": {
+        "llama-2-13b-hf": {
             "Code Generation Task": 3,
             "Text Generation Task": 3,
             "Translation and Multilingual Applications Task": 3,
@@ -110,7 +110,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 3,
         },
-        "Llama-2-13b": {
+        "llama-2-13b": {
             "Code Generation Task": 3,
             "Text Generation Task": 3,
             "Translation and Multilingual Applications Task": 3,
@@ -122,7 +122,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 3,
         },
-        "Llama-2-70b-chat": {
+        "llama-2-70b-chat": {
             "Code Generation Task": 3,
             "Text Generation Task": 3,
             "Translation and Multilingual Applications Task": 3,
@@ -134,7 +134,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 3,
         },
-        "Llama-2-70b-hf": {
+        "llama-2-70b-hf": {
             "Code Generation Task": 3,
             "Text Generation Task": 3,
             "Translation and Multilingual Applications Task": 3,
@@ -146,7 +146,7 @@ llama2_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 3,
         },
-        "Llama-2-70b": {
+        "llama-2-70b": {
             "Code Generation Task": 3,
             "Text Generation Task": 3,
             "Translation and Multilingual Applications Task": 3,

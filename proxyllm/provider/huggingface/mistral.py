@@ -10,7 +10,7 @@ from proxyllm.utils.exceptions.provider import MistralException, UnsupportedMode
 # Mapping of Mistral model categories to their task performance ratings.
 mistral_category_data = {
     "model-categories": {
-        "Mistral-7B-v0.1": {
+        "mistral-7b-v0.1": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
@@ -22,7 +22,7 @@ mistral_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
-        "Mistral-8x7B-Instruct-v0.1": {
+        "mistral-8x7b-instruct-v0.1": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
@@ -34,7 +34,7 @@ mistral_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
-        "Mistral-7B-Instruct-v0.2": {
+        "mistral-7b-instruct-v0.2": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
