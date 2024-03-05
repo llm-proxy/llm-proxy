@@ -26,3 +26,7 @@ def cli(default_config):
             click.echo(
                 f"{FILE_NAME} not installed! Please try copying the file manually."
             )
+
+
+if __name__ == "__main__":
+    cli()
