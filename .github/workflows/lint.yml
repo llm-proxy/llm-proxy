@@ -3,14 +3,13 @@ name: Formatting
 on: push
 
 jobs:
-    
   black-formatter:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       - name: Setup python
         uses: actions/setup-python@v4
         with:
@@ -20,6 +19,5 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --diff --color"
-          src: "./llmproxy"
+          src: "./proxyllm"
           version: "~= 22.0"
-            

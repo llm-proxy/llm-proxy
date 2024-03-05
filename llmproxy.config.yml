@@ -3,7 +3,7 @@ proxy_configuration:
 
 optional_configuration:
   timeout: 10 # Timeout for request to models
-  force_timeout: true # WARNING: This can cause additonal costs!
+  force_timeout: false # WARNING: This can cause additonal costs!
 
 provider_settings:
   - provider: OpenAI
@@ -50,9 +50,9 @@ provider_settings:
     max_output_tokens: 256
     temperature: 0.1
     models:
-      - Mistral-7B-v0.1
-      - Mistral-7B-Instruct-v0.2
-      - Mistral-8x7B-Instruct-v0.1
+      - mistral-7b-v0.1
+      - mistral-7b-instruct-v0.2
+      - mistral-8x7b-instruct-v0.1
 
   - provider: VertexAI
     temperature: 0.1
