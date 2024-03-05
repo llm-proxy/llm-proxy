@@ -30,8 +30,8 @@ coverage = "^7.3.2"
 [tool.pytest.ini_options]
 # filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = [
-    "llmproxy/tests/unit_tests",
-    "llmproxy/tests/integration_tests"
+    "proxyllm/tests/unit_tests",
+    "proxyllm/tests/integration_tests"
 ]
 
 pythonpath = ["."]

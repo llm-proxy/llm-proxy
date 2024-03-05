@@ -1,4 +1,4 @@
-# from llmproxy.utils import categorization
+# from proxyllm.utils import categorization
 
 # Ommited to speed up unit tests, as cateogry routing foucs is shifted to effectiveness/proficency routing
 # def test_categorize_text_returns_expected_category():
