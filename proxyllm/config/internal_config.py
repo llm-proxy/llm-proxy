@@ -51,62 +51,62 @@ internal_config: List[Dict[str, Any]] = [
         "adapter_path": "proxyllm.provider.huggingface.llama2.Llama2Adapter",
         "models": [
             {
-                "name": "Llama-2-7b-chat-hf",
+                "name": "llama-2-7b-chat-hf",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Llama-2-7b-chat",
+                "name": "llama-2-7b-chat",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Llama-2-7b-hf",
+                "name": "llama-2-7b-hf",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Llama-2-7b",
+                "name": "llama-2-7b",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Llama-2-13b-chat-hf",
+                "name": "llama-2-13b-chat-hf",
                 "cost_per_token_input": 1e-07,
                 "cost_per_token_output": 5e-07,
             },
             {
-                "name": "Llama-2-13b-chat",
+                "name": "llama-2-13b-chat",
                 "cost_per_token_input": 1e-07,
                 "cost_per_token_output": 5e-07,
             },
             {
-                "name": "Llama-2-13b-hf",
+                "name": "llama-2-13b-hf",
                 "cost_per_token_input": 1e-07,
                 "cost_per_token_output": 5e-07,
             },
             {
-                "name": "Llama-2-13b",
+                "name": "llama-2-13b",
                 "cost_per_token_input": 1e-07,
                 "cost_per_token_output": 5e-07,
             },
             {
-                "name": "Llama-2-70b-chat-hf",
+                "name": "llama-2-70b-chat-hf",
                 "cost_per_token_input": 6.5e-07,
                 "cost_per_token_output": 2.75e-06,
             },
             {
-                "name": "Llama-2-70b-chat",
+                "name": "llama-2-70b-chat",
                 "cost_per_token_input": 6.5e-07,
                 "cost_per_token_output": 2.75e-06,
             },
             {
-                "name": "Llama-2-70b-hf",
+                "name": "llama-2-70b-hf",
                 "cost_per_token_input": 6.5e-07,
                 "cost_per_token_output": 2.75e-06,
             },
             {
-                "name": "Llama-2-70b",
+                "name": "llama-2-70b",
                 "cost_per_token_input": 6.5e-07,
                 "cost_per_token_output": 2.75e-06,
             },
@@ -117,17 +117,17 @@ internal_config: List[Dict[str, Any]] = [
         "adapter_path": "proxyllm.provider.huggingface.mistral.MistralAdapter",
         "models": [
             {
-                "name": "Mistral-7B-v0.1",
+                "name": "mistral-7b-v0.1",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Mistral-7B-Instruct-v0.2",
+                "name": "mistral-7b-instruct-v0.2",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Mistral-8x7B-Instruct-v0.1",
+                "name": "mistral-8x7b-instruct-v0.1",
                 "cost_per_token_input": 3e-07,
                 "cost_per_token_output": 1e-06,
             },

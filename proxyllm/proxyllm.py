@@ -169,7 +169,10 @@ def _setup_user_models(
 
                 # Loop through user's provider's models and set up instance of model if available
                 for model in provider["models"]:
-                    if model not in available_models[provider_name]["models"]:
+                    model_lower = (
+                        model.lower()  # Do this do avoid case errors with user inputs
+                    )
+                    if model_lower not in available_models[provider_name]["models"]:
                         raise UnsupportedModel(
                             f"{model} is not available, yet!",
                             error_type="UnsupportedModel",
@@ -179,7 +182,7 @@ def _setup_user_models(
                     common_parameters = {
                         "max_output_tokens": provider["max_output_tokens"],
                         "temperature": provider["temperature"],
-                        "model": model,
+                        "model": model_lower,
                         "timeout": optional_config.get("timeout", None),
                     }
 
@@ -203,7 +206,7 @@ def _setup_user_models(
                     model_instance = available_models[provider_name][
                         "adapter_instance"
                     ](**common_parameters)
-                    user_models[model] = model_instance
+                    user_models[model_lower] = model_instance
 
         return user_models
     except UnsupportedModel as e:
