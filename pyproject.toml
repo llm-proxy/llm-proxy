@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "llmproxy"
-version = "0.1.0"
+name = "proxyllm"
+version = "0.1.3"
 description = "LLM Proxy to reduce cost and complexity of using multiple LLMs"
 authors = ["laxitshahi"]
 readme = "README.md"
@@ -34,8 +34,8 @@ coverage = "^7.3.2"
 [tool.pytest.ini_options]
 # filterwarnings = ["ignore::DeprecationWarning"]
 testpaths = [
-    "llmproxy/tests/unit_tests",
-    "llmproxy/tests/integration_tests"
+    "tests/unit_tests",
+    "tests/integration_tests"
 ]
 
 pythonpath = ["."]
