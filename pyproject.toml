@@ -12,13 +12,13 @@ cohere = "^4.27"
 tiktoken = "^0.5.1"
 tokenizers = "^0.14.1"
 transformers = {extras = ["torch"], version = "^4.35.2"}
-torch = "^2.1.0"
 google-cloud-aiplatform = "^1.35.0"
 pyyaml = "^6.0.1"
 datasets = "^2.14.7"
 evaluate = "^0.4.1"
 openai = "^1.11.1"
 click = "^8.1.7"
+torch = "2.1.0"
 
 [tool.poetry.scripts]
 config = "proxyllm.cli:cli"
