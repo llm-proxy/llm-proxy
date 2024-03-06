@@ -18,7 +18,7 @@ datasets = "^2.14.7"
 evaluate = "^0.4.1"
 openai = "^1.11.1"
 click = "^8.1.7"
-torch = "2.1.2"
+torch = "^2.1.2"
 
 [tool.poetry.scripts]
 config = "proxyllm.cli:cli"
