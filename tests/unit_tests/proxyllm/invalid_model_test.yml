@@ -21,7 +21,7 @@ provider_settings:
       - gpt-4-32k
 
   - provider: Llama2
-    class: llmproxy.provider.huggingface.llama2.Llama2
+    class: proxyllm.provider.huggingface.llama2.Llama2
     models:
       - name: Llama-2-7b-chat-hf
         cost_per_hour: 0.06
@@ -31,7 +31,7 @@ provider_settings:
         cost_per_hour: 0.06
 
   - provider: Mistral
-    class: llmproxy.provider.huggingface.mistral.Mistral
+    class: proxyllm.provider.huggingface.mistral.Mistral
     models:
       - name: Mistral-7B-v0.1
         cost_per_hour: 0.06
