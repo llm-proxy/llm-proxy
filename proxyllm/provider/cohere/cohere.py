@@ -4,8 +4,7 @@ import cohere
 
 from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import CohereException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import CohereException
 
 # Dictionary mapping Cohere model categories to task performance ratings.
 cohere_category_data = {

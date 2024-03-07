@@ -5,8 +5,7 @@ from vertexai.language_models import TextGenerationModel
 
 from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, timeout_function, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import UnsupportedModel, VertexAIException
+from proxyllm.utils.exceptions.provider import VertexAIException
 
 # Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {

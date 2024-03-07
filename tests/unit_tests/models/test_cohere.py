@@ -4,7 +4,7 @@ import pytest
 from dotenv import load_dotenv
 
 from proxyllm.provider.cohere.cohere import CohereAdapter
-from proxyllm.utils.exceptions.provider import CohereException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import CohereException
 
 load_dotenv(".env.test")
 

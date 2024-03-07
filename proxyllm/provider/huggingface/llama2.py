@@ -4,12 +4,7 @@ import requests
 
 from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import (
-    EmptyPrompt,
-    Llama2Exception,
-    UnsupportedModel,
-)
+from proxyllm.utils.exceptions.provider import EmptyPrompt, Llama2Exception
 
 # Mapping of Llama-2 model categories to their respective task performance ratings.
 llama2_category_data = {

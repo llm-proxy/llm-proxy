@@ -10,7 +10,6 @@ import pytest
 from dotenv import load_dotenv
 
 from proxyllm.provider.google.vertexai import VertexAIAdapter, VertexAIException
-from proxyllm.utils.exceptions.provider import UnsupportedModel
 
 load_dotenv(".env.test")
 project_id = os.getenv("GOOGLE_PROJECT_ID")

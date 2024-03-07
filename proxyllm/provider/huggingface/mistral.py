@@ -4,8 +4,7 @@ import requests
 
 from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import MistralException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import MistralException
 
 # Mapping of Mistral model categories to their task performance ratings.
 mistral_category_data = {
