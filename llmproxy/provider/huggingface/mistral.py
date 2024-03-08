@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 import requests
-
+from huggingface_hub import InferenceClient
 from llmproxy.provider.base import BaseAdapter
 from llmproxy.utils import logger, tokenizer
 from llmproxy.utils.enums import BaseEnum
@@ -65,36 +65,36 @@ class MistralAdapter(BaseAdapter):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
-        self.chat_history = []
+        self.generated_responses = []
+        self.past_user_inputs = []
 
     def get_completion(self, prompt: str = "") -> str:
         if not self.api_key:
             raise ValueError("No Hugging Face API Key Provided")
 
         try:
-            api_url = (
-                f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
-            )
+            API_URL = "https://api-inference.huggingface.co/pipeline/conversational/facebook/blenderbot-400M-distill"
             headers = {"Authorization": f"Bearer {self.api_key}"}
 
+            """For mistral use: mistralai/{self.model}"""
+            # API_URL = "https://api-inference.huggingface.co/pipeline/conversational/mistralai/Mixtral-8x7B-Instruct-v0.1"
+
             def query(payload):
-                response = requests.post(api_url, headers=headers, json=payload)
+                response = requests.post(API_URL, headers=headers, json=payload)
                 return response.json()
 
-            # Llama2 prompt template
-            prompt_template = f"<s> [INST] {prompt or self.prompt} [/INST]"
-            
-            self.chat_history.append(prompt_template)
             output = query(
                 {
-                    "inputs": prompt or self.prompt,
-                    "parameters": {
-                        "temperature": self.temperature,
-                        "max_length": self.max_output_tokens,
-                        "max_time": self.timeout,
+                    "inputs": {
+                        "past_user_inputs": self.past_user_inputs,
+                        "generated_responses": self.generated_responses,
+                        "text": prompt or self.prompt,
                     },
                 }
             )
+            print(output)
+            self.past_user_inputs = output["conversation"]["past_user_inputs"]
+            self.generated_responses = output["conversation"]["generated_responses"]
 
         except requests.RequestException as e:
             raise MistralException(
@@ -108,10 +108,8 @@ class MistralAdapter(BaseAdapter):
         # Output will be a dict if there is an error
         if "error" in output:
             raise MistralException(f"{output['error']}", error_type="MistralError")
-
         # Output will be a List[dict] if there is no error
-        self.chat_history.append(f"{output[0]["generated_text"]}</s>")
-        return output[0]["generated_text"]
+        return output["generated_text"]
 
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
@@ -141,6 +139,10 @@ class MistralAdapter(BaseAdapter):
         logger.log(msg=f"COST: {cost}", color="GREEN")
 
         return cost
+
+    def clear_chat(self) -> None:
+        self.generated_responses = []
+        self.past_user_inputs = []
 
     def get_category_rank(self, category: str = "") -> int:
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
