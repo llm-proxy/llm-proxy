@@ -405,11 +405,8 @@ class LLMProxy:
             logger.log(msg=f"Making request to model:{instance_data['name']}")
             logger.log(msg="ROUTING...")
 
-            # Attempt to make request to model
             try:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
-                # CustomLogger.loading_animation_sucess()
-
                 response_model = instance_data["name"]
                 logger.log(
                     msg="==========COST ROUTING COMPLETE! Call to model successful!==========",
@@ -417,8 +414,13 @@ class LLMProxy:
                 )
                 logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
-                ## CustomLogger.loading_animation_failure()
-                errors.append({"model_name": instance_data["name"], "error": e})
+                errors.append(
+                    {
+                        "model_name": instance_data["name"],
+                        "error_type": e.__class__.__name__,
+                        "error": str(e),
+                    }
+                )
 
                 logger.log(
                     level="ERROR",
@@ -494,7 +496,13 @@ class LLMProxy:
                 )
                 logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
-                errors.append({"model_name": instance_data["name"], "error": e})
+                errors.append(
+                    {
+                        "model_name": instance_data["name"],
+                        "error_type": e.__class__.__name__,
+                        "error": str(e),
+                    }
+                )
 
                 logger.log(
                     level="ERROR",
