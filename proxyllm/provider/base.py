@@ -1,5 +1,13 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Any, Dict
+
+
+@dataclass
+class EstimatedCostResponse:
+    cost: float
+    num_of_input_tokens: int
+    num_of_output_tokens: int
 
 
 class BaseAdapter(ABC):
@@ -23,7 +31,7 @@ class BaseAdapter(ABC):
     @abstractmethod
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    ) -> EstimatedCostResponse:
         """
         Abstract method to retrieve estimated for a given prompt.
 

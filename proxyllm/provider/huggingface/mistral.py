@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import requests
 
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, EstimatedCostResponse
 from proxyllm.utils import logger, tokenizer
 from proxyllm.utils.enums import BaseEnum
 from proxyllm.utils.exceptions.provider import MistralException, UnsupportedModel
@@ -138,7 +138,7 @@ class MistralAdapter(BaseAdapter):
 
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    ) -> EstimatedCostResponse:
         """
         Estimates the cost for a given prompt based on predefined pricing data.
 
@@ -155,18 +155,10 @@ class MistralAdapter(BaseAdapter):
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
-        # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
         prompt_cost_per_token = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
-
         completion_cost_per_token = price_data["completion"]
-        logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
 
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
@@ -174,9 +166,11 @@ class MistralAdapter(BaseAdapter):
             8,
         )
 
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
+        return EstimatedCostResponse(
+            cost=cost,
+            num_of_input_tokens=len(tokens.tokens),
+            num_of_output_tokens=self.max_output_tokens,
+        )
 
     def get_category_rank(self, category: str = "") -> int:
         """

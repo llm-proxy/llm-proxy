@@ -1,8 +1,6 @@
 from typing import Any, Dict
 
-import cohere
-
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, EstimatedCostResponse
 from proxyllm.utils import logger, tokenizer
 from proxyllm.utils.enums import BaseEnum
 from proxyllm.utils.exceptions.provider import CohereException, UnsupportedModel
@@ -107,8 +105,11 @@ class CohereAdapter(BaseAdapter):
         Raises:
             CohereException: If an error occurs during the API request.
         """
+
+        from cohere import Client, CohereError
+
         try:
-            co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
+            co = Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
                 max_tokens=self.max_output_tokens,
                 message=prompt or self.prompt,
@@ -116,7 +117,7 @@ class CohereAdapter(BaseAdapter):
                 temperature=self.temperature,
             )
             return response.text
-        except cohere.CohereError as e:
+        except CohereError as e:
             raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
             raise CohereException(
@@ -125,7 +126,7 @@ class CohereAdapter(BaseAdapter):
 
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    ) -> EstimatedCostResponse:
         """
         Estimates the maximum cost for a given prompt based on token pricing.
 
@@ -142,21 +143,11 @@ class CohereAdapter(BaseAdapter):
         if not self.prompt and not prompt:
             raise ValueError("No prompt provided.")
 
-        # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
         prompt_cost_per_token = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
-
         completion_cost_per_token = price_data["completion"]
-
-        logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
-
         # Note: Avoiding costs for now
         # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
         tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
         cost = round(
             prompt_cost_per_token * len(tokens)
@@ -164,9 +155,11 @@ class CohereAdapter(BaseAdapter):
             8,
         )
 
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
+        return EstimatedCostResponse(
+            cost=cost,
+            num_of_input_tokens=len(tokens.tokens),
+            num_of_output_tokens=self.max_output_tokens,
+        )
 
     def get_category_rank(self, category: str = "") -> int:
         """

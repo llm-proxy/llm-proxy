@@ -170,7 +170,7 @@ def _setup_user_models(
                 # Loop through user's provider's models and set up instance of model if available
                 for model in provider["models"]:
                     model_lower = (
-                        model.lower()  # Do this do avoid case errors with user inputs
+                        model.lower()  # Do this to avoid case errors with user inputs
                     )
                     if model_lower not in available_models[provider_name]["models"]:
                         raise UnsupportedModel(
@@ -206,6 +206,7 @@ def _setup_user_models(
                     model_instance = available_models[provider_name][
                         "adapter_instance"
                     ](**common_parameters)
+
                     user_models[model_lower] = model_instance
 
         return user_models
@@ -319,6 +320,7 @@ class LLMProxy:
                 Only pass in optional_configuration paramters settings that you want to override
         """
         load_dotenv(path_to_env_vars)
+
         # Read YML for user settings
         user_settings = _get_settings_from_yml(path_to_yml=path_to_user_configuration)
 
@@ -373,24 +375,43 @@ class LLMProxy:
             CompletionResponse: The response from the most cost-effective model.
         """
         min_heap = MinHeap()
+        import time
+
+        t1 = time.perf_counter()
         for model_name, instance in self.user_models.items():
-            # Load the cost data of the current model to get the estimate routing cost
             try:
                 logger.log(msg="========Start Cost Estimation===========")
-                model_price_data = self.models_cost_data[model_name]
-                cost = instance.get_estimated_max_cost(
-                    prompt=prompt, price_data=model_price_data
+
+                logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
+                logger.log(
+                    msg=f"PROMPT (COST/CHARACTER): {self.models_cost_data[model_name]['prompt']}"
+                )
+                logger.log(
+                    msg=f"PROMPT (COST/CHARACTER): {self.models_cost_data[model_name]['completion']}"
                 )
 
-                logger.log(msg="========End Cost Estimation===========\n")
+                cost_data = instance.get_estimated_max_cost(
+                    prompt=prompt, price_data=self.models_cost_data[model_name]
+                )
 
-                item = {"name": model_name, "cost": cost, "instance": instance}
-                min_heap.push(cost, item)
+                item = {
+                    "name": model_name,
+                    "cost": cost_data.cost,
+                    "instance": instance,
+                }
+                min_heap.push(cost_data.cost, item)
+
+                logger.log(msg=f"INPUT TOKENS: {cost_data.num_of_input_tokens}")
+                logger.log(msg=f"COMPLETION TOKENS: {cost_data.num_of_output_tokens}")
+
+                logger.log(msg=f"COST: {cost_data.cost}", color="GREEN")
+                logger.log(msg="========End Cost Estimation===========\n")
             except Exception as e:
                 logger.log(level="ERROR", msg=str(e))
                 logger.log(level="ERROR", msg="(¬_¬)", file_logger_on=False)
                 logger.log(msg="========End Cost Estimation===========\n")
 
+        print(time.perf_counter() - t1)
         completion_res = None
         errors = []
         response_model = ""
