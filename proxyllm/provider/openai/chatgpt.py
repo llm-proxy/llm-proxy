@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import tiktoken
 
-from proxyllm.provider.base import BaseAdapter, EstimatedCostResponse
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger
 from proxyllm.utils.exceptions.provider import OpenAIException, UnsupportedModel
 
@@ -138,43 +138,27 @@ class OpenAIAdapter(BaseAdapter):
 
         return response.choices[0].message.content or None
 
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> EstimatedCostResponse:
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
-        Estimates the maximum cost for processing a given prompt based on token pricing.
+        Tokenizes the provided prompt using the tokenizer.
 
         Args:
-            prompt (str): The text prompt for which to estimate the cost.
-            price_data (Dict[str, Any]): Pricing data for tokens.
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
 
         Returns:
-            float: The estimated cost for processing the prompt.
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
 
-        Raises:
-            ValueError: If no prompt is provided and no default prompt is set.
+        Note:
+            This method currently avoids calculating costs for tokenization.
         """
-        if not self.prompt and not prompt:
-            raise ValueError("No prompt provided.")
-
-        # Assumption, model exists (check should be done at yml load level)
         encoder = tiktoken.encoding_for_model(self.model)
-
-        prompt_cost_per_token = price_data["prompt"]
-        completion_cost_per_token = price_data["completion"]
 
         tokens = encoder.encode(prompt or self.prompt)
 
-        cost = round(
-            prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * self.max_output_tokens,
-            8,
-        )
-
-        return EstimatedCostResponse(
-            cost=cost,
+        return TokenizeResponse(
             num_of_input_tokens=len(tokens),
-            num_of_output_tokens=self.max_output_tokens,
+            num_of_output_tokens=self.max_output_tokens or 256,
         )
 
     def get_category_rank(self, category: str = "") -> int:

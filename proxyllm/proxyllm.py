@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from proxyllm.config.internal_config import internal_config
 from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import categorization, logger
+from proxyllm.utils.cost import calculate_estimated_max_cost
 from proxyllm.utils.enums import BaseEnum
 from proxyllm.utils.exceptions.llmproxy_client import (
     LLMProxyConfigError,
@@ -374,10 +375,13 @@ class LLMProxy:
         Returns:
             CompletionResponse: The response from the most cost-effective model.
         """
-        min_heap = MinHeap()
-        import time
 
-        t1 = time.perf_counter()
+        if not prompt or prompt.isspace():
+            raise ValueError("No prompt provided.")
+
+        min_heap = MinHeap()
+        provider_token_data = {}
+
         for model_name, instance in self.user_models.items():
             try:
                 logger.log(msg="========Start Cost Estimation===========")
@@ -390,28 +394,40 @@ class LLMProxy:
                     msg=f"PROMPT (COST/CHARACTER): {self.models_cost_data[model_name]['completion']}"
                 )
 
-                cost_data = instance.get_estimated_max_cost(
-                    prompt=prompt, price_data=self.models_cost_data[model_name]
+                instance_provider = instance.__class__.__name__
+
+                # Save token data per provider
+                if instance_provider not in provider_token_data:
+                    provider_token_data[instance_provider] = instance.tokenize(
+                        prompt=prompt
+                    )
+
+                token_data = provider_token_data[instance_provider]
+
+                cost = calculate_estimated_max_cost(
+                    price_data=self.models_cost_data[model_name],
+                    num_of_input_tokens=token_data.num_of_input_tokens,
+                    max_output_tokens=token_data.num_of_output_tokens,
                 )
 
                 item = {
                     "name": model_name,
-                    "cost": cost_data.cost,
+                    "cost": cost,
                     "instance": instance,
                 }
-                min_heap.push(cost_data.cost, item)
 
-                logger.log(msg=f"INPUT TOKENS: {cost_data.num_of_input_tokens}")
-                logger.log(msg=f"COMPLETION TOKENS: {cost_data.num_of_output_tokens}")
+                min_heap.push(cost, item)
 
-                logger.log(msg=f"COST: {cost_data.cost}", color="GREEN")
+                logger.log(msg=f"INPUT TOKENS: {token_data.num_of_input_tokens}")
+                logger.log(msg=f"COMPLETION TOKENS: {token_data.num_of_output_tokens}")
+
+                logger.log(msg=f"COST: {cost}", color="GREEN")
                 logger.log(msg="========End Cost Estimation===========\n")
             except Exception as e:
                 logger.log(level="ERROR", msg=str(e))
                 logger.log(level="ERROR", msg="(¬_¬)", file_logger_on=False)
                 logger.log(msg="========End Cost Estimation===========\n")
 
-        print(time.perf_counter() - t1)
         completion_res = None
         errors = []
         response_model = ""
