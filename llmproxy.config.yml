@@ -22,8 +22,8 @@ provider_settings:
     max_output_tokens: 256
     temperature: 0.1
     models:
-      - Llama-2-7b-hf
-      - Llama-2-7b-chat-hf
+      # - Llama-2-7b-hf
+      # - Llama-2-7b-chat-hf
       - Llama-2-13b-hf
       - Llama-2-13b-chat-hf
       - Llama-2-70b-hf

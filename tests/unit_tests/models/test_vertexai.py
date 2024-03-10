@@ -35,7 +35,9 @@ def test_get_estimated_max_cost():
     price_data = {"prompt": 1.5e-06, "completion": 2e-06}
 
     # Act
-    actual_cost = vertex.get_estimated_max_cost(prompt=prompt, price_data=price_data)
+    actual_cost = vertex.get_estimated_max_cost(
+        prompt=prompt, price_data=price_data
+    ).cost
 
     # Assert
     assert (

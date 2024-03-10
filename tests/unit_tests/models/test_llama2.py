@@ -59,7 +59,9 @@ def test_llama2_get_estimated_max_cost():
     prompt = "I am a cat in a hat!"
     price_data = {"prompt": 5e-08, "completion": 2.5e-07}
     # Act
-    actual_cost = llama2.get_estimated_max_cost(prompt=prompt, price_data=price_data)
+    actual_cost = llama2.get_estimated_max_cost(
+        prompt=prompt, price_data=price_data
+    ).cost
 
     # Assert
     assert (
