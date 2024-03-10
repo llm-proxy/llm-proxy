@@ -78,30 +78,35 @@ There are 2 ways to get started. You can directly clone the repo into your proje
 ### Installation
 
 With pip:
+
 ```shell
 pip install proxyllm
 ```
 
 With poetry:
+
 ```shell
 poetry add proxyllm
 ```
 
 Run the install script for the default configuration file:
+
 ```shell
 config --default-config
 ```
 
 If you prefer poetry:
+
 ```shell
 poetry run config --default-config
 ```
 
-> If the installation script does not work, you can visit the [repo](https://github.com/llm-proxy/llm-proxy/blob/main/llmproxy.config.yml) to grab a copy manually.
+> If the installation scripts do not work, you can visit the [repo](https://github.com/llm-proxy/llm-proxy/blob/main/llmproxy.config.yml) to grab a copy manually.
 
-> Ensure that you have all of your API keys for each respective provider in the .env file (You can utilize the .env.example for reference)
+**Note:**
 
-> **Note:** For Google's models, you will need the path to application credentials, and the project ID inside of the .env
+- Ensure that you have all of your API keys for each respective provider in the .env file (You can utilize the .env.example for reference)
+- For Google's models, you will need the path to application credentials, and the project ID inside of the .env
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
