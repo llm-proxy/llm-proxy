@@ -29,19 +29,17 @@ def test_invalid_api_key():
         chatbot.get_completion()
 
 
-# TODO: Slowing down Unit tests too much, TEST LATER IN INTEGRATION TESTS
-def test_get_estimated_max_cost():
+def test_openai_tokenize_returns_expected_num_of_input_tokens():
     # Arrange
-    gpt = OpenAIAdapter(
-        api_key=openai_api_key, max_output_tokens=256, model="gpt-3.5-turbo-1106"
-    )
-    expected_cost = 0.00052
-    prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 1e-06, "completion": 2e-06}
+    expected_num_of_input_tokens = 10
+    max_output_tokens = 256
+    openai = OpenAIAdapter(api_key=openai_api_key, max_output_tokens=100, model="gpt-4")
+    prompt = "The quick brown fox jumps over the lazy dog."
+
     # Act
-    actual_cost = gpt.get_estimated_max_cost(prompt=prompt, price_data=price_data).cost
+    encoding = openai.tokenize(prompt=prompt)
 
     # Assert
     assert (
-        actual_cost == expected_cost
+        encoding.num_of_input_tokens == expected_num_of_input_tokens
     ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"
