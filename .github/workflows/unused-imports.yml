@@ -37,5 +37,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'Remove unused imports'
-          branch: ${{ github.head_ref }}
           file_pattern: '*.py'
