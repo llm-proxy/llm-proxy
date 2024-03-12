@@ -14,3 +14,13 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Install Poetry
+      run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies with Poetry
+      run: |
+        poetry config virtualenvs.create false
+        poetry install
+
