@@ -2,6 +2,8 @@ import importlib
 import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal
+import openai
+from typing import Any, Dict, List, Literal
 
 import yaml
 from dotenv import load_dotenv
