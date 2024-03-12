@@ -2,27 +2,35 @@ name: Unused Imports
 
 on: push
 
-permissions:
-  contents: write
-
 jobs:
   unused-imports:
     runs-on: ubuntu-latest
 
     steps:
+
     - uses: actions/checkout@v2
+
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
 
-    - name: Install autoflake
-      run: pip install autoflake
+
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1.3.4
+      with:
+        version: 1.6.1
+        virtualenvs-create: false
+
+
+    - name: Install dependencies with Poetry
+      run: poetry install
 
     - name: Remove unused imports with autoflake
       run: |
-        autoflake --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
+        poetry run autoflake --recursive --remove-all-unused-imports --ignore-init-module-imports --in-place .
+  
 
     - name: Commit changes
       uses: stefanzweifel/git-auto-commit-action@v4
