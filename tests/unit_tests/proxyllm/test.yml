@@ -53,7 +53,7 @@ provider_settings:
     models:
       - Mistral-7B-v0.1
       - Mistral-7B-Instruct-v0.2
-      - Mistral-8x7B-Instruct-v0.1
+      - Mixtral-8x7B-Instruct-v0.1
 # DONT USE FOR TESTING FOR NOW TO AVOID CHARGES
 # - provider: VertexAI
 #   temperature: 0.1
