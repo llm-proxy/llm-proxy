@@ -20,7 +20,10 @@ jobs:
         version: 1.6.1
         virtualenvs-create: false
 
-    - name: Remove unused imports with autoflake and check with flake8
+    - name: Install dependencies with Poetry
+      run: poetry install
+
+    - name: Remove unused imports with autoflake
       run: |
         poetry run autoflake --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
 
