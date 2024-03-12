@@ -22,7 +22,7 @@ mistral_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
-        "mistral-8x7b-instruct-v0.1": {
+        "mixtral-8x7b-instruct-v0.1": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
