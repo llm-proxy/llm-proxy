@@ -9,8 +9,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: creyD/autoflake_action@v1.1
+    - uses: creyD/autoflake_action@master
       with:
         options: --remove-all-unused-imports --recursive --in-place --exclude=__init__.py
-      env:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
