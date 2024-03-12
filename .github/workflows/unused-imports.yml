@@ -2,9 +2,6 @@ name: Unused Imports
 
 on: push
 
-permissions:
-  contents: write
-
 jobs:
   unused-imports:
     runs-on: ubuntu-latest
@@ -15,3 +12,4 @@ jobs:
     - uses: creyD/autoflake_action@v1.1
       with:
         options: --remove-all-unused-imports --recursive --in-place --exclude=__init__.py
+        github_token: ${{ secrets.GITHUB_TOKEN }}
