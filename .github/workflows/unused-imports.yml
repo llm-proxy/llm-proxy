@@ -24,3 +24,13 @@ jobs:
         poetry config virtualenvs.create false
         poetry install
 
+    - name: Remove unused imports with autoflake and check with flake8
+      run: |
+        poetry run autoflake --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
+
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: 'Remove unused imports'
+        branch: ${{ github.head_ref }}
+        file_pattern: '*.py'
