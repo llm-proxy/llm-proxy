@@ -2,18 +2,31 @@ name: Unused Imports
 
 on: push
 
-
+permissions:
+  contents: write
 
 jobs:
   unused-imports:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
-    - uses: creyD/autoflake_action@master
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        options: --remove-all-unused-imports --recursive --in-place --exclude=__init__.py
+        python-version: '3.11'
+
+    - name: Install autoflake
+      run: pip install autoflake
+
+    - name: Remove unused imports with autoflake
+      run: |
+        autoflake --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
+
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: 'Remove unused imports'
+        branch: ${{ github.head_ref }}
+        file_pattern: '*.py'
