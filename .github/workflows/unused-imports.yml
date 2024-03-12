@@ -14,4 +14,4 @@ jobs:
 
     - uses: creyD/autoflake_action@v1.1
       with:
-        options: --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
+        options: --remove-all-unused-imports --recursive --in-place --exclude=__init__.py
