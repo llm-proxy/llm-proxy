@@ -3,7 +3,7 @@ name: Unused Imports
 on: push
 
 jobs:
-  lint-and-clean:
+  unused-imports:
     runs-on: ubuntu-latest
 
     steps:
