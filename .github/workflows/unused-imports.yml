@@ -12,21 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: creyD/autoflake_action@v1.1
       with:
-        python-version: '3.11'
-
-    - name: Install autoflake
-      run: pipx install autoflake
-
-    - name: Remove unused imports with autoflake
-      run: |
-        autoflake --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
-
-    - name: Commit changes
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: 'Remove unused imports'
-        branch: ${{ github.head_ref }}
-        file_pattern: '*.py'
+        options: --remove-all-unused-imports --recursive --in-place --exclude=__init__.py .
