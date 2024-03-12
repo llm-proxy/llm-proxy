@@ -7,35 +7,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - uses: actions/checkout@v2
+      - name: Install Poetry
+        run: pipx install poetry
 
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: "poetry"
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        cache: "poetry"
+      - name: Setup poetry
+        uses: snok/install-poetry@v1
 
+      - name: Install dependencies
+        run: poetry lock --no-update && poetry install
 
-    - name: Install and configure Poetry
-      uses: snok/install-poetry@v1.3.4
-      with:
-        version: 1.6.1
-        virtualenvs-create: false
+      - name: Remove unused imports with autoflake
+        run: |
+          poetry run autoflake --recursive --remove-all-unused-imports --ignore-init-module-imports --in-place .
+    
 
-
-    - name: Install dependencies with Poetry
-      run: poetry lock --no-update && poetry install
-
-    - name: Remove unused imports with autoflake
-      run: |
-        poetry run autoflake --recursive --remove-all-unused-imports --ignore-init-module-imports --in-place .
-  
-
-    - name: Commit changes
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: 'Remove unused imports'
-        branch: ${{ github.head_ref }}
-        file_pattern: '*.py'
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Remove unused imports'
+          branch: ${{ github.head_ref }}
+          file_pattern: '*.py'
