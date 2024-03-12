@@ -52,7 +52,7 @@ provider_settings:
     models:
       - mistral-7b-v0.1
       - mistral-7b-instruct-v0.2
-      - mistral-8x7b-instruct-v0.1
+      - mixtral-8x7b-instruct-v0.1
 
   - provider: VertexAI
     temperature: 0.1
