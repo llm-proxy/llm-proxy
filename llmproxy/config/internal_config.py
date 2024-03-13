@@ -119,17 +119,17 @@ internal_config: List[Dict[str, Any]] = [
         "adapter_path": "llmproxy.provider.huggingface.mistral.MistralAdapter",
         "models": [
             {
-                "name": "Mistral-7B-v0.1",
+                "name": "Mixtral-7B-v0.1",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Mistral-7B-Instruct-v0.2",
+                "name": "Mixtral-7B-Instruct-v0.2",
                 "cost_per_token_input": 5e-08,
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "Mistral-8x7B-Instruct-v0.1",
+                "name": "Mixtral-8x7B-Instruct-v0.1",
                 "cost_per_token_input": 3e-07,
                 "cost_per_token_output": 1e-06,
             },
