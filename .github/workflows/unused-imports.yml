@@ -15,3 +15,5 @@ jobs:
 
       - name: Remove unused imports
         uses: creyD/autoflake_action@v1.1
+        with:
+          dry: true
