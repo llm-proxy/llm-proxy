@@ -1,6 +1,6 @@
 import time
 
-from llmproxy.llmproxy import LLMProxy
+from proxyllm import LLMProxy
 
 # NOTE: Temp Test file, will be removed in future in favour of unit/integration tests
 

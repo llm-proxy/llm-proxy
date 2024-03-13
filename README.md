@@ -57,31 +57,69 @@ There are 2 ways to get started. You can directly clone the repo into your proje
 
 - Python 3.11+
 
-### Local Installation
+<!-- ### Local Installation -->
+<!---->
+<!-- If you want to test the LLM Proxy you can use the following steps: -->
+<!---->
+<!-- 1. Clone the repository into the project of your choice -->
+<!---->
+<!-- ```shell -->
+<!-- git clone https://github.com/llm-proxy/llm-proxy.git -->
+<!-- ``` -->
+<!---->
+<!-- 2. Ensure that you have a `llmproxy.config.yaml` file set up in the root directory of your project -->
+<!-- 3. Ensure that you have all of your API keys for each respective provider setup (You can utilize the .env.example for reference) -->
+<!-- 4. Ensure that you only have providers and API keys for models you want active -->
+<!---->
+<!-- **Note:** For Google's models, you will need the path to application credentials, and the project ID inside of the .env -->
+<!---->
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
-If you want to test the LLM Proxy you can use the following steps:
+### Installation
 
-1. Clone the repository into the project of your choice
+With pip:
 
 ```shell
-git clone https://github.com/llm-proxy/llm-proxy.git
+pip install proxyllm
 ```
 
-2. Ensure that you have a `llmproxy.config.yaml` file set up in the root directory of your project
-3. Ensure that you have all of your API keys for each respective provider setup (You can utilize the .env.example for reference)
-4. Ensure that you only have providers and API keys for models you want active
+With poetry:
 
-**Note:** For Google's models, you will need the path to application credentials, and the project ID inside of the .env
+```shell
+poetry add proxyllm
+```
+
+Run the install script for the default configuration file:
+
+```shell
+config --default-config
+```
+
+If you prefer poetry:
+
+```shell
+poetry run config --default-config
+```
+
+> If the installation scripts do not work, you can visit the [repo](https://github.com/llm-proxy/llm-proxy/blob/main/llmproxy.config.yml) to grab a copy manually.
+
+**Note:**
+
+- Ensure that you have all of your API keys for each respective provider in the .env file (You can utilize the .env.example for reference)
+- For Google's models, you will need the path to application credentials, and the project ID inside of the .env
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### PyPi installation
-
--- IN PROGRESS
 
 ## Usage
 
 Currently, the LLM Proxy provides 2 different route types: Cost and Category.
+
+To get started import the LLMProxy client:
+
+```python
+from proxyllm import LLMProxy
+```
+
 After the setup is complete, you only need 1 line of code to get started:
 
 ```python
@@ -127,6 +165,8 @@ print("ERRORS: ", output.errors)
   - [ ] Claude
 - [ ] Support for multimodal Models
 - [ ] Custom, optimized model for category routing
+- [ ] Effectiveness Routing
+- [ ] Context Injection
 
 See the [open issues](https://github.com/llm-proxy/llm-proxy/issues) for a full list of proposed features (and known issues).
 

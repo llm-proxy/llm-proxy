@@ -1,6 +1,6 @@
 import time
 
-from llmproxy.llmproxy import LLMProxy
+from proxyllm import LLMProxy
 
 # NOTE: Temp Test file, will be removed in future in favour of unit/integration tests
 
@@ -12,7 +12,7 @@ def main() -> None:
     # print(output)
 
     start = time.time()
-    proxy_client = LLMProxy()
+    proxy_client = LLMProxy(route_type="cost")
     output = proxy_client.route(prompt=prompt)
     end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
