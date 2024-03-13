@@ -179,7 +179,7 @@ class Llama2Adapter(BaseAdapter):
         self.model = model
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
-        self.chat_history = ["<s>"]
+        self.chat_history = []
 
     def get_completion(self, prompt: str = "") -> str | None:
         if not self.api_key:
@@ -199,12 +199,13 @@ class Llama2Adapter(BaseAdapter):
                 return response.json()
 
             # Llama2 prompt template
-            prompt_template = f"[INST]<<SYS>>\n{{{{ {self.system_prompt} }}}}\n<</SYS>>\n{{{{ {prompt or self.prompt} }}}}\n[/INST]"
+            prompt_template = f"<s> [INST] <<SYS>> {self.system_prompt} <</SYS>> {prompt or self.prompt} [/INST]"
 
             self.chat_history.append(prompt_template)
+            input = "".join(self.chat_history)
             output = query(
                 {
-                    "inputs": "".join(self.chat_history),
+                    "inputs": input,
                     "parameters": {
                         "max_length": self.max_output_tokens,
                         "temperature": self.temperature,
@@ -219,6 +220,7 @@ class Llama2Adapter(BaseAdapter):
         if output["error"]:
             raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
+        self.chat_history.append(f"{output[0]['generated_text']}</s>")
         return output[0]["generated_text"]
 
     def get_estimated_max_cost(
