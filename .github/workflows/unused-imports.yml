@@ -13,28 +13,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install Poetry
-        run: pipx install poetry
-
-      - name: Setup python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-          cache: "poetry"
-
-      - name: Setup poetry
-        uses: snok/install-poetry@v1
-
-      - name: Install dependencies
-        run: poetry lock --no-update && poetry install
-
-      - name: Remove unused imports with autoflake
-        run: |
-          poetry run autoflake --recursive --remove-all-unused-imports --ignore-init-module-imports --in-place .
-    
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'Remove unused imports'
-          file_pattern: '*.py'
+      - name: Remove unused imports
+        uses: creyD/autoflake_action@v1.1
