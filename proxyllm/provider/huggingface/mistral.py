@@ -81,6 +81,9 @@ class MistralAdapter(BaseAdapter):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
+        self.generated_responses = []
+        self.past_user_inputs = []
+        self.response = None
 
     def get_completion(self, prompt: str = "") -> str:
         """
@@ -100,25 +103,44 @@ class MistralAdapter(BaseAdapter):
             raise ValueError("No Hugging Face API Key Provided")
 
         try:
-            api_url = (
-                f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
-            )
             headers = {"Authorization": f"Bearer {self.api_key}"}
+            parameters = {
+                "temperature": self.temperature,
+                "max_length": self.max_output_tokens,
+                "max_time": self.timeout,
+            }
 
             def query(payload):
                 response = requests.post(api_url, headers=headers, json=payload)
                 return response.json()
 
-            output = query(
-                {
-                    "inputs": prompt or self.prompt,
-                    "parameters": {
-                        "temperature": self.temperature,
-                        "max_length": self.max_output_tokens,
-                        "max_time": self.timeout,
-                    },
-                }
-            )
+            # For non-conversational mistral models
+            if self.model != "mixtral-8x7b-instruct-v0.1":
+                api_url = f"https://api-inference.huggingface.co/models/mistralai/{self.model}"
+                output = query(
+                    {
+                        "inputs": prompt or self.prompt,
+                        "parameters": parameters,
+                    }
+                )
+                self.response = output[0]["generated_text"]
+            # For conversational mistral models
+            else:
+                api_url = f"https://api-inference.huggingface.co/pipeline/conversational/mistralai/{self.model}"
+                output = query(
+                    {
+                        "inputs": {
+                            "past_user_inputs": self.past_user_inputs,
+                            "generated_responses": self.generated_responses,
+                            "text": prompt or self.prompt,
+                        },
+                        "parameters": parameters,
+                    }
+                )
+                print(output)
+                self.past_user_inputs = output["conversation"]["past_user_inputs"]
+                self.generated_responses = output["conversation"]["generated_responses"]
+                self.response = output["generated_text"]
 
         except requests.RequestException as e:
             raise MistralException(
@@ -134,7 +156,7 @@ class MistralAdapter(BaseAdapter):
             raise MistralException(f"{output['error']}", error_type="MistralError")
 
         # Output will be a List[dict] if there is no error
-        return output[0]["generated_text"]
+        return self.response
 
     def get_estimated_max_cost(
         self, prompt: str = "", price_data: Dict[str, Any] = None
