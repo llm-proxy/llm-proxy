@@ -17,16 +17,11 @@ def main() -> None:
     end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    # print("ERRORS: ", output.errors)
-    print(f"\Cost route total time taken: {end-start}")
 
     prompt = "ok take that numerical answer and add the number 3 to it. What is this equal to mathematically?"
     output = proxy_client.route(prompt=prompt)
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    print("ERRORS: ", output.errors)
-
-    proxy_client.clear_chat()
 
     # prompt = "what is the mathematical equation '2 + 3' equal to?"
     # output = proxy_client.route(prompt=prompt)
