@@ -127,7 +127,7 @@ internal_config: List[Dict[str, Any]] = [
                 "cost_per_token_output": 2.5e-07,
             },
             {
-                "name": "mistral-8x7b-instruct-v0.1",
+                "name": "mixtral-8x7b-instruct-v0.1",
                 "cost_per_token_input": 3e-07,
                 "cost_per_token_output": 1e-06,
             },
