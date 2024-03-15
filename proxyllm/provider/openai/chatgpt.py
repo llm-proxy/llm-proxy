@@ -1,9 +1,6 @@
-from typing import Any, Dict
-
-import openai
 import tiktoken
 
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger
 from proxyllm.utils.exceptions.provider import OpenAIException
 
@@ -116,8 +113,10 @@ class OpenAIAdapter(BaseAdapter):
                 error_type="No API Key Provided",
             )
 
+        from openai import OpenAI, OpenAIError
+
         try:
-            client = openai.OpenAI(api_key=self.api_key)
+            client = OpenAI(api_key=self.api_key)
             response = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt or self.prompt}],
                 model=self.model,
@@ -126,7 +125,7 @@ class OpenAIAdapter(BaseAdapter):
                 timeout=self.timeout,
             )
 
-        except openai.OpenAIError as e:
+        except OpenAIError as e:
             raise OpenAIException(
                 exception=e.args[0], error_type=type(e).__name__
             ) from e
@@ -137,48 +136,28 @@ class OpenAIAdapter(BaseAdapter):
 
         return response.choices[0].message.content or None
 
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
-        Estimates the maximum cost for processing a given prompt based on token pricing.
+        Tokenizes the provided prompt using the tokenizer.
 
         Args:
-            prompt (str): The text prompt for which to estimate the cost.
-            price_data (Dict[str, Any]): Pricing data for tokens.
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
 
         Returns:
-            float: The estimated cost for processing the prompt.
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
 
-        Raises:
-            ValueError: If no prompt is provided and no default prompt is set.
+        Note:
+            This method currently avoids calculating costs for tokenization.
         """
-        if not self.prompt and not prompt:
-            raise ValueError("No prompt provided.")
-
-        # Assumption, model exists (check should be done at yml load level)
         encoder = tiktoken.encoding_for_model(self.model)
 
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
-        prompt_cost_per_token = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
-
-        completion_cost_per_token = price_data["completion"]
-        logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
-
         tokens = encoder.encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
-        cost = round(
-            prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * self.max_output_tokens,
-            8,
+        return TokenizeResponse(
+            num_of_input_tokens=len(tokens),
+            num_of_output_tokens=self.max_output_tokens or 256,
         )
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
 
     def get_category_rank(self, category: str = "") -> int:
         """

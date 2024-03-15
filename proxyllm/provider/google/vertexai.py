@@ -1,9 +1,4 @@
-from typing import Any, Dict
-
-from google.cloud import aiplatform
-from vertexai.language_models import TextGenerationModel
-
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, timeout_function, tokenizer
 from proxyllm.utils.exceptions.provider import VertexAIException
 
@@ -72,12 +67,16 @@ class VertexAIAdapter(BaseAdapter):
             result (Dict[str, Any]): Dictionary to store the output or exception.
         """
         try:
+            from google.cloud import aiplatform
+
             aiplatform.init(project=self.project_id, location=self.location)
             parameters = {
                 "prompt": prompt or self.prompt,
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
+
+            from vertexai.language_models import TextGenerationModel
 
             chat_model = TextGenerationModel.from_pretrained(self.model)
 
@@ -118,47 +117,27 @@ class VertexAIAdapter(BaseAdapter):
 
         return result.get("output")
 
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
-        Estimates the maximum cost for processing a given prompt based on character pricing.
+        Tokenizes the provided prompt using the tokenizer.
 
         Args:
-            prompt (str): Text prompt for which to estimate the cost.
-            price_data (Dict[str, Any]): Pricing data per character for prompt and completion.
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
 
         Returns:
-            float: Estimated cost for processing the prompt.
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
 
-        Raises:
-            ValueError: If no prompt is provided.
+        Note:
+            This method currently avoids calculating costs for tokenization.
         """
-        if not self.prompt and not prompt:
-            raise ValueError("No prompt provided.")
-
-        # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
-        prompt_cost_per_character = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/CHARACTER): {prompt_cost_per_character}")
-
-        completion_cost_per_character = price_data["completion"]
-        logger.log(msg=f"COMPLETION (COST/CHARACTER): {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
-        cost = round(
-            prompt_cost_per_character * len(tokens)
-            + completion_cost_per_character * self.max_output_tokens,
-            8,
+        return TokenizeResponse(
+            num_of_input_tokens=len(tokens),
+            num_of_output_tokens=self.max_output_tokens or 256,
         )
-
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
 
     def get_category_rank(self, category: str = "") -> int:
         """
