@@ -1,5 +1,12 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Any, Dict
+
+
+@dataclass
+class TokenizeResponse:
+    num_of_input_tokens: int
+    num_of_output_tokens: int
 
 
 class BaseAdapter(ABC):
@@ -21,18 +28,8 @@ class BaseAdapter(ABC):
         """
 
     @abstractmethod
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
-        """
-        Abstract method to retrieve estimated for a given prompt.
-
-        Parameters:
-        - prompt (str): The prompt for which estimated cost is requested. Defaults to an empty string.
-
-        Returns:
-        - float: The estimated cost of the prompt
-        """
+    def tokenize(self, prompt="") -> TokenizeResponse:
+        pass
 
     @abstractmethod
     def get_category_rank(self, category: str = "") -> int:

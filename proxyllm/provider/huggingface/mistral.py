@@ -1,8 +1,9 @@
 from typing import Any, Dict
 
 import requests
+from tokenizers import Encoding
 
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
 from proxyllm.utils.enums import BaseEnum
 from proxyllm.utils.exceptions.provider import MistralException, UnsupportedModel
@@ -136,47 +137,26 @@ class MistralAdapter(BaseAdapter):
         # Output will be a List[dict] if there is no error
         return output[0]["generated_text"]
 
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
-        Estimates the cost for a given prompt based on predefined pricing data.
+        Tokenizes the provided prompt using the tokenizer.
 
         Args:
-            prompt (str): Text prompt for cost estimation.
-            price_data (Dict[str, Any]): Cost per token for prompt and completion.
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
 
         Returns:
-            float: Estimated cost for processing the given prompt.
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
 
-        Raises:
-            ValueError: If no prompt is provided and no default prompt is set.
+        Note:
+            This method currently avoids calculating costs for tokenization.
         """
-        if not self.prompt and not prompt:
-            raise ValueError("No prompt provided.")
+        encoding: Encoding = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
-        # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
-        prompt_cost_per_token = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
-
-        completion_cost_per_token = price_data["completion"]
-        logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
-
-        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
-
-        cost = round(
-            prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * self.max_output_tokens,
-            8,
+        return TokenizeResponse(
+            num_of_input_tokens=len(encoding.tokens),
+            num_of_output_tokens=self.max_output_tokens or 256,
         )
-
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
 
     def get_category_rank(self, category: str = "") -> int:
         """

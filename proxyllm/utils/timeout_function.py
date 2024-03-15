@@ -1,3 +1,35 @@
+import multiprocessing
+import threading
+from typing import Any, Callable, Union
+
+
+def timeout_wrapper(func: Callable, timeout: int, *args, **kwargs):
+    """
+    Wrap a function call in a thread with a timeout.
+
+    Parameters:
+        func (callable): The function to be called.
+        args (tuple): The arguments to pass to the function.
+        timeout (int): The maximum time to wait for the function to complete, in seconds.
+
+    Raises:
+        TimeoutError: If the function does not complete within the specified timeout.
+
+    Note:
+        This function creates a daemon thread to execute the given function with the provided arguments.
+        If the function does not complete within the specified timeout, a TimeoutError is raised.
+    """
+
+    thread = threading.Thread(target=func, args=args, kwargs=kwargs)
+    # make thread daemon so it can run in background
+    # Allows main thread to exit without child thread
+    thread.daemon = True
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError("Operation timed out")
+
+
 """
 Module for executing functions with timeouts using multiprocessing and threading.
 
@@ -14,9 +46,6 @@ Example usage:
     except TimeoutError as e:
         print(e) # Prints "Operation timed out" if some_function does not complete within 5 seconds.
 """
-import multiprocessing
-import threading
-from typing import Any, Callable, Union
 
 
 def worker(func: Callable, queue: multiprocessing.Queue, *args, **kwargs) -> None:
@@ -69,30 +98,3 @@ def timeout_function(
         raise error
 
     return result
-
-
-def timeout_wrapper(func: Callable, timeout: int, *args, **kwargs):
-    """
-    Wrap a function call in a thread with a timeout.
-
-    Parameters:
-        func (callable): The function to be called.
-        args (tuple): The arguments to pass to the function.
-        timeout (int): The maximum time to wait for the function to complete, in seconds.
-
-    Raises:
-        TimeoutError: If the function does not complete within the specified timeout.
-
-    Note:
-        This function creates a daemon thread to execute the given function with the provided arguments.
-        If the function does not complete within the specified timeout, a TimeoutError is raised.
-    """
-
-    thread = threading.Thread(target=func, args=args, kwargs=kwargs)
-    # make thread daemon so it can run in background
-    # Allows main thread to exit without child thread
-    thread.daemon = True
-    thread.start()
-    thread.join(timeout)
-    if thread.is_alive():
-        raise TimeoutError("Operation timed out")
