@@ -68,7 +68,6 @@ def test_get_settings_from_yml(tmp_path) -> None:
         max_output_tokens: 256
         temperature: 0.1
         models:
-            - gpt-3.5-turbo-instruct
             - gpt-3.5-turbo-1106
             - gpt-4
             - gpt-4-32k
@@ -124,7 +123,6 @@ def test_llmproxy_invalid_route_type_in_yaml_config(tmp_path):
         max_output_tokens: 256
         temperature: 0.1
         models:
-            - gpt-3.5-turbo-instruct
             - gpt-3.5-turbo-1106
             - gpt-4
             - gpt-4-32k
@@ -152,7 +150,6 @@ def test_llmproxy_constructor_route_type_override(tmp_path):
         max_output_tokens: 256
         temperature: 0.1
         models:
-            - gpt-3.5-turbo-instruct
             - gpt-3.5-turbo-1106
             - gpt-4
             - gpt-4-32k
@@ -178,7 +175,6 @@ def test_no_route_type_specified_throws_error(tmp_path):
         max_output_tokens: 256
         temperature: 0.1
         models:
-            - gpt-3.5-turbo-instruct
             - gpt-3.5-turbo-1106
             - gpt-4
             - gpt-4-32k
