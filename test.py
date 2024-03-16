@@ -40,7 +40,7 @@ def cost_routing() -> None:
 
 
 def main() -> None:
-    category_routing()
+    # category_routing()
     cost_routing()
 
 
