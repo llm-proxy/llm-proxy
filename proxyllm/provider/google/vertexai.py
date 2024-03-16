@@ -99,7 +99,7 @@ class VertexAIAdapter(BaseAdapter):
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
-
+            # will be changed in the future when more models are released
             if self.model == "gemini-pro":
                 from vertexai.preview.generative_models import GenerativeModel
 
