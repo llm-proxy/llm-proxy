@@ -12,10 +12,11 @@ provider_settings:
     temperature: 0.1
     models: # input names of models you want to use (see below for all models provided)
       # Only models specified here will be added to routing pool
-      - gpt-3.5-turbo-instruct
-      - gpt-3.5-turbo-1106
+      - gpt-4-0125-preview
+      - gpt-4-1106-preview
       - gpt-4
       - gpt-4-32k
+      - gpt-3.5-turbo-0125
 
   - provider: Llama2
     api_key_var: HUGGING_FACE_API_KEY
@@ -40,6 +41,7 @@ provider_settings:
     max_output_tokens: 256
     temperature: 0.1
     models:
+      - command-r
       - command
       - command-light
       - command-nightly
