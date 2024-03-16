@@ -55,6 +55,18 @@ cohere_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
+        "command-r": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2,
+        },
     }
 }
 
