@@ -1,11 +1,6 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
-from typing import Any, Dict
-
-from proxyllm.provider.base import BaseAdapter
 from proxyllm.utils import logger, timeout_function, tokenizer
 from proxyllm.utils.exceptions.provider import VertexAIException
-
-from llmproxy.utils.logger import CustomLogger, console_logger, file_logger
 
 # Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {
@@ -106,7 +101,7 @@ class VertexAIAdapter(BaseAdapter):
             }
 
             if self.model == "gemini-pro":
-                from vertexai.preview.generative_models import GenerativeModel, Part
+                from vertexai.preview.generative_models import GenerativeModel
 
                 chat_model = GenerativeModel(self.model)
                 response = chat_model.generate_content(prompt or self.prompt)
