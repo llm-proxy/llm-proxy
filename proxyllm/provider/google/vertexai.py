@@ -17,6 +17,30 @@ vertexai_category_data = {
             "Financial Task": 2,
             "Content Recommendation Task": 1,
         },
+        "chat-bison": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1,
+        },
+        "gemini-pro": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1,
+        },
     }
 }
 
@@ -75,12 +99,17 @@ class VertexAIAdapter(BaseAdapter):
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
+            # will be changed in the future when more models are released
+            if self.model == "gemini-pro":
+                from vertexai.preview.generative_models import GenerativeModel
 
-            from vertexai.language_models import TextGenerationModel
+                chat_model = GenerativeModel(self.model)
+                response = chat_model.generate_content(prompt or self.prompt)
+            else:
+                from vertexai.language_models import TextGenerationModel
 
-            chat_model = TextGenerationModel.from_pretrained(self.model)
-
-            response = chat_model.predict(**parameters)
+                chat_model = TextGenerationModel.from_pretrained(self.model)
+                response = chat_model.predict(**parameters)
             result["output"] = response.text
 
         except Exception as e:
