@@ -6,61 +6,61 @@ optional_configuration:
   force_timeout: false # WARNING: This can cause additonal costs!
 
 provider_settings:
-  # - provider: OpenAI
-  #   api_key_var: OPENAI_API_KEY # .env name for api key
-  #   max_output_tokens: 256
-  #   temperature: 0.1
-  #   models: # input names of models you want to use (see below for all models provided)
-  #     # Only models specified here will be added to routing pool
-  #     - gpt-4-0125-preview
-  #     - gpt-4-1106-preview
-  #     - gpt-4
-  #     - gpt-4-32k
-  #     - gpt-3.5-turbo-0125
+  - provider: OpenAI
+    api_key_var: OPENAI_API_KEY # .env name for api key
+    max_output_tokens: 256
+    temperature: 0.1
+    models: # input names of models you want to use (see below for all models provided)
+      # Only models specified here will be added to routing pool
+      - gpt-4-0125-preview
+      - gpt-4-1106-preview
+      - gpt-4
+      - gpt-4-32k
+      - gpt-3.5-turbo-0125
 
-  # - provider: Llama2
-  #   api_key_var: HUGGING_FACE_API_KEY
-  #   max_output_tokens: 256
-  #   temperature: 0.1
-  #   models:
-  #     # - Llama-2-7b-hf
-  #     # - Llama-2-7b-chat-hf
-  #     - Llama-2-13b-hf
-  #     - Llama-2-13b-chat-hf
-  #     - Llama-2-70b-hf
-  #     - Llama-2-70b-chat-hf
-  #     # - Llama-2-7b-chat
-  #     # - Llama-2-7b
-  #     # - Llama-2-13b-chat
-  #     # - Llama-2-13b
-  #     # - Llama-2-70b-chat
-  #     # - Llama-2-70b
-  #
+  - provider: Llama2
+    api_key_var: HUGGING_FACE_API_KEY
+    max_output_tokens: 256
+    temperature: 0.1
+    models:
+      # - Llama-2-7b-hf
+      # - Llama-2-7b-chat-hf
+      - Llama-2-13b-hf
+      - Llama-2-13b-chat-hf
+      - Llama-2-70b-hf
+      - Llama-2-70b-chat-hf
+      # - Llama-2-7b-chat
+      # - Llama-2-7b
+      # - Llama-2-13b-chat
+      # - Llama-2-13b
+      # - Llama-2-70b-chat
+      # - Llama-2-70b
+
   - provider: Cohere
     api_key_var: COHERE_API_KEY
     max_output_tokens: 256
     temperature: 0.1
     models:
       - command-r
-      # - command
-      # - command-light
-      # - command-nightly
-      # - command-light-nightly
+      - command
+      - command-light
+      - command-nightly
+      - command-light-nightly
 
-  # - provider: Mistral
-  #   api_key_var: HUGGING_FACE_API_KEY
-  #   max_output_tokens: 256
-  #   temperature: 0.1
-  #   models:
-  #     - mistral-7b-v0.1
-  #     - mistral-7b-instruct-v0.2
-  #     - mixtral-8x7b-instruct-v0.1
-  #
-  # - provider: VertexAI
-  #   temperature: 0.1
-  #   project_id_var: GOOGLE_PROJECT_ID
-  #   max_output_tokens: 256
-  #   models:
-  #     - text-bison
-  #       #Currently not working
-  #     # - chat-bison
+  - provider: Mistral
+    api_key_var: HUGGING_FACE_API_KEY
+    max_output_tokens: 256
+    temperature: 0.1
+    models:
+      - mistral-7b-v0.1
+      - mistral-7b-instruct-v0.2
+      - mixtral-8x7b-instruct-v0.1
+
+  - provider: VertexAI
+    temperature: 0.1
+    project_id_var: GOOGLE_PROJECT_ID
+    max_output_tokens: 256
+    models:
+      - text-bison
+        #Currently not working
+      # - chat-bison
