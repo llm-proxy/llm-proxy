@@ -1,11 +1,8 @@
-from typing import Any, Dict
-
 from tokenizers import Encoding
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import CohereException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import CohereException
 
 # Dictionary mapping Cohere model categories to task performance ratings.
 cohere_category_data = {

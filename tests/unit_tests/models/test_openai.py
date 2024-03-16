@@ -4,7 +4,6 @@ import pytest
 from dotenv import load_dotenv
 
 from proxyllm.provider.openai.chatgpt import OpenAIAdapter, OpenAIException
-from proxyllm.utils.exceptions.provider import UnsupportedModel
 
 load_dotenv(".env.test")
 

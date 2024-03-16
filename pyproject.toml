@@ -25,6 +25,7 @@ config = "proxyllm.cli:cli"
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 isort = "^5.13.2"
+autoflake = "^2.3.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"

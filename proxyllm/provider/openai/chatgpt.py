@@ -1,10 +1,8 @@
-from typing import Any, Dict
-
 import tiktoken
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger
-from proxyllm.utils.exceptions.provider import OpenAIException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import OpenAIException
 
 # Mapping of OpenAI model categories to their respective task performance ratings.
 open_ai_category_data = {
