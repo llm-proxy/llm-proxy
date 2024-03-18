@@ -1,3 +1,4 @@
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 
 claude_category_data = {
     "model-categories": {
@@ -39,3 +40,7 @@ claude_category_data = {
         },
     }
 }
+
+class ClaudeAdapter(BaseAdapter):
+  
+
