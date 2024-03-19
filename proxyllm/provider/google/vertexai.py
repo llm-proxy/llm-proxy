@@ -1,6 +1,7 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, timeout_function, tokenizer
 from proxyllm.utils.exceptions.provider import VertexAIException
+from proxyllm.utils.enums import BaseEnum
 
 # Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {
@@ -43,6 +44,20 @@ vertexai_category_data = {
         },
     }
 }
+
+
+class ModelType(enumerate, BaseEnum):
+    """
+    Enumeration for route types supported by LLM Proxy.
+
+    Attributes:
+        COST: Route requests based on cost efficiency.
+        CATEGORY: Route requests based on category proficiency.
+    """
+
+    GEMINI = ["gemini-pro"]
+    CODEY = ["code-bison,codechat-bison,code-gecko"]
+    PALM = ["text-bison", "chat-bison"]
 
 
 class VertexAIAdapter(BaseAdapter):
@@ -93,6 +108,7 @@ class VertexAIAdapter(BaseAdapter):
         try:
             from google.cloud import aiplatform
 
+            global response
             aiplatform.init(project=self.project_id, location=self.location)
             parameters = {
                 "prompt": prompt or self.prompt,
@@ -100,16 +116,29 @@ class VertexAIAdapter(BaseAdapter):
                 "max_output_tokens": self.max_output_tokens,
             }
             # will be changed in the future when more models are released
-            if self.model == "gemini-pro":
+            if self.model in ModelType.GEMINI:
                 from vertexai.preview.generative_models import GenerativeModel
 
                 chat_model = GenerativeModel(self.model)
                 response = chat_model.generate_content(prompt or self.prompt)
-            else:
+
+            elif self.model in ModelType.PALM:
                 from vertexai.language_models import TextGenerationModel
 
                 chat_model = TextGenerationModel.from_pretrained(self.model)
                 response = chat_model.predict(**parameters)
+            elif self.model in ModelType.CODEY:
+                if self.model == "codechat-bison":
+                    from vertexai.language_models import CodeChatModel
+
+                    chat_model = CodeChatModel.from_pretrained(self.model)
+                    response = chat_model.predict(**parameters)
+                else:
+                    from vertexai.language_models import CodeGenerationModel
+
+                    chat_model = CodeGenerationModel.from_pretrained(self.model)
+                    response = chat_model.start_chat().send_message(**parameters)
+
             result["output"] = response.text
 
         except Exception as e:

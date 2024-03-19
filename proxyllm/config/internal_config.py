@@ -209,13 +209,28 @@ internal_config: List[Dict[str, Any]] = [
             },
             {
                 "name": "gemini-pro",
-                "cost_per_token_input": 1.25e-07,
-                "cost_per_token_output": 3.75e-07,
+                "cost_per_token_input": 1.25e-09,
+                "cost_per_token_output": 3.75e-09,
             },
             {
                 "name": "chat-bison",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
+            },
+            {
+                "name": "code-bison",
+                "cost_per_token_input": 1.5e-07,
+                "cost_per_token_output": 2e-07,
+            },
+            {
+                "name": "codechat-bison",
+                "cost_per_token_input": 1.5e-07,
+                "cost_per_token_output": 2e-07,
+            },
+            {
+                "name": "code-gecko",
+                "cost_per_token_input": 1.5e-07,
+                "cost_per_token_output": 2e-07,
             },
         ],
     },
