@@ -1,6 +1,8 @@
 import requests
 from tokenizers import Encoding
 
+import warnings
+
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
 from proxyllm.utils.exceptions.provider import MistralException
@@ -82,6 +84,11 @@ class MistralAdapter(BaseAdapter):
         self.generated_responses = []
         self.past_user_inputs = []
         self.response = None
+        warnings.warn(
+            """The class "mistral.py" under the provider "huggingface" is deprecated. Use "mistral.py" 
+            under the "mistral" provider instead.""",
+            DeprecationWarning,
+        )
 
     def get_completion(self, prompt: str = "") -> str:
         """
@@ -97,6 +104,12 @@ class MistralAdapter(BaseAdapter):
             MistralException: If an API or internal error occurs during request processing.
             ValueError: If no API key is provided.
         """
+        warnings.warn(
+            """The method named "get_completion()" in the "mistral.py" class found in the "huggingface" provider is deprecated. 
+            Switch to using "mistral.py" under the "mistral" provider in order to use get_completion().""",
+            DeprecationWarning,
+        )
+
         if not self.api_key:
             raise ValueError("No Hugging Face API Key Provided")
 
@@ -170,6 +183,12 @@ class MistralAdapter(BaseAdapter):
         Note:
             This method currently avoids calculating costs for tokenization.
         """
+        warnings.warn(
+            """The method named "tokenize()" in the "mistral.py" class found in the "huggingface" provider is deprecated. 
+            Switch to using "mistral.py" under the "mistral" provider in order to use tokenize().""",
+            DeprecationWarning,
+        )
+
         encoding: Encoding = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
         return TokenizeResponse(
@@ -187,6 +206,12 @@ class MistralAdapter(BaseAdapter):
         Returns:
             int: Performance rank of the model in the specified category.
         """
+        warnings.warn(
+            """The method named "get_category_rank()" in the "mistral.py" class found in the "huggingface" provider is deprecated. 
+            Switch to using "mistral.py" under the "mistral" provider in order to use get_category_rank().""",
+            DeprecationWarning,
+        )
+
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
