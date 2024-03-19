@@ -1,4 +1,6 @@
+import os
 import time
+from proxyllm.provider.anthropic import claude
 
 from proxyllm import LLMProxy
 
@@ -23,6 +25,11 @@ def main() -> None:
     assert output.response_model
     assert output.response
 
+def request():
+    prompt = 'write me a short story about a homeless man in new york'
+
+    client = claude.ClaudeAdapter(api_key=os.environ.get("ANTHROPIC_API_KEY") ,model="claude-3-opus-20240229")
+    print(client.get_completion(prompt))
 
 if __name__ == "__main__":
-    main()
+    request()
