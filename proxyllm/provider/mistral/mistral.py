@@ -74,7 +74,11 @@ class MistralAdapter(BaseAdapter):
         if not self.api_key:
             raise ValueError("No Mistral API Key Provided")
 
-        from mistralai import exceptions as MistralError
+        from mistralai.exceptions import (
+            MistralAPIException,
+            MistralAPIStatusException,
+            MistralConnectionException,
+        )
 
         try:
             self.chat_history.append({"role": "user", "content": prompt or self.prompt})
@@ -89,7 +93,11 @@ class MistralAdapter(BaseAdapter):
                 {"role": "assistant", "content": output.choices[0].message.content}
             )
 
-        except MistralError as e:
+        except (
+            MistralConnectionException,
+            MistralAPIException,
+            MistralAPIStatusException,
+        ) as e:
             raise MistralException(
                 f"Request error: {e}", error_type="RequestError"
             ) from e
