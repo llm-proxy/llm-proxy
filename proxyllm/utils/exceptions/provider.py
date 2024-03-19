@@ -28,9 +28,9 @@ class OpenAIException(Exception):
     def __init__(self, exception: str, error_type: str) -> None:
         super().__init__(f"OpenAI Error: {exception}, Type: {error_type}")
 
-class ClaudeException(Exception):
+class AnthropicException(Exception):
     def __init__(self, exception: str, error_type: str) -> None:
-        super().__init__(f"Claude Error: {exception}, Type: {error_type}")
+        super().__init__(f"Anthropic Error: {exception}, Type: {error_type}")
 
 class UnsupportedModel(Exception):
     """
