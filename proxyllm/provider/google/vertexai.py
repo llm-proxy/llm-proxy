@@ -1,7 +1,7 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, timeout_function, tokenizer
-from proxyllm.utils.exceptions.provider import VertexAIException
 from proxyllm.utils.enums import BaseEnum
+from proxyllm.utils.exceptions.provider import VertexAIException
 
 # Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {
@@ -83,7 +83,6 @@ vertexai_category_data = {
 
 
 class ModelType(str, BaseEnum):
-
     GEMINI = ["gemini-pro"]
     CODEY = ["code-bison,codechat-bison,code-gecko"]
     PALM = ["text-bison", "chat-bison"]
