@@ -149,10 +149,18 @@ class VertexAIAdapter(BaseAdapter):
                 response = chat_model.generate_content(prompt or self.prompt)
 
             elif self.model in ModelType.PALM.value:
-                from vertexai.language_models import TextGenerationModel
+                if self.model == "text-bison":
+                    from vertexai.language_models import TextGenerationModel
 
-                chat_model = TextGenerationModel.from_pretrained(self.model)
-                response = chat_model.predict(prompt or self.prompt, **parameters)
+                    chat_model = TextGenerationModel.from_pretrained(self.model)
+                    response = chat_model.predict(prompt or self.prompt, **parameters)
+                else:
+                    from vertexai.language_models import ChatModel
+
+                    chat_model = ChatModel.from_pretrained(self.model)
+                    response = chat_model.start_chat().send_message(
+                        prompt or self.prompt, **parameters
+                    )
             elif self.model in ModelType.CODEY.value:
                 if self.model == "codechat-bison":
                     from vertexai.language_models import CodeChatModel
