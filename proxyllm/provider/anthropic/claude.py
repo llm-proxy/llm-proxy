@@ -1,6 +1,6 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils.exceptions.provider import AnthropicException
-from anthropic import Anthropic
+
 claude_category_data = {
     "model-categories": {
         "claude-3-opus-20240229": {
@@ -85,9 +85,13 @@ class ClaudeAdapter(BaseAdapter):
             ) from e
         except Exception as e:
             raise AnthropicException(
-                exception=e.args[0], error_type="Unknown OpenAI Error"
+                exception=e.args[0], error_type="Unknown Anthropic Error"
             ) from e
 
-        return response.choices[0].message.content or None
+        return response.content[0]["text"] or None
 
 
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
+        pass
+    def get_category_rank(self, category: str = "") -> int:
+        pass
