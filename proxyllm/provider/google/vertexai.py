@@ -46,14 +46,7 @@ vertexai_category_data = {
 }
 
 
-class ModelType(enumerate, BaseEnum):
-    """
-    Enumeration for route types supported by LLM Proxy.
-
-    Attributes:
-        COST: Route requests based on cost efficiency.
-        CATEGORY: Route requests based on category proficiency.
-    """
+class ModelType(str, BaseEnum):
 
     GEMINI = ["gemini-pro"]
     CODEY = ["code-bison,codechat-bison,code-gecko"]
@@ -108,36 +101,38 @@ class VertexAIAdapter(BaseAdapter):
         try:
             from google.cloud import aiplatform
 
-            global response
             aiplatform.init(project=self.project_id, location=self.location)
             parameters = {
-                "prompt": prompt or self.prompt,
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
             # will be changed in the future when more models are released
-            if self.model in ModelType.GEMINI:
+            if self.model in ModelType.GEMINI.value:
                 from vertexai.preview.generative_models import GenerativeModel
 
                 chat_model = GenerativeModel(self.model)
                 response = chat_model.generate_content(prompt or self.prompt)
 
-            elif self.model in ModelType.PALM:
+            elif self.model in ModelType.PALM.value:
                 from vertexai.language_models import TextGenerationModel
 
                 chat_model = TextGenerationModel.from_pretrained(self.model)
-                response = chat_model.predict(**parameters)
-            elif self.model in ModelType.CODEY:
+                response = chat_model.predict(prompt or self.prompt, **parameters)
+            elif self.model in ModelType.CODEY.value:
                 if self.model == "codechat-bison":
                     from vertexai.language_models import CodeChatModel
 
                     chat_model = CodeChatModel.from_pretrained(self.model)
-                    response = chat_model.predict(**parameters)
+                    response = chat_model.start_chat().send_message(
+                        prompt or self.prompt, **parameters
+                    )
                 else:
                     from vertexai.language_models import CodeGenerationModel
 
                     chat_model = CodeGenerationModel.from_pretrained(self.model)
-                    response = chat_model.start_chat().send_message(**parameters)
+                    response = chat_model.predict(
+                        prefix=prompt or self.prompt, **parameters
+                    )
 
             result["output"] = response.text
 
