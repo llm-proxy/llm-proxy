@@ -1,7 +1,7 @@
+import warnings
+
 import requests
 from tokenizers import Encoding
-
-import warnings
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
