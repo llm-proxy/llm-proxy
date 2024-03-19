@@ -1,5 +1,6 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
-
+from proxyllm.utils.exceptions.provider import AnthropicException
+from anthropic import Anthropic
 claude_category_data = {
     "model-categories": {
         "claude-3-opus-20240229": {
@@ -46,12 +47,47 @@ class ClaudeAdapter(BaseAdapter):
         self,
         prompt: str = "",
         api_key: str | None = "",
+        auth_token: str | None = "",
+        temperature: float | None = None,
         model: str = "",
         max_output_tokens: int | None = None,
         timeout: int | None = None,
     ) -> None:
         self.prompt = prompt
         self.api_key = api_key
+        self.auth_token = auth_token
+        self.temperature = temperature
         self.model = model
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
+
+    def get_completion(self, prompt: str = "") -> str | None:
+        if self.api_key == "":
+            raise AnthropicException(
+                exception="EMPTY API KEY: API key not provided",
+                error_type="No API Key Provided",
+            )
+
+        from anthropic import Anthropic, AnthropicError
+
+        try:
+            client = Anthropic(api_key=self.api_key)
+            response = client.messages.create(
+                messages=[{"role": "user", "content": prompt or self.prompt}],
+                model=self.model,
+                max_tokens=self.max_output_tokens,
+                temperature=self.temperature,
+                timeout=self.timeout,
+            )
+        except AnthropicError as e:
+            raise AnthropicException(
+                exception=e.args[0], error_type=type(e).__name__
+            ) from e
+        except Exception as e:
+            raise AnthropicException(
+                exception=e.args[0], error_type="Unknown OpenAI Error"
+            ) from e
+
+        return response.choices[0].message.content or None
+
+
