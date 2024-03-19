@@ -18,10 +18,9 @@ provider_settings:
     models: # input names of models you want to you (see below for all models provided)
 
   - provider: Mistral
-    api_key_var: HUGGING_FACE_API_KEY
+    api_key_var: MISTRAL_API_KEY
     max_output_tokens: 256
     temperature: 0.1
     models:
-      - Mistral-7B-v0.1
-      - Mistral-7B-Instruct-v0.2
-      - Mistral-8x7B-Instruct-v0.1
+      - open-mixtral-8x7b
+

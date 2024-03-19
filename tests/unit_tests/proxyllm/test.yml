@@ -47,12 +47,10 @@ provider_settings:
 
   - provider: Mistral
     temperature: 0.1
-    api_key_var: HUGGING_FACE_API_KEY
+    api_key_var: MISTRAL_API_KEY
     max_output_tokens: 256
     models:
-      - Mistral-7B-v0.1
-      - Mistral-7B-Instruct-v0.2
-      - Mixtral-8x7B-Instruct-v0.1
+      - open-mixtral-8x7b
 # DONT USE FOR TESTING FOR NOW TO AVOID CHARGES
 # - provider: VertexAI
 #   temperature: 0.1
