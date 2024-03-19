@@ -4,7 +4,7 @@ import pytest
 from dotenv import load_dotenv
 
 from proxyllm.provider.cohere.cohere import CohereAdapter
-from proxyllm.utils.exceptions.provider import CohereException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import CohereException
 
 load_dotenv(".env.test")
 
@@ -30,17 +30,17 @@ def test_cohere_invalid_api_key() -> None:
         cohere_llm.get_completion(prompt)
 
 
-# TODO: Slowing down Unit tests, TEST LATER IN INTEGRATION TESTS
-def test_mistral_get_estimated_max_cost():
+def test_cohere_tokenize_returns_expected_num_of_input_tokens():
     # Arrange
-    cohere = CohereAdapter(api_key=cohere_api_key, max_output_tokens=256)
-    expected_cost = 6.44e-05
-    prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 5e-08, "completion": 2.5e-07}
+    expected_num_of_input_tokens = 11
+    max_output_tokens = 256
+    cohere = CohereAdapter(api_key=cohere_api_key, max_output_tokens=100)
+    prompt = "The quick brown fox jumps over the lazy dog."
+
     # Act
-    actual_cost = cohere.get_estimated_max_cost(prompt=prompt, price_data=price_data)
+    encoding = cohere.tokenize(prompt=prompt)
 
     # Assert
     assert (
-        actual_cost == expected_cost
+        encoding.num_of_input_tokens == expected_num_of_input_tokens
     ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

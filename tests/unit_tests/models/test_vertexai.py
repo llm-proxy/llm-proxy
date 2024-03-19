@@ -4,13 +4,11 @@ They are suppressed and will be addressed later
 """
 
 import os
-import unittest
 
 import pytest
 from dotenv import load_dotenv
 
 from proxyllm.provider.google.vertexai import VertexAIAdapter, VertexAIException
-from proxyllm.utils.exceptions.provider import UnsupportedModel
 
 load_dotenv(".env.test")
 project_id = os.getenv("GOOGLE_PROJECT_ID")
@@ -27,22 +25,6 @@ def test_invalid_project_id() -> None:
         vertexai.get_completion()
 
 
-def test_get_estimated_max_cost():
-    # Arrange
-    vertex = VertexAIAdapter(project_id=project_id, max_output_tokens=256)
-    expected_cost = 0.000533
-    prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 1.5e-06, "completion": 2e-06}
-
-    # Act
-    actual_cost = vertex.get_estimated_max_cost(prompt=prompt, price_data=price_data)
-
-    # Assert
-    assert (
-        actual_cost == expected_cost
-    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"
-
-
 def test_invalid_location():
     # Assert
     with pytest.raises(VertexAIException):
@@ -52,5 +34,17 @@ def test_invalid_location():
         vertexai.get_completion()
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_vertexai_tokenize_returns_expected_num_of_input_tokens():
+    # Arrange
+    expected_num_of_input_tokens = 36
+    max_output_tokens = 256
+    vertexai = VertexAIAdapter(max_output_tokens=100)
+    prompt = "The quick brown fox jumps over the lazy dog."
+
+    # Act
+    encoding = vertexai.tokenize(prompt=prompt)
+
+    # Assert
+    assert (
+        encoding.num_of_input_tokens == expected_num_of_input_tokens
+    ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

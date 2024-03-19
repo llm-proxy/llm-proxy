@@ -41,17 +41,17 @@ def test_mistral_temperature_under_0() -> None:
         mistral.get_completion()
 
 
-# TODO: Slowing down Unit tests too much, TEST LATER IN INTEGRATION TESTS
-def test_mistral_get_estimated_max_cost():
+def test_mistral_tokenize_returns_expected_num_of_input_tokens():
     # Arrange
-    mistral = MistralAdapter(api_key=mistral_api_key, max_output_tokens=256)
-    expected_cost = 6.44e-05
-    prompt = "I am a cat in a hat!"
-    price_data = {"prompt": 5e-08, "completion": 2.5e-07}
+    expected_num_of_input_tokens = 11
+    max_output_tokens = 256
+    mistral = MistralAdapter(api_key=mistral_api_key, max_output_tokens=100)
+    prompt = "The quick brown fox jumps over the lazy dog."
+
     # Act
-    actual_cost = mistral.get_estimated_max_cost(prompt=prompt, price_data=price_data)
+    encoding = mistral.tokenize(prompt=prompt)
 
     # Assert
     assert (
-        actual_cost == expected_cost
+        encoding.num_of_input_tokens == expected_num_of_input_tokens
     ), "NOTE: Flaky test may need to be changed/removed in future based on pricing"

@@ -1,5 +1,3 @@
-from typing import Dict
-
 from proxyllm.utils.sorting import MinHeap
 
 

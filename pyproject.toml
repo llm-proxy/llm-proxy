@@ -1,15 +1,14 @@
 [tool.poetry]
 name = "proxyllm"
-version = "0.1.5"
+version = "0.1.6"
 description = "LLM Proxy to reduce cost and complexity of using multiple LLMs"
-authors = ["laxitshahi"]
+authors = []
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
 python-dotenv = "^1.0.0"
 cohere = "^4.27"
-tiktoken = "^0.5.1"
 google-cloud-aiplatform = "^1.35.0"
 pyyaml = "^6.0.1"
 datasets = "^2.14.7"
@@ -18,6 +17,7 @@ openai = "^1.11.1"
 click = "^8.1.7"
 transformers = "^4.38.2"
 torch = "^2.2.1"
+tiktoken = "^0.6.0"
 
 [tool.poetry.scripts]
 config = "proxyllm.cli:cli"
@@ -25,6 +25,7 @@ config = "proxyllm.cli:cli"
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 isort = "^5.13.2"
+autoflake = "^2.3.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"

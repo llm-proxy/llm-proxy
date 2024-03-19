@@ -1,12 +1,6 @@
-from typing import Any, Dict
-
-from google.cloud import aiplatform
-from vertexai.language_models import TextGenerationModel
-
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, timeout_function, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import UnsupportedModel, VertexAIException
+from proxyllm.utils.exceptions.provider import VertexAIException
 
 # Dictionary mapping Vertex AI model categories to task performance ratings.
 vertexai_category_data = {
@@ -17,6 +11,30 @@ vertexai_category_data = {
             "Translation and Multilingual Applications Task": 1,
             "Natural Language Processing Task": 1,
             "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1,
+        },
+        "chat-bison": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 2,
+            "Legal Task": 2,
+            "Financial Task": 2,
+            "Content Recommendation Task": 1,
+        },
+        "gemini-pro": {
+            "Code Generation Task": 1,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 1,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
             "Educational Applications Task": 1,
             "Healthcare and Medical Task": 2,
             "Legal Task": 2,
@@ -75,6 +93,8 @@ class VertexAIAdapter(BaseAdapter):
             result (Dict[str, Any]): Dictionary to store the output or exception.
         """
         try:
+            from google.cloud import aiplatform
+
             aiplatform.init(project=self.project_id, location=self.location)
             # self.chat_history.append({"author": "user", "content": self.prompt or prompt})
             parameters = {
@@ -82,10 +102,17 @@ class VertexAIAdapter(BaseAdapter):
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
+            # will be changed in the future when more models are released
+            if self.model == "gemini-pro":
+                from vertexai.preview.generative_models import GenerativeModel
 
-            chat_model = TextGenerationModel.from_pretrained(self.model)
+                chat_model = GenerativeModel(self.model)
+                response = chat_model.generate_content(prompt or self.prompt)
+            else:
+                from vertexai.language_models import TextGenerationModel
 
-            response = chat_model.predict(**parameters)
+                chat_model = TextGenerationModel.from_pretrained(self.model)
+                response = chat_model.predict(**parameters)
             result["output"] = response.text
 
         except Exception as e:
@@ -122,47 +149,27 @@ class VertexAIAdapter(BaseAdapter):
 
         return result.get("output")
 
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
-        Estimates the maximum cost for processing a given prompt based on character pricing.
+        Tokenizes the provided prompt using the tokenizer.
 
         Args:
-            prompt (str): Text prompt for which to estimate the cost.
-            price_data (Dict[str, Any]): Pricing data per character for prompt and completion.
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
 
         Returns:
-            float: Estimated cost for processing the prompt.
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
 
-        Raises:
-            ValueError: If no prompt is provided.
+        Note:
+            This method currently avoids calculating costs for tokenization.
         """
-        if not self.prompt and not prompt:
-            raise ValueError("No prompt provided.")
-
-        # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
-        prompt_cost_per_character = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/CHARACTER): {prompt_cost_per_character}")
-
-        completion_cost_per_character = price_data["completion"]
-        logger.log(msg=f"COMPLETION (COST/CHARACTER): {completion_cost_per_character}")
 
         tokens = tokenizer.vertexai_encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
 
-        cost = round(
-            prompt_cost_per_character * len(tokens)
-            + completion_cost_per_character * self.max_output_tokens,
-            8,
+        return TokenizeResponse(
+            num_of_input_tokens=len(tokens),
+            num_of_output_tokens=self.max_output_tokens or 256,
         )
-
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
 
     def get_category_rank(self, category: str = "") -> int:
         """

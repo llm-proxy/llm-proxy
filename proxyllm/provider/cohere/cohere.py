@@ -1,11 +1,8 @@
-from typing import Any, Dict
+from tokenizers import Encoding
 
-import cohere
-
-from proxyllm.provider.base import BaseAdapter
+from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
-from proxyllm.utils.enums import BaseEnum
-from proxyllm.utils.exceptions.provider import CohereException, UnsupportedModel
+from proxyllm.utils.exceptions.provider import CohereException
 
 # Dictionary mapping Cohere model categories to task performance ratings.
 cohere_category_data = {
@@ -58,6 +55,18 @@ cohere_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
+        "command-r": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 1,
+            "Conversational AI Task": 1,
+            "Educational Applications Task": 2,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 2,
+        },
     }
 }
 
@@ -108,9 +117,12 @@ class CohereAdapter(BaseAdapter):
         Raises:
             CohereException: If an error occurs during the API request.
         """
+
+        from cohere import Client, CohereError
+
         try:
             self.chat_history.append({"role": "USER", "message": prompt or self.prompt})
-            co = cohere.Client(api_key=self.api_key, timeout=self.timeout)
+            co = Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
                 max_tokens=self.max_output_tokens,
                 message=prompt or self.prompt,
@@ -120,57 +132,35 @@ class CohereAdapter(BaseAdapter):
             )
             self.chat_history.append({"role": "CHATBOT", "message": response.text})
             return response.text
-        except cohere.CohereError as e:
+        except CohereError as e:
             raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
             raise CohereException(
                 exception=str(e), error_type="Unknown Cohere Error"
             ) from e
 
-    def get_estimated_max_cost(
-        self, prompt: str = "", price_data: Dict[str, Any] = None
-    ) -> float:
+    def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
-        Estimates the maximum cost for a given prompt based on token pricing.
+        Tokenizes the provided prompt using the tokenizer.
 
         Args:
-            prompt (str): Text prompt for which to estimate cost.
-            price_data (Dict[str, Any]): Pricing data for tokens.
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
 
         Returns:
-            float: Estimated maximum cost for the prompt.
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
 
-        Raises:
-            ValueError: If no prompt is provided.
+        Note:
+            This method currently avoids calculating costs for tokenization.
         """
-        if not self.prompt and not prompt:
-            raise ValueError("No prompt provided.")
-
-        # Assumption, model exists (check should be done at yml load level)
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-
-        prompt_cost_per_token = price_data["prompt"]
-        logger.log(msg=f"PROMPT (COST/TOKEN): {prompt_cost_per_token}")
-
-        completion_cost_per_token = price_data["completion"]
-
-        logger.log(msg=f"COMPLETION (COST/TOKEN): {completion_cost_per_token}")
-
         # Note: Avoiding costs for now
         # tokens = self.co.tokenize(text=prompt or self.prompt).tokens
-        tokens = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
-        logger.log(msg=f"INPUT TOKENS: {len(tokens)}")
-        logger.log(msg=f"COMPLETION TOKENS: {self.max_output_tokens}")
+        encoding: Encoding = tokenizer.bpe_tokenize_encode(prompt or self.prompt)
 
-        cost = round(
-            prompt_cost_per_token * len(tokens)
-            + completion_cost_per_token * self.max_output_tokens,
-            8,
+        return TokenizeResponse(
+            num_of_input_tokens=len(encoding.tokens),
+            num_of_output_tokens=self.max_output_tokens or 256,
         )
-
-        logger.log(msg=f"COST: {cost}", color="GREEN")
-
-        return cost
 
     def get_category_rank(self, category: str = "") -> int:
         """

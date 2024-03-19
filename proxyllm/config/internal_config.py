@@ -24,25 +24,59 @@ internal_config: List[Dict[str, Any]] = [
         "provider": "OpenAI",
         "adapter_path": "proxyllm.provider.openai.chatgpt.OpenAIAdapter",
         "models": [
+            # GPT-4 Turbo
+            {
+                "name": "gpt-4-0125-preview",
+                "cost_per_token_input": 10e-06,
+                "cost_per_token_output": 30e-06,
+            },
+            {
+                "name": "gpt-4-1106-preview",
+                "cost_per_token_input": 10e-06,
+                "cost_per_token_output": 30e-06,
+            },
+            # GPT-4
+            {
+                "name": "gpt-4",
+                "cost_per_token_input": 30e-06,
+                "cost_per_token_output": 60e-06,
+            },
+            {
+                "name": "gpt-4-32k",
+                "cost_per_token_input": 60e-06,
+                "cost_per_token_output": 120e-06,
+            },
+            # GPT-3.5 Turbo || LEGACY
+            # {
+            #     "name": "gpt-3.5-turbo-instruct",
+            #     "cost_per_token_input": 1.5e-06,
+            #     "cost_per_token_output": 2e-06,
+            # },
+            {
+                "name": "gpt-3.5-turbo-0125",
+                "cost_per_token_input": 0.5e-06,
+                "cost_per_token_output": 1.5e-06,
+            },
+            # Older Models
             {
                 "name": "gpt-3.5-turbo-1106",
                 "cost_per_token_input": 1e-06,
                 "cost_per_token_output": 2e-06,
             },
             {
-                "name": "gpt-3.5-turbo-instruct",
+                "name": "gpt-3.5-turbo-0613",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
             },
             {
-                "name": "gpt-4",
-                "cost_per_token_input": 3e-05,
-                "cost_per_token_output": 6e-05,
+                "name": "gpt-3.5-turbo-16k-0613",
+                "cost_per_token_input": 3e-06,
+                "cost_per_token_output": 4e-06,
             },
             {
-                "name": "gpt-4-32k",
-                "cost_per_token_input": 6e-05,
-                "cost_per_token_output": 0.00012,
+                "name": "gpt-3.5-turbo-0301",
+                "cost_per_token_input": 1.5e-06,
+                "cost_per_token_output": 2e-06,
             },
         ],
     },
@@ -138,6 +172,11 @@ internal_config: List[Dict[str, Any]] = [
         "adapter_path": "proxyllm.provider.cohere.cohere.CohereAdapter",
         "models": [
             {
+                "name": "command-r",
+                "cost_per_token_input": 0.5e-06,
+                "cost_per_token_output": 1.5e-06,
+            },
+            {
                 "name": "command",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
@@ -167,7 +206,17 @@ internal_config: List[Dict[str, Any]] = [
                 "name": "text-bison",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-            }
+            },
+            {
+                "name": "gemini-pro",
+                "cost_per_token_input": 1.25e-07,
+                "cost_per_token_output": 3.75e-07,
+            },
+            {
+                "name": "chat-bison",
+                "cost_per_token_input": 1.5e-06,
+                "cost_per_token_output": 2e-06,
+            },
         ],
     },
 ]
