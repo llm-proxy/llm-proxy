@@ -8,31 +8,7 @@ from proxyllm.utils.exceptions.provider import MistralException
 # Mapping of Mistral model categories to their task performance ratings.
 mistral_category_data = {
     "model-categories": {
-        "mistral-7b-v0.1": {
-            "Code Generation Task": 2,
-            "Text Generation Task": 1,
-            "Translation and Multilingual Applications Task": 2,
-            "Natural Language Processing Task": 1,
-            "Conversational AI Task": 1,
-            "Educational Applications Task": 2,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 2,
-        },
-        "mixtral-8x7b-instruct-v0.1": {
-            "Code Generation Task": 2,
-            "Text Generation Task": 1,
-            "Translation and Multilingual Applications Task": 2,
-            "Natural Language Processing Task": 1,
-            "Conversational AI Task": 1,
-            "Educational Applications Task": 2,
-            "Healthcare and Medical Task": 3,
-            "Legal Task": 3,
-            "Financial Task": 3,
-            "Content Recommendation Task": 2,
-        },
-        "mistral-7b-instruct-v0.2": {
+        "open-mixtral-8x7b": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
             "Translation and Multilingual Applications Task": 2,
@@ -96,24 +72,24 @@ class MistralAdapter(BaseAdapter):
             ValueError: If no API key is provided.
         """
         if not self.api_key:
-            raise ValueError("No Hugging Face API Key Provided")
+            raise ValueError("No Mistral API Key Provided")
 
-        from mistralai import exceptions
+        from mistralai import exceptions as MistralError
 
         try:
             self.chat_history.append({"role": "user", "content": prompt or self.prompt})
             client = MistralClient(api_key=self.api_key, timeout=self.timeout)
             output = client.chat(
                 max_tokens=self.max_output_tokens,
-                message=self.chat_history,
+                messages=self.chat_history,
                 model=self.model,
                 temperature=self.temperature,
             )
             self.chat_history.append(
                 {"role": "assistant", "content": output.choices[0].message.content}
             )
-            print(output)
-        except exceptions as e:
+
+        except MistralError as e:
             raise MistralException(
                 f"Request error: {e}", error_type="RequestError"
             ) from e
