@@ -3,7 +3,7 @@ from proxyllm.utils.exceptions.provider import AnthropicException
 from proxyllm.utils import logger, tokenizer
 
 #TODO: Catagorization ratings for each model.
-claude_category_data = {
+anthropic_category_data = {
     "model-categories": {
         "claude-3-opus-20240229": {
             "Code Generation Task": 1,
@@ -99,7 +99,7 @@ class ClaudeAdapter(BaseAdapter):
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
-        category_rank = claude_category_data["model-categories"][self.model][category]
+        category_rank = anthropic_category_data["model-categories"][self.model][category]
 
         logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
         return category_rank
