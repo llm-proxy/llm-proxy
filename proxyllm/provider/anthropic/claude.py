@@ -93,7 +93,23 @@ class ClaudeAdapter(BaseAdapter):
         return response.content[0].text or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
-        pass
+        """Count the number of tokens in a given string.
+
+        Note that this is only accurate for older models, e.g. `claude-2.1`. For newer
+        models this can only be used as a _very_ rough estimate, instead you should rely
+        on the `usage` property in the response for exact counts.
+        """
+        from anthropic import Anthropic
+
+        client = Anthropic(api_key=self.api_key)
+
+        tokenizer = client.get_tokenizer()
+        encoded_text = tokenizer.encode(prompt)
+
+        return TokenizeResponse(
+            num_of_input_tokens=len(encoded_text.ids),
+            num_of_output_tokens=self.max_output_tokens or 256,
+        )
 
     def get_category_rank(self, category: str = "") -> int:
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
