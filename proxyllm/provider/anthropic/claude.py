@@ -1,6 +1,7 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils.exceptions.provider import AnthropicException
 
+#TODO: Catagorization ratings for each model.
 claude_category_data = {
     "model-categories": {
         "claude-3-opus-20240229": {
@@ -95,3 +96,4 @@ class ClaudeAdapter(BaseAdapter):
         pass
     def get_category_rank(self, category: str = "") -> int:
         pass
+
