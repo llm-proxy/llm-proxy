@@ -57,12 +57,14 @@ provider_settings:
       #- mixtral-8x7b-instruct-v0.1
       - open-mixtral-8x7b
 
-  #- provider: VertexAI
-  #  temperature: 0.1
-  #  project_id_var: GOOGLE_PROJECT_ID
-  #  max_output_tokens: 256
-  #  models:
-  #    - text-bison
-  #    - gemini-pro
-  #    #Currently not working
-  #    #- chat-bison 
+  - provider: VertexAI
+    temperature: 0.1
+    project_id_var: GOOGLE_PROJECT_ID
+    max_output_tokens: 256
+    models:
+      - text-bison
+      - chat-bison 
+      - gemini-pro
+      - code-bison
+      - codechat-bison
+      - code-gecko
