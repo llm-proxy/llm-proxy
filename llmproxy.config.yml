@@ -62,6 +62,8 @@ provider_settings:
     max_output_tokens: 256
     models:
       - text-bison
+      - chat-bison 
       - gemini-pro
-      #Currently not working
-      #- chat-bison 
+      - code-bison
+      - codechat-bison
+      - code-gecko
