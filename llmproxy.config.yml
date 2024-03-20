@@ -67,8 +67,8 @@ provider_settings:
       #- chat-bison
       -
   - provider: Anthropic
+    api_key_var: ANTHROPIC_API_KEY
     temperature: 0.1
-    project_id_var: ANTHROPIC_API_KEY
     max_output_tokens: 256
     models:
       - claude-3-opus-20240229
