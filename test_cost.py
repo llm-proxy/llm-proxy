@@ -3,6 +3,7 @@ import time
 
 from proxyllm import LLMProxy
 from proxyllm.provider.anthropic import claude
+from dotenv import load_dotenv
 
 # NOTE: Temp Test file, will be removed in future in favour of unit/integration tests
 
@@ -28,10 +29,10 @@ def main() -> None:
 
 def request():
     prompt = "write me a short story about a homeless man in new york"
-
+    load_dotenv(".env")
     client = claude.ClaudeAdapter(
-        api_key=os.environ.get("ANTHROPIC_API_KEY"), model="claude-3-opus-20240229"
-    )
+        api_key=os.getenv("ANTHROPIC_API_KEY"), model="claude-3-haiku-20240307",
+    max_output_tokens = 256, temperature= 0)
     print(client.get_completion(prompt))
 
 
