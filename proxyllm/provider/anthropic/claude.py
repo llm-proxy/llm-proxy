@@ -1,5 +1,6 @@
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils.exceptions.provider import AnthropicException
+from proxyllm.utils import logger, tokenizer
 
 #TODO: Catagorization ratings for each model.
 claude_category_data = {
@@ -95,5 +96,11 @@ class ClaudeAdapter(BaseAdapter):
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         pass
     def get_category_rank(self, category: str = "") -> int:
-        pass
+        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
+        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+
+        category_rank = claude_category_data["model-categories"][self.model][category]
+
+        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        return category_rank
 
