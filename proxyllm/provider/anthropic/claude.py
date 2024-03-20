@@ -103,11 +103,8 @@ class ClaudeAdapter(BaseAdapter):
 
         client = Anthropic(api_key=self.api_key)
 
-        tokenizer = client.get_tokenizer()
-        encoded_text = tokenizer.encode(prompt)
-
         return TokenizeResponse(
-            num_of_input_tokens=len(encoded_text.ids),
+            num_of_input_tokens=client.count_tokens(prompt),
             num_of_output_tokens=self.max_output_tokens or 256,
         )
 
