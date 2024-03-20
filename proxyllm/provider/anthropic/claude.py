@@ -47,21 +47,22 @@ anthropic_category_data = {
 
 class ClaudeAdapter(BaseAdapter):
     """
-        Adapter class for interacting with Anthropic's language models.
+    Adapter class for interacting with Anthropic's language models.
 
-        Facilitates the sending of requests to and handling of responses from Claude's API,
-        including authentication, setting request parameters, and parsing responses. This adapter
-        is part of the ProxyLLM application, enabling seamless integration with Anthropic's services.
+    Facilitates the sending of requests to and handling of responses from Anthropic's API,
+    including authentication, setting request parameters, and parsing responses. This adapter
+    is part of the ProxyLLM application, enabling seamless integration with Anthropic's services.
 
-        Attributes:
-            prompt (str): Default text prompt for generating responses.
-            api_key (str): API key for authenticating requests to Claude.
-            auth_token (str): Authorization token for additional security, if required.
-            temperature (float): Controls the randomness in the generated text, affecting creativity.
-            model (str): Identifier for the selected Claude model.
-            max_output_tokens (int): Maximum number of tokens for the response.
-            timeout (int): Timeout for the API request in seconds.
-        """
+    Attributes:
+        prompt (str): Default text prompt for generating responses.
+        api_key (str): API key for authenticating requests to Anthropic models.
+        auth_token (str): Authorization token for additional security, if required.
+        temperature (float): Controls the randomness in the generated text, affecting creativity.
+        model (str): Identifier for the selected Anthropic model.
+        max_output_tokens (int): Maximum number of tokens for the response.
+        timeout (int): Timeout for the API request in seconds.
+    """
+
     def __init__(
         self,
         prompt: str = "",
@@ -81,6 +82,18 @@ class ClaudeAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
+        """
+        Requests a text completion from the specified Anthropic model.
+
+        Args:
+            prompt (str): The text prompt for generating completion.
+
+        Returns:
+            str | None: The model's text response, or None if an error occurs.
+
+        Raises:
+            AnthropicException: If an API or internal error occurs during request processing.
+        """
         if self.api_key == "" and self.auth_token == "":
             raise AnthropicException(
                 exception="API key or auth token not provided",
@@ -109,9 +122,18 @@ class ClaudeAdapter(BaseAdapter):
         return response.content[0].text or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
-        """Count the number of tokens in a given string.
+        """
+        Tokenizes the provided prompt using the tokenizer.
 
-        Note that this is only accurate for older models, e.g. `claude-2.1`. For newer
+        Args:
+            prompt (str, optional): The prompt to be tokenized. Defaults to an empty string.
+
+        Returns:
+            TokenizeResponse: An object containing information about the tokenization process,
+                including the number of input tokens and the maximum number of output tokens.
+
+        Note:
+        Note: that this is only accurate for older models, e.g. `claude-2.1`. For newer
         models this can only be used as a _very_ rough estimate, instead you should rely
         on the `usage` property in the response for exact counts.
         """
@@ -126,14 +148,15 @@ class ClaudeAdapter(BaseAdapter):
 
     def get_category_rank(self, category: str = "") -> int:
         """
-                Retrieves the performance rank of the current model for a specified task category.
+        Retrieves the performance rank of the current model for a specified task category.
 
-                Args:
-                    category (str): The task category for which to retrieve the model's rank.
+        Args:
+            category (str): The task category for which to retrieve the model's rank.
 
-                Returns:
-                    int: The performance rank of the model in the specified category.
-                """
+        Returns:
+            int: The performance rank of the model in the specified category.
+        """
+
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
