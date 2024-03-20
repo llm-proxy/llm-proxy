@@ -46,12 +46,28 @@ anthropic_category_data = {
 
 
 class ClaudeAdapter(BaseAdapter):
+    """
+        Adapter class for interacting with Anthropic's language models.
+
+        Facilitates the sending of requests to and handling of responses from Claude's API,
+        including authentication, setting request parameters, and parsing responses. This adapter
+        is part of the ProxyLLM application, enabling seamless integration with Anthropic's services.
+
+        Attributes:
+            prompt (str): Default text prompt for generating responses.
+            api_key (str): API key for authenticating requests to Claude.
+            auth_token (str): Authorization token for additional security, if required.
+            temperature (float): Controls the randomness in the generated text, affecting creativity.
+            model (str): Identifier for the selected Claude model.
+            max_output_tokens (int): Maximum number of tokens for the response.
+            timeout (int): Timeout for the API request in seconds.
+        """
     def __init__(
         self,
         prompt: str = "",
         api_key: str | None = "",
         auth_token: str | None = "",
-        temperature: float = 0,
+        temperature: float = 0.0,
         model: str = "",
         max_output_tokens: int | None = None,
         timeout: int | None = None,
