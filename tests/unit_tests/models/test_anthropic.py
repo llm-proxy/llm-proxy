@@ -3,11 +3,12 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from proxyllm.provider.anthropic. claude import ClaudeAdapter, AnthropicException
+from proxyllm.provider.anthropic.claude import AnthropicException, ClaudeAdapter
 
 load_dotenv(".env.test")
 
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+
 
 def test_empty_api_credentials():
     with pytest.raises(AnthropicException):
@@ -16,6 +17,6 @@ def test_empty_api_credentials():
 
 def test_invalid_api_credentials():
     with pytest.raises(AnthropicException):
-        ClaudeAdapter(api_key="invalid_key", auth_token="invalid_token").get_completion("Sample prompt")
-
-
+        ClaudeAdapter(api_key="invalid_key", auth_token="invalid_token").get_completion(
+            "Sample prompt"
+        )
