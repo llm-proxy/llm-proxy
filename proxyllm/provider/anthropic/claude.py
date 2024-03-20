@@ -51,7 +51,7 @@ class ClaudeAdapter(BaseAdapter):
         prompt: str = "",
         api_key: str | None = "",
         auth_token: str | None = "",
-        temperature: float | None = None,
+        temperature: float = 0,
         model: str = "",
         max_output_tokens: int | None = None,
         timeout: int | None = None,
@@ -65,10 +65,10 @@ class ClaudeAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(self, prompt: str = "") -> str | None:
-        if self.api_key == "":
+        if self.api_key == "" and self.auth_token == "":
             raise AnthropicException(
-                exception="EMPTY API KEY: API key not provided",
-                error_type="No API Key Provided",
+                exception="API key or auth token not provided",
+                error_type="No API Key or Auth Token Provided",
             )
 
         from anthropic import Anthropic, AnthropicError
@@ -90,8 +90,7 @@ class ClaudeAdapter(BaseAdapter):
             raise AnthropicException(
                 exception=e.args[0], error_type="Unknown Anthropic Error"
             ) from e
-
-        return response.content[0]["text"] or None
+        return response.content[0].text or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         pass
