@@ -64,4 +64,13 @@ provider_settings:
       - text-bison
       - gemini-pro
       #Currently not working
-      #- chat-bison 
+      #- chat-bison
+      -
+  - provider: Anthropic
+    temperature: 0.1
+    project_id_var: ANTHROPIC_API_KEY
+    max_output_tokens: 256
+    models:
+      - claude-3-opus-20240229
+      - claude-3-sonnet-20240229
+      - claude-3-haiku-20240307
