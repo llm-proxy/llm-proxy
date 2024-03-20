@@ -125,6 +125,15 @@ class ClaudeAdapter(BaseAdapter):
         )
 
     def get_category_rank(self, category: str = "") -> int:
+        """
+                Retrieves the performance rank of the current model for a specified task category.
+
+                Args:
+                    category (str): The task category for which to retrieve the model's rank.
+
+                Returns:
+                    int: The performance rank of the model in the specified category.
+                """
         logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
         logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
