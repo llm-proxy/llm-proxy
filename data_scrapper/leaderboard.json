@@ -1,0 +1,732 @@
+[
+    {
+        "Rank": "1",
+        "Model": "GPT-4-1106-preview",
+        "Arena_Elo": "1251",
+        "95% CI": "+5/-4",
+        "Votes": "48226",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "1",
+        "Model": "GPT-4-0125-preview",
+        "Arena_Elo": "1249",
+        "95% CI": "+5/-6",
+        "Votes": "22282",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2023/12"
+    },
+    {
+        "Rank": "1",
+        "Model": "Claude-3-Opus",
+        "Arena_Elo": "1247",
+        "95% CI": "+6/-6",
+        "Votes": "14854",
+        "Organization": "Anthropic",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2023/8"
+    },
+    {
+        "Rank": "4",
+        "Model": "Bard (Gemini Pro)",
+        "Arena_Elo": "1202",
+        "95% CI": "+6/-7",
+        "Votes": "12623",
+        "Organization": "Google",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Online"
+    },
+    {
+        "Rank": "4",
+        "Model": "Claude-3-Sonnet",
+        "Arena_Elo": "1190",
+        "95% CI": "+6/-6",
+        "Votes": "14845",
+        "Organization": "Anthropic",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2023/8"
+    },
+    {
+        "Rank": "5",
+        "Model": "GPT-4-0314",
+        "Arena_Elo": "1185",
+        "95% CI": "+4/-6",
+        "Votes": "27245",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/9"
+    },
+    {
+        "Rank": "7",
+        "Model": "GPT-4-0613",
+        "Arena_Elo": "1159",
+        "95% CI": "+4/-5",
+        "Votes": "43783",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/9"
+    },
+    {
+        "Rank": "7",
+        "Model": "Mistral-Large-2402",
+        "Arena_Elo": "1155",
+        "95% CI": "+5/-6",
+        "Votes": "18959",
+        "Organization": "Mistral",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "8",
+        "Model": "Owen-1-5-72B-Chat",
+        "Arena_Elo": "1146",
+        "95% CI": "+4/-5",
+        "Votes": "16729",
+        "Organization": "Alibaba",
+        "License": "Qianwen LICENSE",
+        "Knowledge_Cutoff": "2024/2"
+    },
+    {
+        "Rank": "8",
+        "Model": "Claude-1",
+        "Arena_Elo": "1145",
+        "95% CI": "+5/-6",
+        "Votes": "21929",
+        "Organization": "Anthropic",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "8",
+        "Model": "Mistral-Medium",
+        "Arena_Elo": "1145",
+        "95% CI": "+5/-4",
+        "Votes": "23931",
+        "Organization": "Mistral",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "12",
+        "Model": "Claude-2-0",
+        "Arena_Elo": "1126",
+        "95% CI": "+7/-5",
+        "Votes": "13679",
+        "Organization": "Anthropic",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "12",
+        "Model": "Mistral-Next",
+        "Arena_Elo": "1123",
+        "95% CI": "+5/-5",
+        "Votes": "11875",
+        "Organization": "Mistral",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "12",
+        "Model": "Gemini Pro (Dev API)",
+        "Arena_Elo": "1118",
+        "95% CI": "+5/-6",
+        "Votes": "12146",
+        "Organization": "Google",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "13",
+        "Model": "Claude-2-1",
+        "Arena_Elo": "1115",
+        "95% CI": "+4/-6",
+        "Votes": "32431",
+        "Organization": "Anthropic",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "13",
+        "Model": "Mistral-8x7b-Instruct-v0.1",
+        "Arena_Elo": "1114",
+        "95% CI": "+5/-5",
+        "Votes": "27892",
+        "Organization": "Mistral",
+        "License": "Apache 2.0",
+        "Knowledge_Cutoff": "2023/12"
+    },
+    {
+        "Rank": "13",
+        "Model": "GPT-3.5-Turbo-0613",
+        "Arena_Elo": "1113",
+        "95% CI": "+5/-4",
+        "Votes": "41354",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/9"
+    },
+    {
+        "Rank": "13",
+        "Model": "Gemini Pro",
+        "Arena_Elo": "1110",
+        "95% CI": "+8/-9",
+        "Votes": "6932",
+        "Organization": "Google",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "15",
+        "Model": "Claude-Instant-1",
+        "Arena_Elo": "1104",
+        "95% CI": "+6/-5",
+        "Votes": "21955",
+        "Organization": "Anthropic",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Unknown"
+    },
+    {
+        "Rank": "18",
+        "Model": "WizardLM-70B-v1.0",
+        "Arena_Elo": "1102",
+        "95% CI": "+7/-7",
+        "Votes": "9022",
+        "Organization": "Microsoft",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/8"
+    },
+    {
+        "Rank": "15",
+        "Model": "GPT-3.5-Turbo-0314",
+        "Arena_Elo": "1101",
+        "95% CI": "+9/-8",
+        "Votes": "5942",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/9"
+    },
+    {
+        "Rank": "18",
+        "Model": "Yi-34B-Chat",
+        "Arena_Elo": "1099",
+        "95% CI": "+5/-7",
+        "Votes": "9138",
+        "Organization": "01 AI",
+        "License": "Yi License",
+        "Knowledge_Cutoff": "2023/6"
+    },
+    {
+        "Rank": "18",
+        "Model": "TuTu-2-DPO-70B",
+        "Arena_Elo": "1097",
+        "95% CI": "+8/-6",
+        "Votes": "7097",
+        "Organization": "AllenAI/UW",
+        "License": "AI2 ImpACT Low-risk",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "18",
+        "Model": "GPT-3.5-Turbo-0125",
+        "Arena_Elo": "1096",
+        "95% CI": "+6/-5",
+        "Votes": "19993",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/9"
+    },
+    {
+        "Rank": "21",
+        "Model": "Vicuna-33B",
+        "Arena_Elo": "1089",
+        "95% CI": "+4/-5",
+        "Votes": "20404",
+        "Organization": "LMSYS",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/8"
+    },
+    {
+        "Rank": "23",
+        "Model": "OpenChat-3-5-0106",
+        "Arena_Elo": "1084",
+        "95% CI": "+7/-6",
+        "Votes": "6402",
+        "Organization": "OpenChat",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2024/1"
+    },
+    {
+        "Rank": "25",
+        "Model": "Starling-LM-7B-alpha",
+        "Arena_Elo": "1084",
+        "95% CI": "+7/-8",
+        "Votes": "8639",
+        "Organization": "UC Berkeley",
+        "License": "CC-BY-NC-4.0",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "26",
+        "Model": "Llama-2-70b-chat",
+        "Arena_Elo": "1082",
+        "95% CI": "+0/-0",
+        "Votes": "23882",
+        "Organization": "Meta",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "24",
+        "Model": "Nous-Hermes-2-Mistral-8x7B-DPO",
+        "Arena_Elo": "1081",
+        "95% CI": "+10/-10",
+        "Votes": "4047",
+        "Organization": "NousResearch",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2024/1"
+    },
+    {
+        "Rank": "25",
+        "Model": "NV-Llama2-70B-SteerLM-Chat",
+        "Arena_Elo": "1076",
+        "95% CI": "+9/-9",
+        "Votes": "3821",
+        "Organization": "Nvidia",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "27",
+        "Model": "DeepSeek-LLM-67B-Chat",
+        "Arena_Elo": "1073",
+        "95% CI": "+9/-8",
+        "Votes": "5285",
+        "Organization": "DeepSeek AI",
+        "License": "DeepSeek License",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "27",
+        "Model": "Mistral-7B-Instruct-v0.2",
+        "Arena_Elo": "1073",
+        "95% CI": "+6/-6",
+        "Votes": "10598",
+        "Organization": "Mistral",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2023/12"
+    },
+    {
+        "Rank": "27",
+        "Model": "OpenHermes-2-5-Mistral-7b",
+        "Arena_Elo": "1072",
+        "95% CI": "+7/-7",
+        "Votes": "5358",
+        "Organization": "NousResearch",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "27",
+        "Model": "OpenChat-3-5",
+        "Arena_Elo": "1071",
+        "95% CI": "+7/-5",
+        "Votes": "8545",
+        "Organization": "OpenChat",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "29",
+        "Model": "pplix-70b-online",
+        "Arena_Elo": "1068",
+        "95% CI": "+6/-6",
+        "Votes": "7368",
+        "Organization": "Perplexity AI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Online"
+    },
+    {
+        "Rank": "29",
+        "Model": "GPT-3.5-Turbo-1106",
+        "Arena_Elo": "1068",
+        "95% CI": "+5/-5",
+        "Votes": "18093",
+        "Organization": "OpenAI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/9"
+    },
+    {
+        "Rank": "30",
+        "Model": "SOLAR-10.7B-Instruct-v1.0",
+        "Arena_Elo": "1061",
+        "95% CI": "+7/-9",
+        "Votes": "4556",
+        "Organization": "Upstage AI",
+        "License": "CC-BY-NC-4.0",
+        "Knowledge_Cutoff": "2023/11"
+    },
+    {
+        "Rank": "30",
+        "Model": "Dolphin-2.2-1-Mistral-7B",
+        "Arena_Elo": "1058",
+        "95% CI": "+12/-11",
+        "Votes": "1800",
+        "Organization": "Cognitive Computations",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2023/10"
+    },
+    {
+        "Rank": "37",
+        "Model": "WizardLM-13b-v1.2",
+        "Arena_Elo": "1054",
+        "95% CI": "+7/-6",
+        "Votes": "7730",
+        "Organization": "Microsoft",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "37",
+        "Model": "Qwen1.5-7B-Chat",
+        "Arena_Elo": "1049",
+        "95% CI": "+11/-13",
+        "Votes": "1885",
+        "Organization": "Alibaba",
+        "License": "Qianwen LICENSE",
+        "Knowledge_Cutoff": "2024/2"
+    },
+    {
+        "Rank": "35",
+        "Model": "CodeLlama-70B-instruct",
+        "Arena_Elo": "1046",
+        "95% CI": "+18/-16",
+        "Votes": "452",
+        "Organization": "Meta",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2024/1"
+    },
+    {
+        "Rank": "37",
+        "Model": "Zephyr-7b-beta",
+        "Arena_Elo": "1046",
+        "95% CI": "+7/-6",
+        "Votes": "12120",
+        "Organization": "HuggingFace",
+        "License": "MIT",
+        "Knowledge_Cutoff": "2023/10"
+    },
+    {
+        "Rank": "38",
+        "Model": "Llama-2-13b-chat",
+        "Arena_Elo": "1043",
+        "95% CI": "+6/-6",
+        "Votes": "14652",
+        "Organization": "Meta",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "38",
+        "Model": "MPT-30B-chat",
+        "Arena_Elo": "1042",
+        "95% CI": "+8/-11",
+        "Votes": "2868",
+        "Organization": "MosaicML",
+        "License": "CC-BY-NC-SA-4.0",
+        "Knowledge_Cutoff": "2023/6"
+    },
+    {
+        "Rank": "39",
+        "Model": "CodeLlama-34B-instruct",
+        "Arena_Elo": "1040",
+        "95% CI": "+8/-7",
+        "Votes": "8167",
+        "Organization": "Meta",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "40",
+        "Model": "Vicuna-13B",
+        "Arena_Elo": "1037",
+        "95% CI": "+6/-6",
+        "Votes": "17405",
+        "Organization": "LMSYS",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "40",
+        "Model": "pplix-7b-online",
+        "Arena_Elo": "1035",
+        "95% CI": "+7/-7",
+        "Votes": "6724",
+        "Organization": "Perplexity AI",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "Online"
+    },
+    {
+        "Rank": "39",
+        "Model": "Zephyr-7b-alpha",
+        "Arena_Elo": "1033",
+        "95% CI": "+14/-11",
+        "Votes": "1931",
+        "Organization": "HuggingFace",
+        "License": "MIT",
+        "Knowledge_Cutoff": "2023/10"
+    },
+    {
+        "Rank": "41",
+        "Model": "Qwen-14B-Chat",
+        "Arena_Elo": "1032",
+        "95% CI": "+8/-8",
+        "Votes": "5377",
+        "Organization": "Alibaba",
+        "License": "Qianwen LICENSE",
+        "Knowledge_Cutoff": "2023/8"
+    },
+    {
+        "Rank": "41",
+        "Model": "Guanaco-33B",
+        "Arena_Elo": "1029",
+        "95% CI": "+10/-12",
+        "Votes": "3233",
+        "Organization": "UW",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/5"
+    },
+    {
+        "Rank": "43",
+        "Model": "Gemma-7B-it",
+        "Arena_Elo": "1029",
+        "95% CI": "+6/-9",
+        "Votes": "5627",
+        "Organization": "Google",
+        "License": "Gemma license",
+        "Knowledge_Cutoff": "2024/2"
+    },
+    {
+        "Rank": "44",
+        "Model": "Llama-2-7b-chat",
+        "Arena_Elo": "1027",
+        "95% CI": "+6/-6",
+        "Votes": "10672",
+        "Organization": "Meta",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "40",
+        "Model": "falcon-180b-chat",
+        "Arena_Elo": "1026",
+        "95% CI": "+20/-15",
+        "Votes": "1411",
+        "Organization": "TII",
+        "License": "Falcon-180B TII License",
+        "Knowledge_Cutoff": "2023/9"
+    },
+    {
+        "Rank": "49",
+        "Model": "StripedHyena-Nous-7B",
+        "Arena_Elo": "1015",
+        "95% CI": "+7/-8",
+        "Votes": "5612",
+        "Organization": "Together AI",
+        "License": "Apache 2.0",
+        "Knowledge_Cutoff": "2023/12"
+    },
+    {
+        "Rank": "52",
+        "Model": "OLMo-7B-instruct",
+        "Arena_Elo": "1012",
+        "95% CI": "+8/-8",
+        "Votes": "4912",
+        "Organization": "Allen AI",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2024/2"
+    },
+    {
+        "Rank": "54",
+        "Model": "PaLM-Chat-Bison-001",
+        "Arena_Elo": "1002",
+        "95% CI": "+7/-8",
+        "Votes": "9383",
+        "Organization": "Google",
+        "License": "Proprietary",
+        "Knowledge_Cutoff": "2021/6"
+    },
+    {
+        "Rank": "55",
+        "Model": "Mistral-7B-Instruct-v0.1",
+        "Arena_Elo": "1002",
+        "95% CI": "+6/-6",
+        "Votes": "9807",
+        "Organization": "Mistral",
+        "License": "Apache 2.0",
+        "Knowledge_Cutoff": "2023/9"
+    },
+    {
+        "Rank": "54",
+        "Model": "Vicuna-7B",
+        "Arena_Elo": "1001",
+        "95% CI": "+7/-8",
+        "Votes": "7539",
+        "Organization": "LMSYS",
+        "License": "Llama 2 Community",
+        "Knowledge_Cutoff": "2023/7"
+    },
+    {
+        "Rank": "56",
+        "Model": "Gemma-2B-it",
+        "Arena_Elo": "985",
+        "95% CI": "+13/-11",
+        "Votes": "2704",
+        "Organization": "Google",
+        "License": "Gemma license",
+        "Knowledge_Cutoff": "2024/2"
+    },
+    {
+        "Rank": "59",
+        "Model": "Qwen1.5-4B-Chat",
+        "Arena_Elo": "972",
+        "95% CI": "+13/-9",
+        "Votes": "3138",
+        "Organization": "Alibaba",
+        "License": "Qianwen LICENSE",
+        "Knowledge_Cutoff": "2024/2"
+    },
+    {
+        "Rank": "60",
+        "Model": "Koala-13B",
+        "Arena_Elo": "962",
+        "95% CI": "+8/-8",
+        "Votes": "7405",
+        "Organization": "UC Berkeley",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "60",
+        "Model": "ChatGLM3-6B",
+        "Arena_Elo": "955",
+        "95% CI": "+9/-8",
+        "Votes": "5007",
+        "Organization": "Tsinghua",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2023/10"
+    },
+    {
+        "Rank": "62",
+        "Model": "GPT4AI1-13B-Snoozy",
+        "Arena_Elo": "937",
+        "95% CI": "+10/-17",
+        "Votes": "1936",
+        "Organization": "Nomic AI",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/3"
+    },
+    {
+        "Rank": "63",
+        "Model": "MPT-7B-Chat",
+        "Arena_Elo": "928",
+        "95% CI": "+10/-9",
+        "Votes": "4263",
+        "Organization": "MosaicML",
+        "License": "CC-BY-NC-SA-4.0",
+        "Knowledge_Cutoff": "2023/5"
+    },
+    {
+        "Rank": "63",
+        "Model": "ChatGLM2-6B",
+        "Arena_Elo": "925",
+        "95% CI": "+10/-12",
+        "Votes": "2909",
+        "Organization": "Tsinghua",
+        "License": "Apache-2.0",
+        "Knowledge_Cutoff": "2023/6"
+    },
+    {
+        "Rank": "63",
+        "Model": "RWKV-4-Raven-14B",
+        "Arena_Elo": "922",
+        "95% CI": "+9/-9",
+        "Votes": "5216",
+        "Organization": "RWKV",
+        "License": "Apache 2.0",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "67",
+        "Model": "Alpaca-13B",
+        "Arena_Elo": "901",
+        "95% CI": "+8/-9",
+        "Votes": "6193",
+        "Organization": "Stanford",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/3"
+    },
+    {
+        "Rank": "67",
+        "Model": "OpenAssistant-Pythia-12B",
+        "Arena_Elo": "893",
+        "95% CI": "+7/-11",
+        "Votes": "6700",
+        "Organization": "OpenAssistant",
+        "License": "Apache 2.0",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "68",
+        "Model": "ChatGLM-6B",
+        "Arena_Elo": "880",
+        "95% CI": "+8/-10",
+        "Votes": "5258",
+        "Organization": "Tsinghua",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/3"
+    },
+    {
+        "Rank": "69",
+        "Model": "FastChat-T5-3B",
+        "Arena_Elo": "871",
+        "95% CI": "+9/-8",
+        "Votes": "4576",
+        "Organization": "LMSYS",
+        "License": "Apache 2.0",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "71",
+        "Model": "StableLM-Tuned-Alpha-7B",
+        "Arena_Elo": "842",
+        "95% CI": "+10/-12",
+        "Votes": "3512",
+        "Organization": "Stability AI",
+        "License": "CC-BY-NC-SA-4.0",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "72",
+        "Model": "Dolly-V2-12B",
+        "Arena_Elo": "820",
+        "95% CI": "+9/-11",
+        "Votes": "3707",
+        "Organization": "Databricks",
+        "License": "MIT",
+        "Knowledge_Cutoff": "2023/4"
+    },
+    {
+        "Rank": "72",
+        "Model": "LLaMA-13B",
+        "Arena_Elo": "797",
+        "95% CI": "+13/-14",
+        "Votes": "2597",
+        "Organization": "Meta",
+        "License": "Non-commercial",
+        "Knowledge_Cutoff": "2023/2"
+    }
+]
