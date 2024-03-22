@@ -67,7 +67,6 @@ class ClaudeAdapter(BaseAdapter):
         self,
         prompt: str = "",
         api_key: str | None = "",
-        auth_token: str | None = "",
         temperature: float = 0.0,
         model: str = "",
         max_output_tokens: int | None = None,
@@ -75,7 +74,6 @@ class ClaudeAdapter(BaseAdapter):
     ) -> None:
         self.prompt = prompt
         self.api_key = api_key
-        self.auth_token = auth_token
         self.temperature = temperature
         self.model = model
         self.max_output_tokens = max_output_tokens
@@ -94,10 +92,10 @@ class ClaudeAdapter(BaseAdapter):
         Raises:
             AnthropicException: If an API or internal error occurs during request processing.
         """
-        if self.api_key == "" and self.auth_token == "":
+        if self.api_key == "":
             raise AnthropicException(
-                exception="API key or auth token not provided",
-                error_type="No API Key or Auth Token Provided",
+                exception="API key not provided",
+                error_type="No API Key has been Provided",
             )
 
         from anthropic import Anthropic, AnthropicError
