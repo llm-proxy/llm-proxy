@@ -94,8 +94,8 @@ class ClaudeAdapter(BaseAdapter):
         """
         if self.api_key == "":
             raise AnthropicException(
-                exception="API key not provided",
-                error_type="No API Key has been Provided",
+                exception="EMPTY API KEY: API key not provided",
+                error_type="No API Key Provided",
             )
 
         from anthropic import Anthropic, AnthropicError
