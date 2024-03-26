@@ -29,6 +29,11 @@ class OpenAIException(Exception):
         super().__init__(f"OpenAI Error: {exception}, Type: {error_type}")
 
 
+class AnthropicException(Exception):
+    def __init__(self, exception: str, error_type: str) -> None:
+        super().__init__(f"Anthropic Error: {exception}, Type: {error_type}")
+
+
 class UnsupportedModel(Exception):
     """
     General Exceptions shared across models
