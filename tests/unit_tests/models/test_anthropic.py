@@ -12,7 +12,7 @@ anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
 
 def test_empty_api_key():
     with pytest.raises(AnthropicException):
-        adapter = ClaudeAdapter(api_key="sfsfs")
+        adapter = ClaudeAdapter(api_key="")
         adapter.get_completion()
 
 
@@ -24,7 +24,7 @@ def test_invalid_api_credentials():
 
 def test_claude_tokenize_returns_expected_num_of_input_tokens():
     # Set up your expected number of tokens based on the 'prompt' string
-    expected_num_of_input_tokens = 10  #
+    expected_num_of_input_tokens = 10
     max_output_tokens = 256
     claude = ClaudeAdapter(api_key=anthropic_api_key, max_output_tokens=max_output_tokens, model="claude-3-opus-20240229")
     prompt = "The quick brown fox jumps over the lazy dog."
