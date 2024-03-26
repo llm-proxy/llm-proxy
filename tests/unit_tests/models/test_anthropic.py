@@ -26,8 +26,14 @@ def test_claude_tokenize_returns_expected_num_of_input_tokens():
     # Set up your expected number of tokens based on the 'prompt' string
     expected_num_of_input_tokens = 10
     max_output_tokens = 256
-    claude = ClaudeAdapter(api_key=anthropic_api_key, max_output_tokens=max_output_tokens, model="claude-3-opus-20240229")
+    claude = ClaudeAdapter(
+        api_key=anthropic_api_key,
+        max_output_tokens=max_output_tokens,
+        model="claude-3-opus-20240229",
+    )
     prompt = "The quick brown fox jumps over the lazy dog."
     tokenize_response = claude.tokenize(prompt=prompt)
 
-    assert tokenize_response.num_of_input_tokens == expected_num_of_input_tokens, "The number of input tokens does not match the expected value"
+    assert (
+        tokenize_response.num_of_input_tokens == expected_num_of_input_tokens
+    ), "The number of input tokens does not match the expected value"
