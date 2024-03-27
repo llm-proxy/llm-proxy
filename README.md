@@ -156,6 +156,14 @@ print("ERRORS: ", output.errors)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- GCF Implementation Guide -->
+## GCF Setup Guide
+If you plan to use proxyLLM through HTTP request such as using Postman
+![alt text](proxyLLM_GCF_demo.gif)
+Please follow this [guide](https://github.com/llm-proxy/llm-proxy/wiki/Basic-Setup-for-proxyLLM-Google-Cloud-Function) to set up your own proxyLLM in Google Cloud Function.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- ROADMAP -->
 
 ## Roadmap
