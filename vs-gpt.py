@@ -2,12 +2,45 @@ import os
 import time
 
 from dotenv import load_dotenv
+from proxyllm.provider.cohere.cohere import CohereAdapter
+from proxyllm.provider.google.vertexai import VertexAIAdapter
+from proxyllm.provider.huggingface.llama2 import Llama2Adapter
+from proxyllm.provider.huggingface.mistral import MistralAdapter
 from proxyllm.provider.openai.chatgpt import OpenAIAdapter
 from proxyllm.proxyllm import LLMProxy
 
 load_dotenv(".env.test")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+HUGGING_FACE_API_KEY = os.getenv("HUGGING_FACE_API_KEY")
+GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID")
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
+model_tokenizer = {
+    "gpt-4-0125-preview": OpenAIAdapter(model="gpt-4-0125-preview", api_key=OPENAI_API_KEY).tokenize,
+    "gpt-4-1106-preview": OpenAIAdapter(model="gpt-4-1106-preview", api_key=OPENAI_API_KEY).tokenize,
+    "gpt-4": OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY).tokenize,
+    "gpt-4-32k": OpenAIAdapter(model="gpt-4-32k", api_key=OPENAI_API_KEY).tokenize,
+    "gpt-3.5-turbo-0125": OpenAIAdapter(model="gpt-3.5-turbo-0125", api_key=OPENAI_API_KEY).tokenize,
+    "Llama-2-13b-hf": Llama2Adapter(model="Llama-2-13b-hf", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "Llama-2-13b-chat-hf": Llama2Adapter(model="Llama-2-13b-chat-hf", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "Llama-2-70b-hf": Llama2Adapter(model="Llama-2-70b-hf", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "Llama-2-70b-chat-hf": Llama2Adapter(model="Llama-2-70b-chat-hf", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "command-r": CohereAdapter(model="command-r", api_key=COHERE_API_KEY).tokenize,
+    "command": CohereAdapter(model="command", api_key=COHERE_API_KEY).tokenize,
+    "command-light": CohereAdapter(model="command-light", api_key=COHERE_API_KEY).tokenize,
+    "command-nightly": CohereAdapter(model="command-nightly", api_key=COHERE_API_KEY).tokenize,
+    "command-light-nightly": CohereAdapter(model="command-light-nightly", api_key=COHERE_API_KEY).tokenize,
+    "mistral-7b-v0.1": MistralAdapter(model="mistral-7b-v0.1", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "mistral-7b-instruct-v0.2": MistralAdapter(model="mistral-7b-instruct-v0.2", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "mixtral-8x7b-instruct-v0.1": MistralAdapter(model="mixtral-8x7b-instruct-v0.1", api_key=HUGGING_FACE_API_KEY).tokenize,
+    "text-bison": VertexAIAdapter(model="text-bison", project_id=GOOGLE_PROJECT_ID).tokenize,
+    "chat-bison": VertexAIAdapter(model="chat-bison", project_id=GOOGLE_PROJECT_ID).tokenize,
+    "gemini-pro": VertexAIAdapter(model="gemini-pro", project_id=GOOGLE_PROJECT_ID).tokenize,
+    "code-bison": VertexAIAdapter(model="code-bison", project_id=GOOGLE_PROJECT_ID).tokenize,
+    "codechat-bison": VertexAIAdapter(model="codechat-bison", project_id=GOOGLE_PROJECT_ID).tokenize,
+    "code-gecko": VertexAIAdapter(model="code-gecko", project_id=GOOGLE_PROJECT_ID).tokenize,
+}
 def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
     start_openai = time.perf_counter()
     openai_output = openai.get_completion(prompt=prompt)
@@ -18,10 +51,15 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
     PRICE_PER_GPT4_TOKEN = 0.00003
     openai_cost = openai_num_of_input_tokens * PRICE_PER_GPT4_TOKEN
 
+    
     start_llmproxy = time.perf_counter()
     llmproxy_output = llmproxy.route(prompt=prompt)
     end_llmproxy = time.perf_counter()
     llmproxy_latency = end_llmproxy - start_llmproxy
+    
+    llmproxy_num_of_input_tokens = None
+    PRICE_PER_LLMPROXY_TOKEN = None
+    llmproxy_cost = llmproxy_num_of_input_tokens * PRICE_PER_LLMPROXY_TOKEN
 
     return {
         "openai":{
