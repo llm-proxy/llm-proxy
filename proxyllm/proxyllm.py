@@ -238,9 +238,12 @@ def _setup_model_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         for provider in settings:
             # Loop through the "models" and save the cost data for each model
             for model_yml_data in provider.get("models", []):
-                model_name, prompt_cost, completion_cost, model_elo = (
-                    model_yml_data.values()
-                )
+                (
+                    model_name,
+                    prompt_cost,
+                    completion_cost,
+                    model_elo,
+                ) = model_yml_data.values()
                 model_data[model_name] = {
                     "prompt": prompt_cost,
                     "completion": completion_cost,
@@ -506,7 +509,7 @@ class LLMProxy:
             )
 
             logger.log(
-                msg="Sorting fetched models based on proficency...",
+                msg="Sorting fetched models based on proficiency...",
             )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}

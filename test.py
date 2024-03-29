@@ -39,9 +39,28 @@ def cost_routing() -> None:
     assert output.response
 
 
+def proficiency_routing() -> None:
+    # prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
+    prompt = "what is 1+1?"
+    # output = proxy_client.route(route_type="cost", prompt=prompt)
+    # print(output)
+
+    start = time.time()
+    proxy_client = LLMProxy(route_type="proficiency")
+    output = proxy_client.route(prompt=prompt)
+    end = time.time()
+    print("RESPONSE MODEL: ", output.response_model)
+    print("RESPONSE: ", output.response)
+    # print("ERRORS: ", output.errors)
+    print(f"\Proficiency route total time taken: {end-start}")
+    assert output.response_model
+    assert output.response
+
+
 def main() -> None:
     category_routing()
     cost_routing()
+    proficiency_routing()
 
 
 if __name__ == "__main__":
