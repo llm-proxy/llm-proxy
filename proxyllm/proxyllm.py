@@ -587,7 +587,7 @@ class LLMProxy:
         """
 
         min_heap = MinHeap()
-        logger.log(msg="Sorting fetched models based on elo rating...", color="GEEN")
+        logger.log(msg="Sorting fetched models based on elo rating...", color="GREEN")
         for model_name, instance in self.user_models.items():
             logger.log(
                 msg="========Fetching models for proficiency routing===========",
