@@ -32,7 +32,7 @@ def test_no_user_setting(tmp_path) -> None:
         LLMProxy(
             path_to_user_configuration=yml_path,
             path_to_env_vars=PATH_TO_ENV_TEST,
-            route_type="category",
+            route_type="proficiency",
         )
 
 
@@ -48,7 +48,7 @@ def test_no_model_in_user_setting(tmp_path) -> None:
         LLMProxy(
             path_to_user_configuration=yml_path,
             path_to_env_vars=PATH_TO_ENV_TEST,
-            route_type="category",
+            route_type="proficiency",
         )
 
 
@@ -79,7 +79,7 @@ def test_get_settings_from_yml(tmp_path) -> None:
     LLMProxy(
         path_to_user_configuration=yml_path,
         path_to_env_vars=PATH_TO_ENV_TEST,
-        route_type="category",
+        route_type="proficiency",
     )
 
 
@@ -161,10 +161,10 @@ def test_llmproxy_constructor_route_type_override(tmp_path):
     proxy = LLMProxy(
         path_to_user_configuration=yml_path,
         path_to_env_vars=PATH_TO_ENV_TEST,
-        route_type="category",
+        route_type="proficiency",
     )
 
-    assert proxy.route_type == "category"
+    assert proxy.route_type == "proficiency"
 
 
 def test_no_route_type_specified_throws_error(tmp_path):
