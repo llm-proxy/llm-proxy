@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from proxyllm.provider.openai.chatgpt import OpenAIAdapter
 from proxyllm.proxyllm import LLMProxy
 
+load_dotenv(".env.test")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 def call_models(prompt: str) -> dict:
     start_openai = time.perf_counter()
     openai = OpenAIAdapter(prompt=prompt, model="gpt-4", api_key=OPENAI_API_KEY)
