@@ -8,15 +8,13 @@ from proxyllm.proxyllm import LLMProxy
 load_dotenv(".env.test")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-def call_models(prompt: str) -> dict:
+def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
     start_openai = time.perf_counter()
-    openai = OpenAIAdapter(prompt=prompt, model="gpt-4", api_key=OPENAI_API_KEY)
     openai_output = openai.get_completion(prompt=prompt)
     end_openai = time.perf_counter()
     openai_latency = end_openai - start_openai
 
     start_llmproxy = time.perf_counter()
-    llmproxy = LLMProxy(route_type="cost")
     llmproxy_output = llmproxy.route(prompt=prompt)
     end_llmproxy = time.perf_counter()
     llmproxy_latency = end_llmproxy - start_llmproxy
@@ -24,11 +22,13 @@ def call_models(prompt: str) -> dict:
     return {
         "openai":{
             "response":openai_output,
-            "latency":openai_latency
+            "latency":openai_latency,
+            "cost": None, # TODO - Add the estimated cost
         },
         "llmproxy":{
             "response":llmproxy_output,
-            "latency":llmproxy_latency
+            "latency":llmproxy_latency,
+            "cost": None, # TODO - Add the estimated cost
         }
     }
     
@@ -284,5 +284,11 @@ c) exchange rates will be affected but not the value of the dollar.
 d) the exchange rate will not be affected."""
 ]
 
+openai = OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY)
+llmproxy = LLMProxy(route_type="cost")
+
+responses = dict()
 for prompt in sample_prompts:
-    pass
+    responses[prompt] = call_models(sample_prompts, openai, llmproxy)
+
+print(responses)
