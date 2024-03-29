@@ -14,6 +14,10 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
     end_openai = time.perf_counter()
     openai_latency = end_openai - start_openai
 
+    openai_num_of_input_tokens = openai.tokenize(prompt=prompt)
+    PRICE_PER_GPT4_TOKEN = 0.00003
+    openai_cost = openai_num_of_input_tokens * PRICE_PER_GPT4_TOKEN
+
     start_llmproxy = time.perf_counter()
     llmproxy_output = llmproxy.route(prompt=prompt)
     end_llmproxy = time.perf_counter()
@@ -23,7 +27,7 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
         "openai":{
             "response":openai_output,
             "latency":openai_latency,
-            "cost": None, # TODO - Add the estimated cost
+            "cost": openai_cost,
         },
         "llmproxy":{
             "response":llmproxy_output,
