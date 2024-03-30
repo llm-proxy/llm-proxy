@@ -256,17 +256,17 @@ def _setup_model_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def _get_route_type(
     user_settings: Dict[str, Any] | None,
-    constructor_route_type: Literal["cost", "category"] | None,
-) -> Literal["cost", "category"]:
+    constructor_route_type: Literal["cost", "category", "proficiency"] | None,
+) -> Literal["cost", "category", "proficiency"]:
     """
     Determine the routing type based on user settings or constructor arguments.
 
     Args:
         user_settings (Dict[str, Any] | None): Configuration from the user settings.
-        constructor_route_type (Literal["cost", "category"] | None): Routing type specified at object construction.
+        constructor_route_type (Literal["cost", "category", "proficiency"] | None): Routing type specified at object construction.
 
     Returns:
-        Literal["cost", "category"]: The determined route type.
+        Literal["cost", "category", "proficiency"]: The determined route type.
 
     Raises:
         UserConfigError: If the route type is not specified or invalid.
@@ -311,7 +311,7 @@ class LLMProxy:
         self,
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
-        route_type: Literal["cost", "category"] | None = None,
+        route_type: Literal["cost", "category", "proficiency"] | None = None,
         **kwargs,
     ) -> None:
         """
