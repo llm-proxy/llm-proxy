@@ -101,6 +101,8 @@ class ClaudeAdapter(BaseAdapter):
         from anthropic import Anthropic, AnthropicError
 
         try:
+
+            # TODO :: Remove reinitialization of the client
             client = Anthropic(api_key=self.api_key)
             response = client.messages.create(
                 messages=[{"role": "user", "content": prompt or self.prompt}],
