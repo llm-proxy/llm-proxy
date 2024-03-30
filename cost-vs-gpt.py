@@ -12,7 +12,7 @@ from proxyllm.proxyllm import LLMProxy
 from proxyllm.utils.cost import calculate_estimated_max_cost
 
 
-load_dotenv(".env.test")
+load_dotenv(".env")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 HUGGING_FACE_API_KEY = os.getenv("HUGGING_FACE_API_KEY")
