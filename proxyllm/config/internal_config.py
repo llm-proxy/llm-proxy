@@ -234,4 +234,25 @@ internal_config: List[Dict[str, Any]] = [
             },
         ],
     },
+    {
+        "provider": "Anthropic",
+        "adapter_path": "proxyllm.provider.anthropic.claude.ClaudeAdapter",
+        "models": [
+            {
+                "name": "claude-3-opus-20240229",
+                "cost_per_token_input": 1.5e-05,
+                "cost_per_token_output": 7.5e-05,
+            },
+            {
+                "name": "claude-3-sonnet-20240229",
+                "cost_per_token_input": 3e-06,
+                "cost_per_token_output": 1.5e-05,
+            },
+            {
+                "name": "claude-3-haiku-20240307",
+                "cost_per_token_input": 2.5e-07,
+                "cost_per_token_output": 1.25e-06,
+            },
+        ],
+    },
 ]
