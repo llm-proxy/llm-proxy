@@ -103,6 +103,7 @@ class VertexAIAdapter(BaseAdapter):
         max_output_tokens (int): Maximum number of tokens for the response.
         timeout (int): Timeout for the API request.
         force_timeout (bool): Whether to enforce a timeout for the request.
+        chat_models_dict (Dict[str, Any]): Used to store the chat instances of each model
     """
 
     def __init__(
@@ -124,7 +125,7 @@ class VertexAIAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
         self.force_timeout = force_timeout
-        self.chat_history = []
+        self.chat_models_dict = {}
 
     def _make_request(self, prompt, result):
         """
@@ -138,19 +139,22 @@ class VertexAIAdapter(BaseAdapter):
             from google.cloud import aiplatform
 
             aiplatform.init(project=self.project_id, location=self.location)
-            self.chat_history.append(
-                {"author": "user", "content": self.prompt or prompt}
-            )
             parameters = {
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
             # will be changed in the future when more models are released
             if self.model in ModelType.GEMINI.value:
-                from vertexai.preview.generative_models import GenerativeModel
+                # Create the chat model's chat instance to start a conversation
+                if self.model not in self.chat_models_dict:
+                    from vertexai.preview.generative_models import GenerativeModel
 
-                chat_model = GenerativeModel(self.model)
-                response = chat_model.generate_content(prompt or self.prompt)
+                    chat_model = GenerativeModel(self.model)
+                    chat = chat_model.start_chat(history=[])
+                    self.chat_models_dict[self.model] = chat
+
+                chat_instance = self.chat_models_dict[self.model]
+                response = chat_instance.send_message(prompt or self.prompt)
 
             elif self.model in ModelType.PALM.value:
                 if self.model == "text-bison":
@@ -159,18 +163,31 @@ class VertexAIAdapter(BaseAdapter):
                     chat_model = TextGenerationModel.from_pretrained(self.model)
                     response = chat_model.predict(prompt or self.prompt, **parameters)
                 else:
-                    from vertexai.language_models import ChatModel
+                    # Create the chat model's chat instance to start a conversation
+                    if self.model not in self.chat_models_dict:
+                        from vertexai.language_models import ChatModel
 
-                    chat_model = ChatModel.from_pretrained(self.model)
-                    response = chat_model.start_chat().send_message(
+                        chat_model = ChatModel.from_pretrained(self.model)
+                        chat = chat_model.start_chat(message_history=[])
+                        self.chat_models_dict[self.model] = chat
+
+                    chat_instance = self.chat_models_dict[self.model]
+                    response = chat_instance.send_message(
                         prompt or self.prompt, **parameters
                     )
+
+            # CODEY = ["code-bison, codechat-bison, code-gecko"]
             elif self.model in ModelType.CODEY.value:
                 if self.model == "codechat-bison":
-                    from vertexai.language_models import CodeChatModel
+                    if self.model not in self.chat_models_dict:
+                        from vertexai.language_models import CodeChatModel
 
-                    chat_model = CodeChatModel.from_pretrained(self.model)
-                    response = chat_model.start_chat().send_message(
+                        chat_model = CodeChatModel.from_pretrained(self.model)
+                        chat = chat_model.start_chat(message_history=[])
+                        self.chat_models_dict[self.model] = chat
+
+                    chat_instance = self.chat_models_dict[self.model]
+                    response = chat_instance.send_message(
                         prompt or self.prompt, **parameters
                     )
                 else:
