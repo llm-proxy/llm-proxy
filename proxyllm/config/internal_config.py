@@ -148,27 +148,6 @@ internal_config: List[Dict[str, Any]] = [
     },
     {
         "provider": "Mistral",
-        "adapter_path": "proxyllm.provider.huggingface.mistral.MistralAdapter",
-        "models": [
-            {
-                "name": "mistral-7b-v0.1",
-                "cost_per_token_input": 5e-08,
-                "cost_per_token_output": 2.5e-07,
-            },
-            {
-                "name": "mistral-7b-instruct-v0.2",
-                "cost_per_token_input": 5e-08,
-                "cost_per_token_output": 2.5e-07,
-            },
-            {
-                "name": "mixtral-8x7b-instruct-v0.1",
-                "cost_per_token_input": 3e-07,
-                "cost_per_token_output": 1e-06,
-            },
-        ],
-    },
-    {
-        "provider": "Mistral",
         "adapter_path": "proxyllm.provider.mistral.mistral.MistralAdapter",
         "models": [
             {
