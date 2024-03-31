@@ -103,7 +103,6 @@ class VertexAIAdapter(BaseAdapter):
         max_output_tokens (int): Maximum number of tokens for the response.
         timeout (int): Timeout for the API request.
         force_timeout (bool): Whether to enforce a timeout for the request.
-        chat_models_dict (Dict[str, Any]): Used to store the chat instances of each model
     """
 
     def __init__(
