@@ -43,11 +43,12 @@ class RouteType(str, BaseEnum):
 
     Attributes:
         COST: Route requests based on cost efficiency.
-        CATEGORY: Route requests based on category proficiency.
+        CATEGORY: Route requests based on category elo.
     """
 
     COST = "cost"
     CATEGORY = "category"
+    ELO = "elo"
 
 
 def _get_settings_from_yml(
@@ -96,7 +97,6 @@ def _setup_available_models(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 
             # Loop through and aggregate all of the variations of "models" of each provider
             provider_models = set()
-            model_costs = {}
             for model in provider.get("models", []):
                 provider_models.add(model["name"])
 
@@ -219,7 +219,7 @@ def _setup_user_models(
         ) from e
 
 
-def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _setup_model_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Extract and return the cost data for each model from configuration settings.
 
@@ -233,34 +233,40 @@ def _setup_models_cost_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
         KeyError: If expected keys are missing from the settings.
     """
     try:
-        models_cost_data = {}
+        model_data = {}
         # Loop through all the providers in settings
         for provider in settings:
             # Loop through the "models" and save the cost data for each model
-            for model_data in provider.get("models", []):
-                model_name, prompt_cost, completion_cost = model_data.values()
-                models_cost_data[model_name] = {
+            for model_yml_data in provider.get("models", []):
+                (
+                    model_name,
+                    prompt_cost,
+                    completion_cost,
+                    model_elo,
+                ) = model_yml_data.values()
+                model_data[model_name] = {
                     "prompt": prompt_cost,
                     "completion": completion_cost,
+                    "elo": model_elo,
                 }
-        return models_cost_data
+        return model_data
     except Exception as e:
         raise e
 
 
 def _get_route_type(
     user_settings: Dict[str, Any] | None,
-    constructor_route_type: Literal["cost", "category"] | None,
-) -> Literal["cost", "category"]:
+    constructor_route_type: Literal["cost", "category", "elo"] | None,
+) -> Literal["cost", "category", "elo"]:
     """
     Determine the routing type based on user settings or constructor arguments.
 
     Args:
         user_settings (Dict[str, Any] | None): Configuration from the user settings.
-        constructor_route_type (Literal["cost", "category"] | None): Routing type specified at object construction.
+        constructor_route_type (Literal["cost", "category", "elo"] | None): Routing type specified at object construction.
 
     Returns:
-        Literal["cost", "category"]: The determined route type.
+        Literal["cost", "category", "elo"]: The determined route type.
 
     Raises:
         UserConfigError: If the route type is not specified or invalid.
@@ -298,14 +304,14 @@ class LLMProxy:
         user_models (Dict[str, BaseAdapter]): Models configured by the user, ready for use.
         available_models (Dict[str, Any]): All models available within the proxy.
         route_type (Literal["cost", "category"]): Selected routing strategy.
-        models_cost_data (Dict[str, Any]): Cost data for each model used in cost-based routing.
+        model_data (Dict[str, Any]): Data for each model used in cost-based or elo routing.
     """
 
     def __init__(
         self,
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
-        route_type: Literal["cost", "category"] | None = None,
+        route_type: Literal["cost", "category", "elo"] | None = None,
         **kwargs,
     ) -> None:
         """
@@ -340,9 +346,9 @@ class LLMProxy:
             user_settings=user_settings, constructor_route_type=route_type
         )
 
-        if self.route_type == RouteType.COST:
+        if self.route_type == RouteType.COST or RouteType.ELO:
             # Setup the cost data of each model
-            self.models_cost_data = _setup_models_cost_data(settings=internal_config)
+            self.model_data = _setup_model_data(settings=internal_config)
 
     def route(
         self,
@@ -362,6 +368,8 @@ class LLMProxy:
                 return self._cost_route(prompt=prompt)
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
+            case RouteType.ELO:
+                return self._elo_route(prompt=prompt)
             case _:
                 raise ValueError("Invalid route type, please try again")
 
@@ -388,10 +396,10 @@ class LLMProxy:
 
                 logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
                 logger.log(
-                    msg=f"PROMPT (COST/CHARACTER): {self.models_cost_data[model_name]['prompt']}"
+                    msg=f"PROMPT (COST/CHARACTER): {self.model_data[model_name]['prompt']}"
                 )
                 logger.log(
-                    msg=f"PROMPT (COST/CHARACTER): {self.models_cost_data[model_name]['completion']}"
+                    msg=f"PROMPT (COST/CHARACTER): {self.model_data[model_name]['completion']}"
                 )
 
                 instance_provider = instance.__class__.__name__
@@ -405,7 +413,7 @@ class LLMProxy:
                 token_data = provider_token_data[instance_provider]
 
                 cost = calculate_estimated_max_cost(
-                    price_data=self.models_cost_data[model_name],
+                    price_data=self.model_data[model_name],
                     num_of_input_tokens=token_data.num_of_input_tokens,
                     max_output_tokens=token_data.num_of_output_tokens,
                 )
@@ -485,7 +493,7 @@ class LLMProxy:
 
     def _category_route(self, prompt: str):
         """
-        Routes requests based on the category proficiency of available models.
+        Routes requests based on the category elo of available models.
 
         Args:
             prompt (str): The input prompt for the text generation.
@@ -501,7 +509,7 @@ class LLMProxy:
             )
 
             logger.log(
-                msg="Sorting fetched models based on proficency...",
+                msg="Sorting fetched models based on elo...",
             )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
@@ -556,6 +564,94 @@ class LLMProxy:
                 logger.log(
                     level="ERROR",
                     msg="========CATEGORY ROUTING FAILED!===========\n",
+                )
+
+        if not completion_res:
+            raise RequestsFailed(
+                "Requests to all models failed! Please check your configuration!"
+            )
+
+        return CompletionResponse(
+            response=completion_res, response_model=response_model, errors=errors
+        )
+
+    def _elo_route(self, prompt: str):
+        """
+        Routes the request to the appropriate models based on elo elo rating of available models
+
+        Args:
+            prompt (str): The input prompt to generate text for.
+
+        Returns:
+            CompletionResponse: The generated text response along with any errors encountered.
+        """
+
+        min_heap = MinHeap()
+        logger.log(msg="Sorting fetched models based on elo rating...", color="GREEN")
+        for model_name, instance in self.user_models.items():
+            logger.log(
+                msg="========Fetching models for elo routing===========",
+            )
+
+            logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
+
+            elo_rating = self.model_data[model_name]["elo"]
+
+            logger.log(msg=f"ELO RATING OF MODEL: {elo_rating}", color="BLUE")
+
+            item = {"name": model_name, "elo": elo_rating, "instance": instance}
+            min_heap.push(-1 * elo_rating, item)
+
+            logger.log(
+                msg="========Finished fetching model for elo routing=============\n",
+            )
+
+        completion_res = None
+        errors = []
+        response_model = ""
+        while not completion_res:
+            # Iterate through heap until there are no more options
+            max_val_instance = min_heap.pop_min()
+            if not max_val_instance:
+                break
+
+            instance_data = max_val_instance["data"]
+            logger.log(msg="========START ELO ROUTING===========")
+            logger.log(msg=f"Making request to model:{instance_data['name']}")
+            logger.log(msg="ROUTING...")
+
+            try:
+                completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                response_model = instance_data["name"]
+                logger.log(
+                    msg="==========ELO ROUTING COMPLETE! Call to model successful!==========",
+                    color="GREEN",
+                )
+                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
+            except Exception as e:
+                errors.append(
+                    {
+                        "model_name": instance_data["name"],
+                        "error_type": e.__class__.__name__,
+                        "error": str(e),
+                    }
+                )
+
+                logger.log(
+                    level="ERROR",
+                    msg=f"Request to model {instance_data['name']} failed!",
+                )
+
+                logger.log(
+                    level="ERROR",
+                    msg=f"Error when making request to model: {e}",
+                )
+
+                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+
+                logger.log(
+                    level="ERROR",
+                    msg="========ELO ROUTING FAILED!===========\n",
                 )
 
         if not completion_res:
