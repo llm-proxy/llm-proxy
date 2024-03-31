@@ -12,7 +12,7 @@ def main() -> None:
     # print(output)
 
     start = time.time()
-    proxy_client = LLMProxy(route_type="proficiency")
+    proxy_client = LLMProxy(route_type="elo")
     output = proxy_client.route(prompt=prompt)
     end = time.time()
     print("RESPONSE MODEL: ", output.response_model)

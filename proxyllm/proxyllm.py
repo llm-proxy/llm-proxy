@@ -43,12 +43,12 @@ class RouteType(str, BaseEnum):
 
     Attributes:
         COST: Route requests based on cost efficiency.
-        CATEGORY: Route requests based on category proficiency.
+        CATEGORY: Route requests based on category elo.
     """
 
     COST = "cost"
     CATEGORY = "category"
-    PROFICIENCY = "proficiency"
+    ELO = "elo"
 
 
 def _get_settings_from_yml(
@@ -256,17 +256,17 @@ def _setup_model_data(settings: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def _get_route_type(
     user_settings: Dict[str, Any] | None,
-    constructor_route_type: Literal["cost", "category", "proficiency"] | None,
-) -> Literal["cost", "category", "proficiency"]:
+    constructor_route_type: Literal["cost", "category", "elo"] | None,
+) -> Literal["cost", "category", "elo"]:
     """
     Determine the routing type based on user settings or constructor arguments.
 
     Args:
         user_settings (Dict[str, Any] | None): Configuration from the user settings.
-        constructor_route_type (Literal["cost", "category", "proficiency"] | None): Routing type specified at object construction.
+        constructor_route_type (Literal["cost", "category", "elo"] | None): Routing type specified at object construction.
 
     Returns:
-        Literal["cost", "category", "proficiency"]: The determined route type.
+        Literal["cost", "category", "elo"]: The determined route type.
 
     Raises:
         UserConfigError: If the route type is not specified or invalid.
@@ -304,14 +304,14 @@ class LLMProxy:
         user_models (Dict[str, BaseAdapter]): Models configured by the user, ready for use.
         available_models (Dict[str, Any]): All models available within the proxy.
         route_type (Literal["cost", "category"]): Selected routing strategy.
-        model_data (Dict[str, Any]): Data for each model used in cost-based or proficiency routing.
+        model_data (Dict[str, Any]): Data for each model used in cost-based or elo routing.
     """
 
     def __init__(
         self,
         path_to_user_configuration: str = "llmproxy.config.yml",
         path_to_env_vars: str = ".env",
-        route_type: Literal["cost", "category", "proficiency"] | None = None,
+        route_type: Literal["cost", "category", "elo"] | None = None,
         **kwargs,
     ) -> None:
         """
@@ -346,7 +346,7 @@ class LLMProxy:
             user_settings=user_settings, constructor_route_type=route_type
         )
 
-        if self.route_type == RouteType.COST or RouteType.PROFICIENCY:
+        if self.route_type == RouteType.COST or RouteType.ELO:
             # Setup the cost data of each model
             self.model_data = _setup_model_data(settings=internal_config)
 
@@ -368,8 +368,8 @@ class LLMProxy:
                 return self._cost_route(prompt=prompt)
             case RouteType.CATEGORY:
                 return self._category_route(prompt=prompt)
-            case RouteType.PROFICIENCY:
-                return self._proficiency_route(prompt=prompt)
+            case RouteType.ELO:
+                return self._elo_route(prompt=prompt)
             case _:
                 raise ValueError("Invalid route type, please try again")
 
@@ -493,7 +493,7 @@ class LLMProxy:
 
     def _category_route(self, prompt: str):
         """
-        Routes requests based on the category proficiency of available models.
+        Routes requests based on the category elo of available models.
 
         Args:
             prompt (str): The input prompt for the text generation.
@@ -509,7 +509,7 @@ class LLMProxy:
             )
 
             logger.log(
-                msg="Sorting fetched models based on proficiency...",
+                msg="Sorting fetched models based on elo...",
             )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
@@ -575,9 +575,9 @@ class LLMProxy:
             response=completion_res, response_model=response_model, errors=errors
         )
 
-    def _proficiency_route(self, prompt: str):
+    def _elo_route(self, prompt: str):
         """
-        Routes the request to the appropriate models based on proficiency elo rating of available models
+        Routes the request to the appropriate models based on elo elo rating of available models
 
         Args:
             prompt (str): The input prompt to generate text for.
@@ -590,7 +590,7 @@ class LLMProxy:
         logger.log(msg="Sorting fetched models based on elo rating...", color="GREEN")
         for model_name, instance in self.user_models.items():
             logger.log(
-                msg="========Fetching models for proficiency routing===========",
+                msg="========Fetching models for elo routing===========",
             )
 
             logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
@@ -603,7 +603,7 @@ class LLMProxy:
             min_heap.push(-1 * elo_rating, item)
 
             logger.log(
-                msg="========Finished fetching model for proficiency routing=============\n",
+                msg="========Finished fetching model for elo routing=============\n",
             )
 
         completion_res = None
@@ -616,7 +616,7 @@ class LLMProxy:
                 break
 
             instance_data = max_val_instance["data"]
-            logger.log(msg="========START PROFICIENCY ROUTING===========")
+            logger.log(msg="========START ELO ROUTING===========")
             logger.log(msg=f"Making request to model:{instance_data['name']}")
             logger.log(msg="ROUTING...")
 
@@ -624,7 +624,7 @@ class LLMProxy:
                 completion_res = instance_data["instance"].get_completion(prompt=prompt)
                 response_model = instance_data["name"]
                 logger.log(
-                    msg="==========PROFICIENCY ROUTING COMPLETE! Call to model successful!==========",
+                    msg="==========ELO ROUTING COMPLETE! Call to model successful!==========",
                     color="GREEN",
                 )
                 logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
@@ -651,7 +651,7 @@ class LLMProxy:
 
                 logger.log(
                     level="ERROR",
-                    msg="========PROFICIENCY ROUTING FAILED!===========\n",
+                    msg="========ELO ROUTING FAILED!===========\n",
                 )
 
         if not completion_res:
