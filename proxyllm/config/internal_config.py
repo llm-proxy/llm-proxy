@@ -201,31 +201,31 @@ internal_config: List[Dict[str, Any]] = [
                 "name": "command-r",
                 "cost_per_token_input": 0.5e-06,
                 "cost_per_token_output": 1.5e-06,
-                "elo": 0,
+                "elo": 1120,  # approximated, should have a similar elo rating to mixtral-8x7b-instruct-v0.1
             },
             {
                 "name": "command",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,
+                "elo": 1050,  # estimated, previous version of command-r
             },
             {
                 "name": "command-light",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,
+                "elo": 1025,  # estimated, smaller version of command
             },
             {
                 "name": "command-nightly",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,
+                "elo": 500,  # estimated, latest but unstable
             },
             {
                 "name": "command-light-nightly",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,
+                "elo": 499,  # estimated, latest but unstable
             },
         ],
     },
@@ -237,7 +237,7 @@ internal_config: List[Dict[str, Any]] = [
                 "name": "text-bison",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,
+                "elo": 1003,  # estimated, similar to chat-bison but should rank higher
             },
             {
                 "name": "gemini-pro",
@@ -249,25 +249,25 @@ internal_config: List[Dict[str, Any]] = [
                 "name": "chat-bison",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,
+                "elo": 1002,
             },
             {
                 "name": "code-bison",
                 "cost_per_token_input": 1.5e-07,
                 "cost_per_token_output": 2e-07,
-                "elo": 0,
+                "elo": 999,  # estimated
             },
             {
                 "name": "codechat-bison",
                 "cost_per_token_input": 1.5e-07,
                 "cost_per_token_output": 2e-07,
-                "elo": 0,
+                "elo": 1000,  # estimated
             },
             {
                 "name": "code-gecko",
                 "cost_per_token_input": 1.5e-07,
                 "cost_per_token_output": 2e-07,
-                "elo": 0,
+                "elo": 1001,  # estimated
             },
         ],
     },
