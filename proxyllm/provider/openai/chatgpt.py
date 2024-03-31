@@ -124,8 +124,8 @@ class OpenAIAdapter(BaseAdapter):
         self.prompt = prompt
         self.model = model
         self.temperature = temperature
-        self.max_output_tokens = max_output_tokens
         self.api_key = api_key
+        self.max_output_tokens = max_output_tokens
         self.timeout = timeout
         self.chat_history = []
 
