@@ -78,6 +78,7 @@ class ClaudeAdapter(BaseAdapter):
         self.model = model
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
+        self.chat_history = []
 
     def get_completion(self, prompt: str = "") -> str | None:
         """
@@ -104,12 +105,17 @@ class ClaudeAdapter(BaseAdapter):
 
             # TODO :: Remove reinitialization of the client
             client = Anthropic(api_key=self.api_key)
+            self.chat_history.append({"role": "user", "content": prompt or self.prompt})
+
             response = client.messages.create(
-                messages=[{"role": "user", "content": prompt or self.prompt}],
+                messages=self.chat_history,
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
                 timeout=self.timeout,
+            )
+            self.chat_history.append(
+                {"role": "assistant", "content": response.content[0].text}
             )
         except AnthropicError as e:
             raise AnthropicException(
