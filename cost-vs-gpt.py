@@ -1,5 +1,6 @@
 import os
 import time
+import pandas as pd
 
 from dotenv import load_dotenv
 
@@ -216,8 +217,8 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
             "prompt": model_info["gpt-4"]["cost_per_token_input"],
             "completion": model_info["gpt-4"]["cost_per_token_output"],
         },
-        num_of_input_tokens=openai.tokenize(prompt=prompt)[0],
-        max_output_tokens=openai.tokenize(prompt=openai_output)[0],
+        num_of_input_tokens=openai.tokenize(prompt=prompt).num_of_input_tokens,
+        max_output_tokens=openai.tokenize(prompt=openai_output).num_of_input_tokens,
     )
 
     start_llmproxy = time.perf_counter()
@@ -234,12 +235,12 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
                 "cost_per_token_output"
             ],
         },
-        num_of_input_tokens=model_info[llmproxy_output.response_model]["tokenizer"](
+        num_of_input_tokens=len(model_info[llmproxy_output.response_model]["tokenizer"](
             prompt=prompt
-        )[0],
-        max_output_tokens=model_info[llmproxy_output.response_model]["tokenizer"](
+        ).tokens),
+        max_output_tokens=len(model_info[llmproxy_output.response_model]["tokenizer"](
             prompt=llmproxy_output.response
-        )[0],
+        ).tokens),
     )
 
     return {
@@ -472,10 +473,16 @@ d) Plasma""",
 openai = OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY)
 llmproxy = LLMProxy(route_type="cost")
 
-responses = dict()
 for prompt in sample_prompts:
-    responses[prompt] = call_models(
+    response = call_models(
         prompt=prompt, openai=openai, llmproxy=llmproxy
     )
 
-print(responses)
+    prompts.append(prompt)
+    openai_response.append(response["openai"]["response"])
+    openai_latency.append(response["openai"]["latency"])
+    openai_cost.append(response["openai"]["cost"])
+    llmproxy_response.append(response["llmproxy"]["response"])
+    llmproxy_latency.append(response["llmproxy"]["latency"])
+    llmproxy_cost.append(response["llmproxy"]["cost"])
+
