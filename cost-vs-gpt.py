@@ -473,6 +473,14 @@ d) Plasma""",
 openai = OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY)
 llmproxy = LLMProxy(route_type="cost")
 
+prompts = []
+openai_response = []
+openai_latency = []
+openai_cost = []
+llmproxy_response = []
+llmproxy_latency = []
+llmproxy_cost = []
+
 for prompt in sample_prompts:
     response = call_models(
         prompt=prompt, openai=openai, llmproxy=llmproxy
@@ -486,3 +494,14 @@ for prompt in sample_prompts:
     llmproxy_latency.append(response["llmproxy"]["latency"])
     llmproxy_cost.append(response["llmproxy"]["cost"])
 
+df = pd.DataFrame({
+    'sample_prompt': prompt,
+    'openai_reponse': openai_response,
+    'openai_latency': openai_latency,
+    'openai_cost':openai_cost,
+    'llmproxy_response': llmproxy_response,
+    'llmproxy_latency': llmproxy_latency,
+    'llmproxy_cost': llmproxy_cost,
+    })
+
+df.to_csv('cost-vs-gpt.csv', index=False)
