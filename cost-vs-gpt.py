@@ -4,6 +4,7 @@ import time
 from dotenv import load_dotenv
 
 from proxyllm.config.internal_config import internal_config
+from proxyllm.provider.anthropic.claude import ClaudeAdapter
 from proxyllm.provider.openai.chatgpt import OpenAIAdapter
 from proxyllm.proxyllm import LLMProxy
 from proxyllm.utils.cost import calculate_estimated_max_cost
@@ -21,7 +22,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID")
 GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
-# TODO - change everything to BPE except for VertexAI
+
 model_info = {
     "gpt-4-0125-preview": {
         "tokenizer": bpe_tokenize_encode,
@@ -186,6 +187,21 @@ model_info = {
             "cost_per_token_output"
         ],
     },
+    "claude-3-opus-20240229": {
+        "tokenizer": ClaudeAdapter(api_key=ANTHROPIC_API_KEY, model="claude-3-opus-20240229").tokenize,
+        "cost_per_token_input": internal_config[5]["models"][0]["cost_per_token_input"],
+        "cost_per_token_output": internal_config[5]["models"][0]["cost_per_token_input"],
+        },
+    "claude-3-sonnet-20240229": {
+        "tokenizer": ClaudeAdapter(api_key=ANTHROPIC_API_KEY, model="claude-3-sonnet-20240229").tokenize,
+        "cost_per_token_input": internal_config[5]["models"][1]["cost_per_token_input"],
+        "cost_per_token_output": internal_config[5]["models"][1]["cost_per_token_input"],
+        },
+    "claude-3-haiku-20240307": {
+        "tokenizer": ClaudeAdapter(api_key=ANTHROPIC_API_KEY, model="claude-3-haiku-20240307").tokenize,
+        "cost_per_token_input": internal_config[5]["models"][2]["cost_per_token_input"],
+        "cost_per_token_output": internal_config[5]["models"][2]["cost_per_token_input"],
+        },
 }
 
 
