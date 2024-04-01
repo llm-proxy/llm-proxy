@@ -11,6 +11,7 @@ python-dotenv = "^1.0.0"
 cohere = "^4.27"
 google-cloud-aiplatform = "^1.35.0"
 openai = "^1.11.1"
+anthropic = "^0.20.0"
 click = "^8.1.7"
 torch = "^2.2.1"
 transformers = "^4.38.2" # remove once we depricate classification routing
