@@ -4,13 +4,10 @@ import time
 from dotenv import load_dotenv
 
 from proxyllm.config.internal_config import internal_config
-from proxyllm.provider.cohere.cohere import CohereAdapter
-from proxyllm.provider.google.vertexai import VertexAIAdapter
-from proxyllm.provider.huggingface.llama2 import Llama2Adapter
-from proxyllm.provider.huggingface.mistral import MistralAdapter
 from proxyllm.provider.openai.chatgpt import OpenAIAdapter
 from proxyllm.proxyllm import LLMProxy
 from proxyllm.utils.cost import calculate_estimated_max_cost
+from proxyllm.utils.tokenizer import bpe_tokenize_encode, vertexai_encode
 
 # TODO - work on Proficiency routing vs gpt
 # TODO - save out put to csv
@@ -20,74 +17,63 @@ load_dotenv(".env.test")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 HUGGING_FACE_API_KEY = os.getenv("HUGGING_FACE_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID")
 GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 # TODO - change everything to BPE except for VertexAI
 model_info = {
     "gpt-4-0125-preview": {
-        "tokenizer": OpenAIAdapter(
-            model="gpt-4-0125-preview", api_key=OPENAI_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[0]["models"][0]["cost_per_token_input"],
         "cost_per_token_output": internal_config[0]["models"][0][
             "cost_per_token_output"
         ],
     },
     "gpt-4-1106-preview": {
-        "tokenizer": OpenAIAdapter(
-            model="gpt-4-1106-preview", api_key=OPENAI_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[0]["models"][1]["cost_per_token_input"],
         "cost_per_token_output": internal_config[0]["models"][1][
             "cost_per_token_output"
         ],
     },
     "gpt-4": {
-        "tokenizer": OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[0]["models"][2]["cost_per_token_input"],
         "cost_per_token_output": internal_config[0]["models"][2][
             "cost_per_token_output"
         ],
     },
     "gpt-4-32k": {
-        "tokenizer": OpenAIAdapter(model="gpt-4-32k", api_key=OPENAI_API_KEY).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[0]["models"][3]["cost_per_token_input"],
         "cost_per_token_output": internal_config[0]["models"][3][
             "cost_per_token_output"
         ],
     },
     "gpt-3.5-turbo-0125": {
-        "tokenizer": OpenAIAdapter(
-            model="gpt-3.5-turbo-0125", api_key=OPENAI_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[0]["models"][4]["cost_per_token_input"],
         "cost_per_token_output": internal_config[0]["models"][4][
             "cost_per_token_output"
         ],
     },
     "Llama-2-13b-hf": {
-        "tokenizer": Llama2Adapter(
-            model="Llama-2-13b-hf", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[1]["models"][6]["cost_per_token_input"],
         "cost_per_token_output": internal_config[1]["models"][6][
             "cost_per_token_output"
         ],
     },
     "Llama-2-13b-chat-hf": {
-        "tokenizer": Llama2Adapter(
-            model="Llama-2-13b-chat-hf", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[1]["models"][4]["cost_per_token_input"],
         "cost_per_token_output": internal_config[1]["models"][4][
             "cost_per_token_output"
         ],
     },
     "Llama-2-70b-hf": {
-        "tokenizer": Llama2Adapter(
-            model="Llama-2-70b-hf", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[1]["models"][10][
             "cost_per_token_input"
         ],
@@ -96,131 +82,105 @@ model_info = {
         ],
     },
     "Llama-2-70b-chat-hf": {
-        "tokenizer": Llama2Adapter(
-            model="Llama-2-70b-chat-hf", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[1]["models"][8]["cost_per_token_input"],
         "cost_per_token_output": internal_config[1]["models"][8][
             "cost_per_token_output"
         ],
     },
     "command-r": {
-        "tokenizer": CohereAdapter(model="command-r", api_key=COHERE_API_KEY).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[3]["models"][0]["cost_per_token_input"],
         "cost_per_token_output": internal_config[3]["models"][0][
             "cost_per_token_output"
         ],
     },
     "command": {
-        "tokenizer": CohereAdapter(model="command", api_key=COHERE_API_KEY).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[3]["models"][1]["cost_per_token_input"],
         "cost_per_token_output": internal_config[3]["models"][1][
             "cost_per_token_output"
         ],
     },
     "command-light": {
-        "tokenizer": CohereAdapter(
-            model="command-light", api_key=COHERE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[3]["models"][2]["cost_per_token_input"],
         "cost_per_token_output": internal_config[3]["models"][2][
             "cost_per_token_output"
         ],
     },
     "command-nightly": {
-        "tokenizer": CohereAdapter(
-            model="command-nightly", api_key=COHERE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[3]["models"][3]["cost_per_token_input"],
         "cost_per_token_output": internal_config[3]["models"][3][
             "cost_per_token_output"
         ],
     },
     "command-light-nightly": {
-        "tokenizer": CohereAdapter(
-            model="command-light-nightly", api_key=COHERE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[3]["models"][4]["cost_per_token_input"],
         "cost_per_token_output": internal_config[3]["models"][4][
             "cost_per_token_output"
         ],
     },
     "mistral-7b-v0.1": {
-        "tokenizer": MistralAdapter(
-            model="mistral-7b-v0.1", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[2]["models"][0]["cost_per_token_input"],
         "cost_per_token_output": internal_config[2]["models"][0][
             "cost_per_token_output"
         ],
     },
     "mistral-7b-instruct-v0.2": {
-        "tokenizer": MistralAdapter(
-            model="mistral-7b-instruct-v0.2", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[2]["models"][1]["cost_per_token_input"],
         "cost_per_token_output": internal_config[2]["models"][1][
             "cost_per_token_output"
         ],
     },
     "mixtral-8x7b-instruct-v0.1": {
-        "tokenizer": MistralAdapter(
-            model="mixtral-8x7b-instruct-v0.1", api_key=HUGGING_FACE_API_KEY
-        ).tokenize,
+        "tokenizer": bpe_tokenize_encode,
         "cost_per_token_input": internal_config[2]["models"][2]["cost_per_token_input"],
         "cost_per_token_output": internal_config[2]["models"][2][
             "cost_per_token_output"
         ],
     },
     "text-bison": {
-        "tokenizer": VertexAIAdapter(
-            model="text-bison", project_id=GOOGLE_PROJECT_ID
-        ).tokenize,
+        "tokenizer": vertexai_encode,
         "cost_per_token_input": internal_config[4]["models"][0]["cost_per_token_input"],
         "cost_per_token_output": internal_config[4]["models"][0][
             "cost_per_token_output"
         ],
     },
     "chat-bison": {
-        "tokenizer": VertexAIAdapter(
-            model="chat-bison", project_id=GOOGLE_PROJECT_ID
-        ).tokenize,
+        "tokenizer": vertexai_encode,
         "cost_per_token_input": internal_config[4]["models"][2]["cost_per_token_input"],
         "cost_per_token_output": internal_config[4]["models"][2][
             "cost_per_token_output"
         ],
     },
     "gemini-pro": {
-        "tokenizer": VertexAIAdapter(
-            model="gemini-pro", project_id=GOOGLE_PROJECT_ID
-        ).tokenize,
+        "tokenizer": vertexai_encode,
         "cost_per_token_input": internal_config[4]["models"][1]["cost_per_token_input"],
         "cost_per_token_output": internal_config[4]["models"][1][
             "cost_per_token_output"
         ],
     },
     "code-bison": {
-        "tokenizer": VertexAIAdapter(
-            model="code-bison", project_id=GOOGLE_PROJECT_ID
-        ).tokenize,
+        "tokenizer": vertexai_encode,
         "cost_per_token_input": internal_config[4]["models"][3]["cost_per_token_input"],
         "cost_per_token_output": internal_config[4]["models"][3][
             "cost_per_token_output"
         ],
     },
     "codechat-bison": {
-        "tokenizer": VertexAIAdapter(
-            model="codechat-bison", project_id=GOOGLE_PROJECT_ID
-        ).tokenize,
+        "tokenizer": vertexai_encode,
         "cost_per_token_input": internal_config[4]["models"][4]["cost_per_token_input"],
         "cost_per_token_output": internal_config[4]["models"][4][
             "cost_per_token_output"
         ],
     },
     "code-gecko": {
-        "tokenizer": VertexAIAdapter(
-            model="code-gecko", project_id=GOOGLE_PROJECT_ID
-        ).tokenize,
+        "tokenizer": vertexai_encode,
         "cost_per_token_input": internal_config[4]["models"][5]["cost_per_token_input"],
         "cost_per_token_output": internal_config[4]["models"][5][
             "cost_per_token_output"
