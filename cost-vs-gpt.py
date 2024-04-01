@@ -201,7 +201,7 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
             "completion": model_info["gpt-4"]["cost_per_token_output"],
         },
         num_of_input_tokens=openai.tokenize(prompt=prompt),
-        max_output_tokens=256,  # TODO - Tokenize output
+        max_output_tokens=openai.tokenize(prompt=openai_output),
     )
 
     start_llmproxy = time.perf_counter()
@@ -221,7 +221,9 @@ def call_models(prompt: str, openai: OpenAIAdapter, llmproxy: LLMProxy) -> dict:
         num_of_input_tokens=model_info[llmproxy_output.response_model]["tokenizer"](
             prompt=prompt
         ),
-        max_output_tokens=256,  # TODO - Tokenize output
+        max_output_tokens=model_info[llmproxy_output.response_model]["tokenizer"](
+            prompt=llmproxy_output.response
+        ),  # TODO - Tokenize output
     )
 
     return {
