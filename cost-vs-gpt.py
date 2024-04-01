@@ -12,7 +12,7 @@ from proxyllm.utils.tokenizer import bpe_tokenize_encode, vertexai_encode
 
 # TODO - work on Proficiency routing vs gpt
 # TODO - save out put to csv
-# TODO - update for the anthropic models
+
 
 load_dotenv(".env.test")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -475,7 +475,7 @@ llmproxy = LLMProxy(route_type="cost")
 responses = dict()
 for prompt in sample_prompts:
     responses[prompt] = call_models(
-        prompt=sample_prompts, openai=openai, llmproxy=llmproxy
+        prompt=prompt, openai=openai, llmproxy=llmproxy
     )
 
 print(responses)
