@@ -175,7 +175,6 @@ class VertexAIAdapter(BaseAdapter):
                         prompt or self.prompt, **parameters
                     )
 
-            # CODEY = ["code-bison, codechat-bison, code-gecko"]
             elif self.model in ModelType.CODEY.value:
                 if self.model == "codechat-bison":
                     if self.model not in self.chat_models_dict:
