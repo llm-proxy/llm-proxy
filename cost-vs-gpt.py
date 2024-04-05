@@ -471,7 +471,7 @@ d) Plasma""",
 ]
 
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     openai = OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY)
     llmproxy = LLMProxy(route_type="cost")
 
@@ -506,3 +506,4 @@ if "__name__" == "__main__":
         })
 
     df.to_csv('cost-vs-gpt.csv', index=False)
+    print("The file RAN")
