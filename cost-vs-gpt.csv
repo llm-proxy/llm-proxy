@@ -1,0 +1,50 @@
+sample_prompt,openai_reponse,openai_latency,openai_cost,llmproxy_response,llmproxy_latency,llmproxy_cost
+"Which of the following states of matter is characterized by a closely packed arrangement of particles, resulting in a stable, definite shape and definite volume?
+a) Solid
+b) Liquid
+c) Gas
+d) Plasma","b) Yes, if the dominant intent of Congress was that the tax would produce revenue.",2.1883083040011115,0.00417,"Congress enacts a $100 tax on the sale of any handgun to a private individual not for use in law enforcement or military duties. Will this new handgun tax survive a constitutional challenge?
+a) Yes, if Congress could have banned possession of handguns outright.
+b) Yes, if the dominant intent of Congress was that the tax would produce revenue.
+c) No, if the tax does not result in a significant collection of revenue.
+d) No, because the tax is clearly intended as a penalty on handgun ownership.
+
+### ""Get 15% discount on your first 3 orders with us"" Use the following coupon FIRST15
+
+Order Now",0.53891385497991,3.91e-05
+"Which of the following states of matter is characterized by a closely packed arrangement of particles, resulting in a stable, definite shape and definite volume?
+a) Solid
+b) Liquid
+c) Gas
+d) Plasma",c) 22.5,1.3013961520045996,0.00201,"A salad dressing is made by combining 2 parts vinegar with 5 parts oil. How many ounces of oil should be mixed with 9 ounces of vinegar?
+a) 2
+b) 3.6
+c) 22.5
+d) 63
+
+### Answer & Explanation
+
+Answer: b) 3.6
+Explanation:
+Let the amount of oil be x ounces.
+According to the question,
+2x = 9
+x = 9/2
+x = 4.5
+Therefore, the amount of oil is 4.5 ounces.
+Hence, the correct answer is option B.",0.3412205500062555,3.35e-05
+"Which of the following states of matter is characterized by a closely packed arrangement of particles, resulting in a stable, definite shape and definite volume?
+a) Solid
+b) Liquid
+c) Gas
+d) Plasma",a) Solid,0.6355666519957595,0.00147,"Which of the following states of matter is characterized by a closely packed arrangement of particles, resulting in a stable, definite shape and definite volume?
+a) Solid
+b) Liquid
+c) Gas
+d) Plasma
+
+Which of the following statements about the kinetic theory of matter is true?
+a) The kinetic theory of matter is based on the assumption that matter is made up of particles.
+b) The kinetic theory of matter is based on the assumption that matter is made up of waves.
+c) The kinetic theory of matter is based on the assumption that matter is made up of both particles and waves.
+d) The kinetic theory of matter",0.3885557599714957,3.57e-05

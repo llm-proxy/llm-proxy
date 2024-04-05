@@ -470,38 +470,40 @@ d) Plasma""",
     # d) the exchange rate will not be affected."""
 ]
 
-openai = OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY)
-llmproxy = LLMProxy(route_type="cost")
 
-prompts = []
-openai_response = []
-openai_latency = []
-openai_cost = []
-llmproxy_response = []
-llmproxy_latency = []
-llmproxy_cost = []
+if "__name__" == "__main__":
+    openai = OpenAIAdapter(model="gpt-4", api_key=OPENAI_API_KEY)
+    llmproxy = LLMProxy(route_type="cost")
 
-for prompt in sample_prompts:
-    response = call_models(
-        prompt=prompt, openai=openai, llmproxy=llmproxy
-    )
+    prompts = []
+    openai_response = []
+    openai_latency = []
+    openai_cost = []
+    llmproxy_response = []
+    llmproxy_latency = []
+    llmproxy_cost = []
 
-    prompts.append(prompt)
-    openai_response.append(response["openai"]["response"])
-    openai_latency.append(response["openai"]["latency"])
-    openai_cost.append(response["openai"]["cost"])
-    llmproxy_response.append(response["llmproxy"]["response"])
-    llmproxy_latency.append(response["llmproxy"]["latency"])
-    llmproxy_cost.append(response["llmproxy"]["cost"])
+    for prompt in sample_prompts:
+        response = call_models(
+            prompt=prompt, openai=openai, llmproxy=llmproxy
+        )
 
-df = pd.DataFrame({
-    'sample_prompt': prompt,
-    'openai_reponse': openai_response,
-    'openai_latency': openai_latency,
-    'openai_cost':openai_cost,
-    'llmproxy_response': llmproxy_response,
-    'llmproxy_latency': llmproxy_latency,
-    'llmproxy_cost': llmproxy_cost,
-    })
+        prompts.append(prompt)
+        openai_response.append(response["openai"]["response"])
+        openai_latency.append(response["openai"]["latency"])
+        openai_cost.append(response["openai"]["cost"])
+        llmproxy_response.append(response["llmproxy"]["response"])
+        llmproxy_latency.append(response["llmproxy"]["latency"])
+        llmproxy_cost.append(response["llmproxy"]["cost"])
 
-df.to_csv('cost-vs-gpt.csv', index=False)
+    df = pd.DataFrame({
+        'sample_prompt': prompt,
+        'openai_reponse': openai_response,
+        'openai_latency': openai_latency,
+        'openai_cost':openai_cost,
+        'llmproxy_response': llmproxy_response,
+        'llmproxy_latency': llmproxy_latency,
+        'llmproxy_cost': llmproxy_cost,
+        })
+
+    df.to_csv('cost-vs-gpt.csv', index=False)
