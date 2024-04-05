@@ -488,7 +488,6 @@ if "__name__" == "__main__":
             prompt=prompt, openai=openai, llmproxy=llmproxy
         )
 
-        prompts.append(prompt)
         openai_response.append(response["openai"]["response"])
         openai_latency.append(response["openai"]["latency"])
         openai_cost.append(response["openai"]["cost"])
