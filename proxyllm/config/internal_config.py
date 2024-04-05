@@ -154,6 +154,7 @@ internal_config: List[Dict[str, Any]] = [
                 "name": "open-mixtral-8x7b",
                 "cost_per_token_input": 7e-07,
                 "cost_per_token_output": 7e-07,
+                "elo": 1114,
             },
         ],
     },
