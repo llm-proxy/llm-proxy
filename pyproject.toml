@@ -17,6 +17,7 @@ torch = "^2.2.1"
 transformers = "^4.38.2" # remove once we depricate classification routing
 tiktoken = "^0.6.0"
 pandas = "^2.2.1"
+wheel = "^0.43.0"
 
 [tool.poetry.scripts]
 config = "proxyllm.cli:cli"
