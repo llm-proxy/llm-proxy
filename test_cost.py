@@ -11,15 +11,17 @@ def main() -> None:
     # prompt = "The quick brown fox jumps over the lazy dog."
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
-
-    start = time.time()
+    chat_history = [
+        {"role": "User", "content": prompt},
+    ]
     proxy_client = LLMProxy(route_type="cost")
-    output = proxy_client.route(prompt=prompt)
-    end = time.time()
+    output = proxy_client.route(prompt=prompt, chat_history=chat_history)
+
+    # start = time.time()
+    # end = time.time()
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    # print("ERRORS: ", output.errors)
-    print(f"\nCost route total time taken: {end-start}")
+    # print(f"\nCost route total time taken: {end-start}")
     assert output.response_model
     assert output.response
 
