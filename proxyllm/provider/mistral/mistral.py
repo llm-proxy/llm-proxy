@@ -136,7 +136,7 @@ class MistralAdapter(BaseAdapter):
                 MistralConnectionException,
             )
 
-            client = MistralClient(api_key=self.api_key)
+            client = MistralClient(api_key=self.api_key, timeout=self.timeout)
             output = client.chat(
                 max_tokens=self.max_output_tokens,
                 messages=[
