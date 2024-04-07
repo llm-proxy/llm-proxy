@@ -172,7 +172,7 @@ class MistralAdapter(BaseAdapter):
                 exception=str(e), error_type="Unknown Mistral Error"
             ) from e
 
-        return provider_response
+        return provider_response or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """

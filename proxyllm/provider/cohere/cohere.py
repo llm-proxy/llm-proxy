@@ -155,13 +155,15 @@ class CohereAdapter(BaseAdapter):
                 "response": response.text,
                 "chat_history": processed_chat_history,
             }
-            return provider_response
+
         except CohereError as e:
             raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
             raise CohereException(
                 exception=str(e), error_type="Unknown Cohere Error"
             ) from e
+
+        return provider_response or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
