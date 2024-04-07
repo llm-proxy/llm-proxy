@@ -499,7 +499,10 @@ class LLMProxy:
             )
 
         return CompletionResponse(
-            response=completion_res, response_model=response_model, errors=errors
+            response=completion_res["response"],
+            response_model=response_model,
+            errors=errors,
+            chat_history=completion_res["chat_history"],
         )
 
     def _category_route(self, prompt: str, chat_history: List[Dict[str, str]]):
@@ -587,7 +590,10 @@ class LLMProxy:
             )
 
         return CompletionResponse(
-            response=completion_res, response_model=response_model, errors=errors
+            response=completion_res["response"],
+            response_model=response_model,
+            errors=errors,
+            chat_history=completion_res["chat_history"],
         )
 
     def _elo_route(self, prompt: str, chat_history: List[Dict[str, str]]):
@@ -679,7 +685,10 @@ class LLMProxy:
             )
 
         return CompletionResponse(
-            response=completion_res, response_model=response_model, errors=errors
+            response=completion_res["response"],
+            response_model=response_model,
+            errors=errors,
+            chat_history=completion_res["chat_history"],
         )
 
     def _make_provider_call(
