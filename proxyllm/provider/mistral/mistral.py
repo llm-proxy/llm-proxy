@@ -55,7 +55,6 @@ class MistralAdapter(BaseAdapter):
         self.temperature = temperature
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
-        self.chat_history = []
 
     def get_completion(self, prompt: str = "") -> str:
         """
@@ -81,17 +80,17 @@ class MistralAdapter(BaseAdapter):
         )
 
         try:
-            self.chat_history.append({"role": "user", "content": prompt or self.prompt})
+            # self.chat_history.append({"role": "user", "content": prompt or self.prompt})
             client = MistralClient(api_key=self.api_key, timeout=self.timeout)
             output = client.chat(
                 max_tokens=self.max_output_tokens,
-                messages=self.chat_history,
+                messages=prompt or self.prompt,
                 model=self.model,
                 temperature=self.temperature,
             )
-            self.chat_history.append(
-                {"role": "assistant", "content": output.choices[0].message.content}
-            )
+            # self.chat_history.append(
+            #    {"role": "assistant", "content": output.choices[0].message.content}
+            # )
 
         except (
             MistralConnectionException,

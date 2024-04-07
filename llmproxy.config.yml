@@ -48,13 +48,15 @@ provider_settings:
       - command-light-nightly
 
   - provider: Mistral
-    api_key_var: HUGGING_FACE_API_KEY
+    api_key_var: MISTRAL_API_KEY
     max_output_tokens: 256
     temperature: 0.1
     models:
-      - mistral-7b-v0.1
-      - mistral-7b-instruct-v0.2
-      - mixtral-8x7b-instruct-v0.1
+      - open-mistral-7b	 
+      #- open-mixtral-8x7b  
+      #- mistral-small-latest
+      #- mistral-medium-latest
+      #- mistral-large-latest
 
   - provider: VertexAI
     temperature: 0.1
