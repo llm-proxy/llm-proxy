@@ -7,21 +7,35 @@ from proxyllm import LLMProxy
 
 def main() -> None:
     # prompt = "I am a man, not a man, but not a man, that is an apple, or a banana!"
-    prompt = "what is 1 + 1"
     # prompt = "The quick brown fox jumps over the lazy dog."
     # output = proxy_client.route(route_type="cost", prompt=prompt)
     # print(output)
-    chat_history = [
-        {"role": "User", "content": prompt},
-    ]
-    proxy_client = LLMProxy(route_type="cost")
-    output = proxy_client.route(prompt=prompt, chat_history=chat_history)
-
     # start = time.time()
     # end = time.time()
+    # print(f"\nCost route total time taken: {end-start}")
+
+    prompt = "what is 1 + 1"
+
+    proxy_client = LLMProxy(route_type="cost")
+    output = proxy_client.route(prompt=prompt)
+    chat_history = output.chat_history
+
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
-    # print(f"\nCost route total time taken: {end-start}")
+    print("CHAT HISTORY: ", chat_history)
+
+    assert output.response_model
+    assert output.response
+
+    # Round 2... FIGHT!
+    prompt2 = "ok take that and now add 3, whats the total now?"
+    output = proxy_client.route(prompt=prompt2, chat_history=chat_history)
+    chat_history = output.chat_history
+
+    print("RESPONSE MODEL: ", output.response_model)
+    print("RESPONSE: ", output.response)
+    print("CHAT HISTORY: ", chat_history)
+
     assert output.response_model
     assert output.response
 
