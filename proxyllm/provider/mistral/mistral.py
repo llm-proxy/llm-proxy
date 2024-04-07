@@ -1,4 +1,5 @@
 from tokenizers import Encoding
+from typing import List, Dict, Any
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
@@ -111,22 +112,31 @@ class MistralAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] = None
+    ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the specified Mistral model.
 
         Args:
-            prompt (str): Text prompt for generating completion.
+            prompt (str): The text prompt for generating completion.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
-            str: The text completion from the model.
+            Dict[str, Any] | None: The model's text response and chat history, or None if an error occurs.
 
         Raises:
-            MistralException: If an API or internal error occurs during request processing.
-            ValueError: If no API key is provided.
+            MistralAPIStatusException: Returned when Mistral receives a non-200 response from the API.
+            MistralAPIException: Returned when the API responds with an error message.
+            MistralConnectionException: Returned when the SDK can not reach the API server for any reason
         """
         if not self.api_key:
             raise ValueError("No Mistral API Key Provided")
+
+        if chat_history is None:
+            chat_history = [{"role": "user", "content": prompt or self.prompt}]
+        else:
+            chat_history.append({"role": "user", "content": prompt or self.prompt})
 
         try:
             from mistralai.client import MistralClient
@@ -139,12 +149,17 @@ class MistralAdapter(BaseAdapter):
             client = MistralClient(api_key=self.api_key, timeout=self.timeout)
             output = client.chat(
                 max_tokens=self.max_output_tokens,
-                messages=[
-                    {"role": "user", "content": prompt or self.prompt},
-                ],
+                messages=chat_history,
                 model=self.model,
                 temperature=self.temperature,
             )
+            response_text = output.choices[0].message.content
+            chat_history.append({"role": "assistant", "content": response_text})
+
+            provider_response = {
+                "response": response_text,
+                "chat_history": chat_history,
+            }
 
         except (
             MistralConnectionException,
@@ -157,8 +172,7 @@ class MistralAdapter(BaseAdapter):
                 exception=str(e), error_type="Unknown Mistral Error"
             ) from e
 
-        # Output will be a List[dict] if there is no error
-        return output.choices[0].message.content or None
+        return provider_response
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
