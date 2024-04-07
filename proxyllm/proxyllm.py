@@ -709,7 +709,8 @@ class LLMProxy:
         try:
             # Grab the output from the providers while supressing internal logging interference
             completion_res = instance_data["instance"].get_completion(
-                prompt=prompt, chat_history=chat_history
+                prompt=prompt,
+                chat_history=chat_history,
             )
         finally:
             # Remove the NullHandler from the root logger
