@@ -1,4 +1,3 @@
-from mistralai.client import MistralClient
 from tokenizers import Encoding
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
@@ -7,6 +6,20 @@ from proxyllm.utils.exceptions.provider import MistralException
 
 # Mapping of Mistral model categories to their task performance ratings.
 mistral_category_data = {
+    "model-categories": {
+        "open-mistral-7b": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
+    },
     "model-categories": {
         "open-mixtral-8x7b": {
             "Code Generation Task": 2,
@@ -20,7 +33,49 @@ mistral_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
-    }
+    },
+    "model-categories": {
+        "mistral-small-latest": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
+    },
+    "model-categories": {
+        "mistral-medium-latest": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
+    },
+    "model-categories": {
+        "mistral-large-latest": {
+            "Code Generation Task": 2,
+            "Text Generation Task": 1,
+            "Translation and Multilingual Applications Task": 2,
+            "Natural Language Processing Task": 2,
+            "Conversational AI Task": 2,
+            "Educational Applications Task": 1,
+            "Healthcare and Medical Task": 1,
+            "Legal Task": 4,
+            "Financial Task": 4,
+            "Content Recommendation Task": 3,
+        },
+    },
 }
 
 
@@ -73,44 +128,37 @@ class MistralAdapter(BaseAdapter):
         if not self.api_key:
             raise ValueError("No Mistral API Key Provided")
 
-        from mistralai.exceptions import (
-            MistralAPIException,
-            MistralAPIStatusException,
-            MistralConnectionException,
-        )
-
         try:
-            # self.chat_history.append({"role": "user", "content": prompt or self.prompt})
-            client = MistralClient(api_key=self.api_key, timeout=self.timeout)
+            from mistralai.client import MistralClient
+            from mistralai.exceptions import (
+                MistralAPIException,
+                MistralAPIStatusException,
+                MistralConnectionException,
+            )
+
+            client = MistralClient(api_key=self.api_key)
             output = client.chat(
                 max_tokens=self.max_output_tokens,
-                messages=prompt or self.prompt,
+                messages=[
+                    {"role": "user", "content": prompt or self.prompt},
+                ],
                 model=self.model,
                 temperature=self.temperature,
             )
-            # self.chat_history.append(
-            #    {"role": "assistant", "content": output.choices[0].message.content}
-            # )
 
         except (
             MistralConnectionException,
             MistralAPIException,
             MistralAPIStatusException,
         ) as e:
-            raise MistralException(
-                f"Request error: {e}", error_type="RequestError"
-            ) from e
+            raise MistralException(exception=str(e), error_type="MistralError") from e
         except Exception as e:
             raise MistralException(
-                f"Unknown error: {e}", error_type=" Unknown Mistral Error"
+                exception=str(e), error_type="Unknown Mistral Error"
             ) from e
 
-        # Output will be a dict if there is an error
-        if "error" in output:
-            raise MistralException(f"{output['error']}", error_type="MistralError")
-
         # Output will be a List[dict] if there is no error
-        return output.choices[0].message.content
+        return output.choices[0].message.content or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
