@@ -1,5 +1,5 @@
 from tokenizers import Encoding
-
+from typing import List, Dict, Any
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
 from proxyllm.utils.exceptions.provider import CohereException
@@ -70,6 +70,8 @@ cohere_category_data = {
     }
 }
 
+ROLE_MAPPING = {"USER": "user", "CHATBOT": "assistant", "SYSTEM": "system"}
+
 
 class CohereAdapter(BaseAdapter):
     """
@@ -103,19 +105,31 @@ class CohereAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] = None
+    ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the Cohere model.
 
         Args:
-            prompt (str): Input text prompt for the model.
+            prompt (str): The text prompt for generating completion.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
-            str | None: The text completion result from the model, or None if an error occurs.
+            Dict[str, Any] | None: The model's text response and chat history, or None if an error occurs.
 
         Raises:
             CohereException: If an error occurs during the API request.
         """
+        if chat_history is None:
+            chat_history = []
+
+        cohere_chat_history = []
+
+        # Convert the proxy chat history into a format that Cohere can process
+        for chat in chat_history:
+            cohere_chat_obj = {"role": chat["role"], "message": chat["content"]}
+            cohere_chat_history.append(cohere_chat_obj)
 
         from cohere import Client, CohereError
 
@@ -126,8 +140,22 @@ class CohereAdapter(BaseAdapter):
                 message=prompt or self.prompt,
                 model=self.model,
                 temperature=self.temperature,
+                chat_history=cohere_chat_history,
             )
-            return response.text
+
+            processed_chat_history = []
+            for chat in response.chat_history:
+                processed_chat_obj = {
+                    "role": ROLE_MAPPING.get(chat["role"]),
+                    "content": chat["message"],
+                }
+                processed_chat_history.append(processed_chat_obj)
+
+            provider_response = {
+                "response": response.text,
+                "chat_history": processed_chat_history,
+            }
+            return provider_response
         except CohereError as e:
             raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
