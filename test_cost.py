@@ -15,25 +15,36 @@ def main() -> None:
     # print(f"\nCost route total time taken: {end-start}")
 
     prompt = "what is 1 + 1"
-
+    chat_history = [
+        {
+            "role": "system",
+            "content": "you are math bot, and you're responses must be short and sweet",
+        }
+    ]
     proxy_client = LLMProxy(route_type="cost")
-    output = proxy_client.route(prompt=prompt)
+    start = time.time()
+    output = proxy_client.route(prompt=prompt, chat_history=chat_history)
+    end = time.time()
     chat_history = output.chat_history
 
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
+    print(f"\nCost route total time taken: {end-start}")
     print("CHAT HISTORY: ", chat_history)
 
     assert output.response_model
     assert output.response
 
-    # Round 2... FIGHT!
-    prompt2 = "ok take that and now add 3, whats the total now?"
+    #    # Round 2... FIGHT!
+    prompt2 = "what was the question i just asked u before this?"
+    start = time.time()
     output = proxy_client.route(prompt=prompt2, chat_history=chat_history)
+    end = time.time()
     chat_history = output.chat_history
 
     print("RESPONSE MODEL: ", output.response_model)
     print("RESPONSE: ", output.response)
+    print(f"\nCost route total time taken: {end-start}")
     print("CHAT HISTORY: ", chat_history)
 
     assert output.response_model
