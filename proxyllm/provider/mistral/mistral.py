@@ -1,5 +1,6 @@
+from typing import Any, Dict, List
+
 from tokenizers import Encoding
-from typing import List, Dict, Any
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
@@ -134,26 +135,33 @@ class MistralAdapter(BaseAdapter):
             raise ValueError("No Mistral API Key Provided")
 
         if chat_history is None:
-            chat_history = [{"role": "user", "content": prompt or self.prompt}]
-        else:
-            chat_history.append({"role": "user", "content": prompt or self.prompt})
+            chat_history = []
+
+        import copy
+
+        from mistralai.client import MistralClient
+        from mistralai.exceptions import (
+            MistralAPIException,
+            MistralAPIStatusException,
+            MistralConnectionException,
+        )
 
         try:
-            from mistralai.client import MistralClient
-            from mistralai.exceptions import (
-                MistralAPIException,
-                MistralAPIStatusException,
-                MistralConnectionException,
+            client = MistralClient(api_key=self.api_key, timeout=self.timeout)
+            mistral_chat_history = copy.deepcopy(chat_history)
+            mistral_chat_history.append(
+                {"role": "user", "content": prompt or self.prompt}
             )
 
-            client = MistralClient(api_key=self.api_key, timeout=self.timeout)
             output = client.chat(
                 max_tokens=self.max_output_tokens,
-                messages=chat_history,
+                messages=mistral_chat_history,
                 model=self.model,
                 temperature=self.temperature,
             )
             response_text = output.choices[0].message.content
+
+            chat_history.append({"role": "user", "content": prompt or self.prompt})
             chat_history.append({"role": "assistant", "content": response_text})
 
             provider_response = {

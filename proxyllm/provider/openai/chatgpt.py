@@ -1,5 +1,6 @@
+from typing import Any, Dict, List
+
 import tiktoken
-from typing import List, Dict, Any
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger
@@ -154,14 +155,20 @@ class OpenAIAdapter(BaseAdapter):
             )
 
         if chat_history is None:
-            chat_history = [{"role": "user", "content": prompt or self.prompt}]
-        else:
-            chat_history.append({"role": "user", "content": prompt or self.prompt})
+            chat_history = []
+
+        import copy
 
         from openai import OpenAI, OpenAIError
 
         try:
             client = OpenAI(api_key=self.api_key)
+
+            openai_chat_history = copy.deepcopy(chat_history)
+            openai_chat_history.append(
+                {"role": "user", "content": prompt or self.prompt}
+            )
+
             response = client.chat.completions.create(
                 messages=chat_history,
                 model=self.model,
@@ -170,6 +177,8 @@ class OpenAIAdapter(BaseAdapter):
                 timeout=self.timeout,
             )
             response_text = response.choices[0].message.content
+
+            chat_history.append({"role": "user", "content": prompt or self.prompt})
             chat_history.append({"role": "assistant", "content": response_text})
 
             provider_response = {
