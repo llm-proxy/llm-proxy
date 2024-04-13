@@ -1,5 +1,7 @@
+from typing import Any, Dict, List
+
 from tokenizers import Encoding
-from typing import List, Dict, Any
+
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger, tokenizer
 from proxyllm.utils.exceptions.provider import CohereException
@@ -70,7 +72,12 @@ cohere_category_data = {
     }
 }
 
-ROLE_MAPPING = {"USER": "user", "CHATBOT": "assistant", "SYSTEM": "system"}
+# Mapping from role names to Cohere's format
+ROLE_NAME_TO_REP = {
+    "user": "USER",
+    "assistant": "CHATBOT",
+    "system": "SYSTEM",
+}
 
 
 class CohereAdapter(BaseAdapter):
@@ -124,11 +131,13 @@ class CohereAdapter(BaseAdapter):
         if chat_history is None:
             chat_history = []
 
-        cohere_chat_history = []
-
         # Convert the proxy chat history into a format that Cohere can process
+        cohere_chat_history = []
         for chat in chat_history:
-            cohere_chat_obj = {"role": chat["role"], "message": chat["content"]}
+            cohere_chat_obj = {
+                "role": ROLE_NAME_TO_REP.get(chat["role"]),
+                "message": chat["content"],
+            }
             cohere_chat_history.append(cohere_chat_obj)
 
         from cohere import Client, CohereError
@@ -143,17 +152,12 @@ class CohereAdapter(BaseAdapter):
                 chat_history=cohere_chat_history,
             )
 
-            processed_chat_history = []
-            for chat in response.chat_history:
-                processed_chat_obj = {
-                    "role": ROLE_MAPPING.get(chat["role"]),
-                    "content": chat["message"],
-                }
-                processed_chat_history.append(processed_chat_obj)
+            chat_history.append({"role": "user", "content": self.prompt or prompt})
+            chat_history.append({"role": "assistant", "content": response.text})
 
             provider_response = {
                 "response": response.text,
-                "chat_history": processed_chat_history,
+                "chat_history": chat_history,
             }
 
         except CohereError as e:
