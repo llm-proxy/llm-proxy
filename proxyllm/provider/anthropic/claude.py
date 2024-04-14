@@ -154,7 +154,7 @@ class ClaudeAdapter(BaseAdapter):
 
         Args:
             chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
-                Each dictionary contains 'role' and 'content' keys indicating the role of the speaker (system or user)
+                Each dictionary contains 'role' and 'content' keys indicating the role of the speaker (system, user, or assistant)
                 and the content of the message, respectively. Defaults to None.
 
         Returns:
