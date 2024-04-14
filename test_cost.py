@@ -32,7 +32,7 @@ def main() -> None:
     assert output.response_model
     assert output.response
 
-    #    # Round 2... FIGHT!
+    # Round 2... FIGHT!
 
     prompt2 = "what was the question i just asked u before this?"
     start = time.time()
