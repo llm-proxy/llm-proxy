@@ -21,8 +21,6 @@ mistral_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
-    },
-    "model-categories": {
         "open-mixtral-8x7b": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
@@ -35,8 +33,6 @@ mistral_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
-    },
-    "model-categories": {
         "mistral-small-latest": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
@@ -49,8 +45,6 @@ mistral_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
-    },
-    "model-categories": {
         "mistral-medium-latest": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
@@ -63,8 +57,6 @@ mistral_category_data = {
             "Financial Task": 4,
             "Content Recommendation Task": 3,
         },
-    },
-    "model-categories": {
         "mistral-large-latest": {
             "Code Generation Task": 2,
             "Text Generation Task": 1,
