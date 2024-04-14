@@ -367,7 +367,7 @@ class LLMProxy:
         Returns:
             CompletionResponse: The generated text response along with any errors encountered.
         """
-        if isinstance(chat_history, list):
+        if isinstance(chat_history, list) or chat_history is None:
             match RouteType(self.route_type):
                 case RouteType.COST:
                     return self._cost_route(prompt=prompt, chat_history=chat_history)
