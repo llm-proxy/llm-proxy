@@ -36,6 +36,7 @@ jobs:
           envkey_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_TEST }}
           envkey_COHERE_API_KEY: ${{ secrets.COHERE_API_KEY_TEST }}
           envkey_HUGGING_FACE_API_KEY: ${{ secrets.HUGGING_FACE_API_KEY_TEST }}
+          envkey_MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           #directory: <directory_name> # optional
           file_name: .env.test # optional (default: .env)
           fail_on_empty: false # optional (default: false)
@@ -44,8 +45,8 @@ jobs:
         name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: "projects/806914350455/locations/global/workloadIdentityPools/llm-proxy/providers/github"
-          service_account: "github-actions@poised-elf-400922.iam.gserviceaccount.com"
+          workload_identity_provider: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
 
       - name: Run test suite
         run: poetry run pytest
