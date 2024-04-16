@@ -31,6 +31,7 @@ class CompletionResponse:
         response (str): The response text from the model, if successful; otherwise, an empty string.
         response_model (str): The model that successfully responded to the request.
         errors (List): A list of error messages from models that failed to respond.
+        chat_history (List): A list of chat messages/responses from the user and models.
     """
 
     response: str = ""
