@@ -382,7 +382,7 @@ class LLMProxy:
                     raise ValueError("Invalid route type, please try again")
         else:
             raise UserChatHistoryError(
-                f"Incorrect format for chat_history: chat_history needs to be a List[Dict[str,str]]."
+                "Incorrect format for chat_history: chat_history needs to be a List[Dict[str,str]]."
             )
 
     def _cost_route(self, prompt: str, chat_history: List[Dict[str, str]]):
