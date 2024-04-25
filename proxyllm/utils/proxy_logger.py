@@ -4,7 +4,6 @@ import sys
 from logging import NullHandler
 from typing import Literal
 
-
 class CustomFormatter(logging.Formatter):
     """
     Custom logging Formatter class that adds color coding to log messages for console output,
