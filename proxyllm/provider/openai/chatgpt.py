@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 import tiktoken
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
-from proxyllm.utils import logger
+from proxyllm.utils import proxy_logger
 from proxyllm.utils.exceptions.provider import OpenAIException
 
 # Mapping of OpenAI model categories to their respective task performance ratings.
@@ -228,11 +228,11 @@ class OpenAIAdapter(BaseAdapter):
         Returns:
             int: The performance rank of the model in the specified category.
         """
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+        proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
+        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = open_ai_category_data["model-categories"][self.model][category]
 
-        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
 
         return category_rank

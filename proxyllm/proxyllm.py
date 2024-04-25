@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from proxyllm.config.internal_config import internal_config
 from proxyllm.provider.base import BaseAdapter
-from proxyllm.utils import categorization, logger
+from proxyllm.utils import categorization, proxy_logger
 from proxyllm.utils.cost import calculate_estimated_max_cost
 from proxyllm.utils.enums import BaseEnum
 from proxyllm.utils.exceptions.llmproxy_client import (
@@ -404,13 +404,13 @@ class LLMProxy:
 
         for model_name, instance in self.user_models.items():
             try:
-                logger.log(msg="========Start Cost Estimation===========")
+                proxy_logger.log(msg="========Start Cost Estimation===========")
 
-                logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
-                logger.log(
+                proxy_logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
+                proxy_logger.log(
                     msg=f"PROMPT (COST/CHARACTER): {self.model_data[model_name]['prompt']}"
                 )
-                logger.log(
+                proxy_logger.log(
                     msg=f"PROMPT (COST/CHARACTER): {self.model_data[model_name]['completion']}"
                 )
 
@@ -438,15 +438,17 @@ class LLMProxy:
 
                 min_heap.push(cost, item)
 
-                logger.log(msg=f"INPUT TOKENS: {token_data.num_of_input_tokens}")
-                logger.log(msg=f"COMPLETION TOKENS: {token_data.num_of_output_tokens}")
+                proxy_logger.log(msg=f"INPUT TOKENS: {token_data.num_of_input_tokens}")
+                proxy_logger.log(
+                    msg=f"COMPLETION TOKENS: {token_data.num_of_output_tokens}"
+                )
 
-                logger.log(msg=f"COST: {cost}", color="GREEN")
-                logger.log(msg="========End Cost Estimation===========\n")
+                proxy_logger.log(msg=f"COST: {cost}", color="GREEN")
+                proxy_logger.log(msg="========End Cost Estimation===========\n")
             except Exception as e:
-                logger.log(level="ERROR", msg=str(e))
-                logger.log(level="ERROR", msg="(¬_¬)", file_logger_on=False)
-                logger.log(msg="========End Cost Estimation===========\n")
+                proxy_logger.log(level="ERROR", msg=str(e))
+                proxy_logger.log(level="ERROR", msg="(¬_¬)", file_logger_on=False)
+                proxy_logger.log(msg="========End Cost Estimation===========\n")
 
         completion_res = None
         errors = []
@@ -459,20 +461,20 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.log(msg="========START COST ROUTING===========")
-            logger.log(msg=f"Making request to model:{instance_data['name']}")
-            logger.log(msg="ROUTING...")
+            proxy_logger.log(msg="========START COST ROUTING===========")
+            proxy_logger.log(msg=f"Making request to model:{instance_data['name']}")
+            proxy_logger.log(msg="ROUTING...")
 
             try:
                 completion_res = instance_data["instance"].get_completion(
                     prompt=prompt, chat_history=chat_history
                 )
                 response_model = instance_data["name"]
-                logger.log(
+                proxy_logger.log(
                     msg="==========COST ROUTING COMPLETE! Call to model successful!==========",
                     color="GREEN",
                 )
-                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
+                proxy_logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 errors.append(
                     {
@@ -482,16 +484,16 @@ class LLMProxy:
                     }
                 )
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg=f"Request to model {instance_data['name']} failed!",
                 )
-                logger.log(
+                proxy_logger.log(
                     level="ERROR", msg=f"Error when making request to model: {e}"
                 )
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+                proxy_logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg="========COST ROUTING FAILED!===========\n",
                 )
@@ -522,18 +524,18 @@ class LLMProxy:
         min_heap = MinHeap()
         best_fit_category = categorization.categorize_text(prompt)
         for model_name, instance in self.user_models.items():
-            logger.log(
+            proxy_logger.log(
                 msg="========Fetching model for category routing===========",
             )
 
-            logger.log(
+            proxy_logger.log(
                 msg="Sorting fetched models based on elo...",
             )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
 
-            logger.log(
+            proxy_logger.log(
                 msg="========Finished fetching model for category routing=============\n",
             )
 
@@ -547,7 +549,7 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
-            logger.log(
+            proxy_logger.log(
                 msg=f"Making request to model: {instance_data['name']}",
             )
 
@@ -556,10 +558,10 @@ class LLMProxy:
                     prompt=prompt, chat_history=chat_history
                 )
                 response_model = instance_data["name"]
-                logger.log(
+                proxy_logger.log(
                     msg="CATEGORY ROUTING COMPLETE! Call to model successful!",
                 )
-                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
+                proxy_logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 errors.append(
                     {
@@ -569,19 +571,19 @@ class LLMProxy:
                     }
                 )
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg=f"Request to model {instance_data['name']} failed!",
                 )
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg=f"Error when making request to model: {e}",
                 )
 
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+                proxy_logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg="========CATEGORY ROUTING FAILED!===========\n",
                 )
@@ -610,22 +612,24 @@ class LLMProxy:
         """
 
         min_heap = MinHeap()
-        logger.log(msg="Sorting fetched models based on elo rating...", color="GREEN")
+        proxy_logger.log(
+            msg="Sorting fetched models based on elo rating...", color="GREEN"
+        )
         for model_name, instance in self.user_models.items():
-            logger.log(
+            proxy_logger.log(
                 msg="========Fetching models for elo routing===========",
             )
 
-            logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
+            proxy_logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
 
             elo_rating = self.model_data[model_name]["elo"]
 
-            logger.log(msg=f"ELO RATING OF MODEL: {elo_rating}", color="BLUE")
+            proxy_logger.log(msg=f"ELO RATING OF MODEL: {elo_rating}", color="BLUE")
 
             item = {"name": model_name, "elo": elo_rating, "instance": instance}
             min_heap.push(-1 * elo_rating, item)
 
-            logger.log(
+            proxy_logger.log(
                 msg="========Finished fetching model for elo routing=============\n",
             )
 
@@ -639,20 +643,20 @@ class LLMProxy:
                 break
 
             instance_data = max_val_instance["data"]
-            logger.log(msg="========START ELO ROUTING===========")
-            logger.log(msg=f"Making request to model:{instance_data['name']}")
-            logger.log(msg="ROUTING...")
+            proxy_logger.log(msg="========START ELO ROUTING===========")
+            proxy_logger.log(msg=f"Making request to model:{instance_data['name']}")
+            proxy_logger.log(msg="ROUTING...")
 
             try:
                 completion_res = instance_data["instance"].get_completion(
                     prompt=prompt, chat_history=chat_history
                 )
                 response_model = instance_data["name"]
-                logger.log(
+                proxy_logger.log(
                     msg="==========ELO ROUTING COMPLETE! Call to model successful!==========",
                     color="GREEN",
                 )
-                logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
+                proxy_logger.log(msg="(• ◡ •)\n", file_logger_on=False, color="GREEN")
             except Exception as e:
                 errors.append(
                     {
@@ -662,19 +666,19 @@ class LLMProxy:
                     }
                 )
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg=f"Request to model {instance_data['name']} failed!",
                 )
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg=f"Error when making request to model: {e}",
                 )
 
-                logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
+                proxy_logger.log(level="ERROR", msg="(•᷄ ∩ •᷅)", file_logger_on=False)
 
-                logger.log(
+                proxy_logger.log(
                     level="ERROR",
                     msg="========ELO ROUTING FAILED!===========\n",
                 )

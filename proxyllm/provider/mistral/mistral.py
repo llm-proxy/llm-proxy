@@ -1,9 +1,8 @@
+import copy
 from typing import Any, Dict, List
 
-from tokenizers import Encoding
-
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
-from proxyllm.utils import logger, tokenizer
+from proxyllm.utils import proxy_logger, tokenizer
 from proxyllm.utils.exceptions.provider import MistralException
 
 # Mapping of Mistral model categories to their task performance ratings.
@@ -129,8 +128,6 @@ class MistralAdapter(BaseAdapter):
         if chat_history is None:
             chat_history = []
 
-        import copy
-
         from mistralai.client import MistralClient
         from mistralai.exceptions import (
             MistralAPIException,
@@ -140,6 +137,7 @@ class MistralAdapter(BaseAdapter):
 
         try:
             client = MistralClient(api_key=self.api_key, timeout=self.timeout)
+
             mistral_chat_history = copy.deepcopy(chat_history)
             mistral_chat_history.append(
                 {"role": "user", "content": prompt or self.prompt}
@@ -205,11 +203,11 @@ class MistralAdapter(BaseAdapter):
         Returns:
             int: Performance rank of the model in the specified category.
         """
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+        proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
+        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = mistral_category_data["model-categories"][self.model][category]
 
-        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
 
         return category_rank
