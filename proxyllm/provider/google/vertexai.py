@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Tuple
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
-from proxyllm.utils import logger, timeout_function, tokenizer
+from proxyllm.utils import proxy_logger, timeout_function, tokenizer
 from proxyllm.utils.enums import BaseEnum
 from proxyllm.utils.exceptions.provider import VertexAIException
 
@@ -157,7 +157,7 @@ class VertexAIAdapter(BaseAdapter):
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
-            
+
             provider_response = None
 
             # TODO :: Refactor so that there is one instance of the textgen/generative, language and chat models
@@ -393,10 +393,10 @@ class VertexAIAdapter(BaseAdapter):
         Returns:
             int: Rank of the model in the specified category.
         """
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+        proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
+        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = vertexai_category_data["model-categories"][self.model][category]
 
-        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
         return category_rank

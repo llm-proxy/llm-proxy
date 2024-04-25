@@ -2,22 +2,7 @@ import datetime as dt
 import logging
 import sys
 from typing import Literal
-
-
-class NullHandler(logging.Handler):
-    """
-    A custom logging handler that suppresses all logging output.
-    """
-
-    def emit(self, record):
-        """
-        Emit a log record, but do nothing.
-
-        Args:
-            record (logging.LogRecord): The log record to be emitted.
-        """
-        pass
-
+from logging import NullHandler
 
 class CustomFormatter(logging.Formatter):
     """
@@ -133,6 +118,10 @@ class CustomLogger:
         CustomLogger._file_logger = file_logger
         return file_logger
 
+
+# Prevent external loggers from using our custom loggers
+null_handler = NullHandler()
+logging.getLogger().addHandler(null_handler)
 
 file_logger = CustomLogger.get_file_logger()
 console_logger = CustomLogger.get_console_logger()
