@@ -113,7 +113,7 @@ class CohereAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(
-        self, prompt: str = "", chat_history: List[Dict[str, str]] = None
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
     ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the Cohere model.
@@ -128,21 +128,17 @@ class CohereAdapter(BaseAdapter):
         Raises:
             CohereException: If an error occurs during the API request.
         """
-        if chat_history is None:
-            chat_history = []
-
-        # Convert the proxy chat history into a format that Cohere can process
-        cohere_chat_history = []
-        for chat in chat_history:
-            cohere_chat_obj = {
-                "role": ROLE_NAME_TO_REP.get(chat["role"]),
-                "message": chat["content"],
-            }
-            cohere_chat_history.append(cohere_chat_obj)
-
         from cohere import Client, CohereError
 
         try:
+            if chat_history is None:
+                chat_history = []
+
+            # Convert the proxy chat history into a format that Cohere can process
+            cohere_chat_history = self.convert_to_cohere_chat_history_format(
+                chat_history
+            )
+
             co = Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
                 max_tokens=self.max_output_tokens,
@@ -152,6 +148,7 @@ class CohereAdapter(BaseAdapter):
                 chat_history=cohere_chat_history,
             )
 
+            # append and return original to avoid reformatting
             chat_history.append({"role": "user", "content": self.prompt or prompt})
             chat_history.append({"role": "assistant", "content": response.text})
 
@@ -210,3 +207,13 @@ class CohereAdapter(BaseAdapter):
         logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
 
         return category_rank
+
+    def convert_to_cohere_chat_history_format(self, chat_history):
+        cohere_chat_history = []
+        for chat in chat_history:
+            cohere_chat_obj = {
+                "role": ROLE_NAME_TO_REP.get(chat["role"]),
+                "message": chat["content"],
+            }
+            cohere_chat_history.append(cohere_chat_obj)
+        return cohere_chat_history

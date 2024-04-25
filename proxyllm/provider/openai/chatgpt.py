@@ -131,7 +131,7 @@ class OpenAIAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(
-        self, prompt: str = "", chat_history: List[Dict[str, str]] = None
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
     ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the specified OpenAI model.
@@ -176,10 +176,13 @@ class OpenAIAdapter(BaseAdapter):
                 timeout=self.timeout,
             )
             response_text = response.choices[0].message.content
-            openai_chat_history.append({"role": "assistant", "content": response_text})
+
+            chat_history.append({"role": "user", "content": prompt or self.prompt})
+            chat_history.append({"role": "assistant", "content": response_text})
+
             provider_response = {
                 "response": response_text,
-                "chat_history": openai_chat_history,
+                "chat_history": chat_history,
             }
         except OpenAIError as e:
             raise OpenAIException(
