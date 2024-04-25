@@ -157,7 +157,7 @@ class VertexAIAdapter(BaseAdapter):
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
-            
+
             provider_response = None
 
             # TODO :: Refactor so that there is one instance of the textgen/generative, language and chat models

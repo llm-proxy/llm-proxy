@@ -16,7 +16,6 @@ class NullHandler(logging.Handler):
         Args:
             record (logging.LogRecord): The log record to be emitted.
         """
-        pass
 
 
 class CustomFormatter(logging.Formatter):

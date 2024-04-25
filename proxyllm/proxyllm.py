@@ -464,7 +464,9 @@ class LLMProxy:
             logger.log(msg="ROUTING...")
 
             try:
-                completion_res = instance_data["instance"].get_completion(prompt=prompt, chat_history=chat_history)
+                completion_res = instance_data["instance"].get_completion(
+                    prompt=prompt, chat_history=chat_history
+                )
                 response_model = instance_data["name"]
                 logger.log(
                     msg="==========COST ROUTING COMPLETE! Call to model successful!==========",
@@ -550,7 +552,9 @@ class LLMProxy:
             )
 
             try:
-                completion_res = instance_data["instance"].get_completion(prompt=prompt, chat_history=chat_history)
+                completion_res = instance_data["instance"].get_completion(
+                    prompt=prompt, chat_history=chat_history
+                )
                 response_model = instance_data["name"]
                 logger.log(
                     msg="CATEGORY ROUTING COMPLETE! Call to model successful!",
@@ -640,7 +644,9 @@ class LLMProxy:
             logger.log(msg="ROUTING...")
 
             try:
-                completion_res = instance_data["instance"].get_completion(prompt=prompt, chat_history=chat_history)
+                completion_res = instance_data["instance"].get_completion(
+                    prompt=prompt, chat_history=chat_history
+                )
                 response_model = instance_data["name"]
                 logger.log(
                     msg="==========ELO ROUTING COMPLETE! Call to model successful!==========",
