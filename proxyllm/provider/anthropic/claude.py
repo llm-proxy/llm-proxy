@@ -82,7 +82,7 @@ class ClaudeAdapter(BaseAdapter):
         self.timeout = timeout
 
     def get_completion(
-        self, prompt: str = "", chat_history: List[Dict[str, str]] = None
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
     ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the specified Anthropic model.

@@ -135,7 +135,7 @@ class VertexAIAdapter(BaseAdapter):
         self,
         prompt: str,
         result: Dict[str, Any],
-        chat_history: List[Dict[str, str]] = None,
+        chat_history: List[Dict[str, str]] | None = None,
     ):
         """
         Private method to make a request to the Vertex AI API.
