@@ -168,9 +168,8 @@ class OpenAIAdapter(BaseAdapter):
             openai_chat_history.append(
                 {"role": "user", "content": prompt or self.prompt}
             )
-
             response = client.chat.completions.create(
-                messages=chat_history,
+                messages=openai_chat_history,
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
