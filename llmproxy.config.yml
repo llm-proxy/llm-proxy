@@ -64,10 +64,10 @@ provider_settings:
     project_id_var: GOOGLE_PROJECT_ID
     max_output_tokens: 256
     models:
-      # - text-bison # non-chat
+      # - text-bison
       - chat-bison 
       - gemini-pro
-      # - code-bison # non-chat
+      # - code-bison
       - codechat-bison
       # - code-gecko # max_output_tokens needs to change in order to work (1 <= max_output_tokens <= 65)
 
