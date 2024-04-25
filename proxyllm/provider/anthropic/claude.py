@@ -102,12 +102,9 @@ class ClaudeAdapter(BaseAdapter):
                 exception="EMPTY API KEY: API key not provided",
                 error_type="No API Key Provided",
             )
+
         if chat_history is None:
             chat_history = []
-
-        system_message, proxy_chat_history = self.format_chat_history(
-            chat_history=chat_history
-        )
 
         try:
             from anthropic import Anthropic, AnthropicError
@@ -115,12 +112,15 @@ class ClaudeAdapter(BaseAdapter):
             # TODO :: Remove reinitialization of the client
             client = Anthropic(api_key=self.api_key)
 
-            proxy_chat_history.append(
+            system_message, claude_chat_history = self.format_chat_history(
+                chat_history=chat_history
+            )
+            claude_chat_history.append(
                 {"role": "user", "content": prompt or self.prompt}
             )
 
             response = client.messages.create(
-                messages=proxy_chat_history,
+                messages=claude_chat_history,
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
@@ -128,13 +128,14 @@ class ClaudeAdapter(BaseAdapter):
                 system=system_message,
             )
             response_text = response.content[0].text
+
             chat_history.append({"role": "user", "content": prompt or self.prompt})
             chat_history.append({"role": "assistant", "content": response_text})
-
             provider_response = {
                 "response": response_text,
                 "chat_history": chat_history,
             }
+
         except AnthropicError as e:
             raise AnthropicException(
                 exception=e.args[0], error_type=type(e).__name__
@@ -149,8 +150,7 @@ class ClaudeAdapter(BaseAdapter):
         self, chat_history: List[Dict[str, str]] = None
     ) -> Tuple[str, List[Dict[str, str]]]:
         """
-        Formats the chat history by separating system messages from user messages as Claude doesn't support a system
-        role but rather a system message passed into its client.
+        Formats the chat history by for claude by ignoring the system role and extracting it as a system message variable
 
         Args:
             chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
@@ -160,22 +160,20 @@ class ClaudeAdapter(BaseAdapter):
         Returns:
             Tuple[str, List[Dict[str, str]]]: A tuple containing the system message (if present) and the formatted chat history.
                 The system message is a string, and the formatted chat history is a list of dictionaries similar to the input.
-
-        Notes:
-            - System messages are extracted and separated from the chat history.
-            - The original chat history is not modified; a deep copy is created for processing.
         """
         import copy
 
-        system_chat_instance = None
         system_message = ""
-        proxy_chat_history = copy.deepcopy(chat_history)
+        claude_chat_history = []
 
-        if proxy_chat_history and proxy_chat_history[0].get("role") == "system":
-            system_message = proxy_chat_history[0].get("content")
-            system_chat_instance = {"role": "system", "content": system_message}
-            proxy_chat_history.remove(system_chat_instance)
-        return system_message, proxy_chat_history
+        if chat_history and chat_history[0].get("role") == "system":
+            system_message = chat_history[0].get("content")
+            claude_chat_history = copy.deepcopy(chat_history[1:])
+
+        elif chat_history:
+            claude_chat_history = copy.deepcopy(chat_history)
+
+        return system_message, claude_chat_history
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """

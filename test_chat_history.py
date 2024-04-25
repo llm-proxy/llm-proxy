@@ -40,5 +40,6 @@ def main() -> None:
     assert output.response_model
     assert output.response
 
+
 if __name__ == "__main__":
     main()
