@@ -157,8 +157,13 @@ class VertexAIAdapter(BaseAdapter):
                 "temperature": self.temperature,
                 "max_output_tokens": self.max_output_tokens,
             }
+            
+            provider_response = None
+
             # TODO :: Refactor so that there is one instance of the textgen/generative, language and chat models
             # will be changed in the future when more models are released
+
+            # Handle GEMINI models
             if self.model in ModelType.GEMINI.value:
                 from vertexai.preview.generative_models import GenerativeModel
 
@@ -177,6 +182,8 @@ class VertexAIAdapter(BaseAdapter):
                     "response": response.text,
                     "chat_history": chat_history,
                 }
+
+            # Handle Palm Models
             elif self.model in ModelType.PALM.value:
                 if self.model == "text-bison":
                     from vertexai.language_models import TextGenerationModel
@@ -214,6 +221,8 @@ class VertexAIAdapter(BaseAdapter):
                         "response": response.text,
                         "chat_history": chat_history,
                     }
+
+            # Handle Codey Models
             elif self.model in ModelType.CODEY.value:
                 if self.model == "codechat-bison":
                     from vertexai.language_models import CodeChatModel
@@ -258,7 +267,7 @@ class VertexAIAdapter(BaseAdapter):
 
     def _format_chat_history(
         self,
-        chat_history: List[Dict[str, str]] = None,
+        chat_history: List[Dict[str, str]] | None = None,
         model_type: str = "",
     ) -> Tuple[str, List[Dict[str, str]]]:
         """
@@ -334,6 +343,7 @@ class VertexAIAdapter(BaseAdapter):
                 chat_history=chat_history,
             )
         else:
+            print(self.timeout)
             timeout_function.timeout_wrapper(
                 self._make_request,
                 self.timeout,
