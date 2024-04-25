@@ -16,6 +16,7 @@ click = "^8.1.7"
 torch = "^2.2.1"
 transformers = "^4.38.2" # remove once we depricate classification routing
 tiktoken = "^0.6.0"
+mistralai = "^0.1.8"
 
 [tool.poetry.scripts]
 config = "proxyllm.cli:cli"

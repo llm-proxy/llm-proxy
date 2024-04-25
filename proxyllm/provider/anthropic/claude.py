@@ -1,3 +1,5 @@
+from typing import Any, Dict, List, Tuple
+
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import logger
 from proxyllm.utils.exceptions.provider import AnthropicException
@@ -79,15 +81,18 @@ class ClaudeAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
+    ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the specified Anthropic model.
 
         Args:
             prompt (str): The text prompt for generating completion.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
-            str | None: The model's text response, or None if an error occurs.
+            Dict[str, Any] | None: The model's text response and chat history, or None if an error occurs.
 
         Raises:
             AnthropicException: If an API or internal error occurs during request processing.
@@ -98,18 +103,39 @@ class ClaudeAdapter(BaseAdapter):
                 error_type="No API Key Provided",
             )
 
-        from anthropic import Anthropic, AnthropicError
+        if chat_history is None:
+            chat_history = []
 
         try:
+            from anthropic import Anthropic, AnthropicError
+
             # TODO :: Remove reinitialization of the client
             client = Anthropic(api_key=self.api_key)
+
+            system_message, claude_chat_history = self.format_chat_history(
+                chat_history=chat_history
+            )
+            claude_chat_history.append(
+                {"role": "user", "content": prompt or self.prompt}
+            )
+
             response = client.messages.create(
-                messages=[{"role": "user", "content": prompt or self.prompt}],
+                messages=claude_chat_history,
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
                 timeout=self.timeout,
+                system=system_message,
             )
+            response_text = response.content[0].text
+
+            chat_history.append({"role": "user", "content": prompt or self.prompt})
+            chat_history.append({"role": "assistant", "content": response_text})
+            provider_response = {
+                "response": response_text,
+                "chat_history": chat_history,
+            }
+
         except AnthropicError as e:
             raise AnthropicException(
                 exception=e.args[0], error_type=type(e).__name__
@@ -118,7 +144,36 @@ class ClaudeAdapter(BaseAdapter):
             raise AnthropicException(
                 exception=e.args[0], error_type="Unknown Anthropic Error"
             ) from e
-        return response.content[0].text or None
+        return provider_response or None
+
+    def format_chat_history(
+        self, chat_history: List[Dict[str, str]] = None
+    ) -> Tuple[str, List[Dict[str, str]]]:
+        """
+        Formats the chat history by for claude by ignoring the system role and extracting it as a system message variable
+
+        Args:
+            chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
+                Each dictionary contains 'role' and 'content' keys indicating the role of the speaker (system, user, or assistant)
+                and the content of the message, respectively. Defaults to None.
+
+        Returns:
+            Tuple[str, List[Dict[str, str]]]: A tuple containing the system message (if present) and the formatted chat history.
+                The system message is a string, and the formatted chat history is a list of dictionaries similar to the input.
+        """
+        import copy
+
+        system_message = ""
+        claude_chat_history = []
+
+        if chat_history and chat_history[0].get("role") == "system":
+            system_message = chat_history[0].get("content")
+            claude_chat_history = copy.deepcopy(chat_history[1:])
+
+        elif chat_history:
+            claude_chat_history = copy.deepcopy(chat_history)
+
+        return system_message, claude_chat_history
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """

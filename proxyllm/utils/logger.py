@@ -4,6 +4,20 @@ import sys
 from typing import Literal
 
 
+class NullHandler(logging.Handler):
+    """
+    A custom logging handler that suppresses all logging output.
+    """
+
+    def emit(self, record):
+        """
+        Emit a log record, but do nothing.
+
+        Args:
+            record (logging.LogRecord): The log record to be emitted.
+        """
+
+
 class CustomFormatter(logging.Formatter):
     """
     Custom logging Formatter class that adds color coding to log messages for console output,

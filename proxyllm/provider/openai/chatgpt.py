@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 import tiktoken
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
@@ -128,15 +130,18 @@ class OpenAIAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
+    ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the specified OpenAI model.
 
         Args:
             prompt (str): The text prompt for generating completion.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
-            str | None: The model's text response, or None if an error occurs.
+            Dict[str, Any] | None: The model's text response and chat history, or None if an error occurs.
 
         Raises:
             OpenAIException: If an API or internal error occurs during request processing.
@@ -149,18 +154,36 @@ class OpenAIAdapter(BaseAdapter):
                 error_type="No API Key Provided",
             )
 
+        if chat_history is None:
+            chat_history = []
+
+        import copy
+
         from openai import OpenAI, OpenAIError
 
         try:
             client = OpenAI(api_key=self.api_key)
+
+            openai_chat_history = copy.deepcopy(chat_history)
+            openai_chat_history.append(
+                {"role": "user", "content": prompt or self.prompt}
+            )
             response = client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt or self.prompt}],
+                messages=openai_chat_history,
                 model=self.model,
                 max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
                 timeout=self.timeout,
             )
+            response_text = response.choices[0].message.content
 
+            chat_history.append({"role": "user", "content": prompt or self.prompt})
+            chat_history.append({"role": "assistant", "content": response_text})
+
+            provider_response = {
+                "response": response_text,
+                "chat_history": chat_history,
+            }
         except OpenAIError as e:
             raise OpenAIException(
                 exception=e.args[0], error_type=type(e).__name__
@@ -170,7 +193,7 @@ class OpenAIAdapter(BaseAdapter):
                 exception=e.args[0], error_type="Unknown OpenAI Error"
             ) from e
 
-        return response.choices[0].message.content or None
+        return provider_response or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """

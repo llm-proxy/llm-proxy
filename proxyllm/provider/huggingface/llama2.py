@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 import requests
 from tokenizers import Encoding
 
@@ -192,15 +194,18 @@ class Llama2Adapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
+    ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the specified Llama-2 model.
 
         Args:
             prompt (str): Text prompt for generating completion.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
-            str | None: The text completion from the model, or None if an error occurs.
+            Dict[str, Any] | None: The model's text response and chat history, or None if an error occurs.
 
         Raises:
             Llama2Exception: If an API or internal error occurs during request processing.
@@ -211,6 +216,9 @@ class Llama2Adapter(BaseAdapter):
 
         if self.prompt == "" and prompt == "":
             raise EmptyPrompt("Empty prompt detected")
+
+        if chat_history is None:
+            chat_history = []
 
         try:
             api_url = (
@@ -235,6 +243,15 @@ class Llama2Adapter(BaseAdapter):
                     },
                 }
             )
+            output_text = output[0]["generated_text"]
+
+            chat_history.append({"role": "user", "content": self.prompt or prompt})
+            chat_history.append({"role": "assistant", "content": output_text})
+
+            provider_response = {
+                "response": output_text,
+                "chat_history": chat_history,
+            }
 
         except Exception as e:
             raise Llama2Exception(exception=e.args[0], error_type="Llama2Error") from e
@@ -242,7 +259,7 @@ class Llama2Adapter(BaseAdapter):
         if output["error"]:
             raise Llama2Exception(exception=output["error"], error_type="Llama2Error")
 
-        return output[0]["generated_text"]
+        return provider_response or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """

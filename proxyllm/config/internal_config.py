@@ -170,30 +170,6 @@ internal_config: List[Dict[str, Any]] = [
         ],
     },
     {
-        "provider": "Mistral",
-        "adapter_path": "proxyllm.provider.huggingface.mistral.MistralAdapter",
-        "models": [
-            {
-                "name": "mistral-7b-v0.1",
-                "cost_per_token_input": 5e-08,
-                "cost_per_token_output": 2.5e-07,
-                "elo": 1003,  # elo rating for Mistral-7B-Instruct-v0.1
-            },
-            {
-                "name": "mistral-7b-instruct-v0.2",
-                "cost_per_token_input": 5e-08,
-                "cost_per_token_output": 2.5e-07,
-                "elo": 1073,
-            },
-            {
-                "name": "mixtral-8x7b-instruct-v0.1",
-                "cost_per_token_input": 3e-07,
-                "cost_per_token_output": 1e-06,
-                "elo": 1114,
-            },
-        ],
-    },
-    {
         "provider": "Cohere",
         "adapter_path": "proxyllm.provider.cohere.cohere.CohereAdapter",
         "models": [
@@ -292,6 +268,42 @@ internal_config: List[Dict[str, Any]] = [
                 "cost_per_token_input": 2.5e-07,
                 "cost_per_token_output": 1.25e-06,
                 "elo": 1177,
+            },
+        ],
+    },
+    {
+        "provider": "Mistral",
+        "adapter_path": "proxyllm.provider.mistral.mistral.MistralAdapter",
+        "models": [
+            {
+                "name": "open-mistral-7b",
+                "cost_per_token_input": 2.5e-07,
+                "cost_per_token_output": 2.5e-07,
+                "elo": 1003,
+            },
+            {
+                "name": "open-mixtral-8x7b",
+                "cost_per_token_input": 7e-07,
+                "cost_per_token_output": 7e-07,
+                "elo": 1073,
+            },
+            {
+                "name": "mistral-small-latest",
+                "cost_per_token_input": 2e-06,
+                "cost_per_token_output": 6e-06,
+                "elo": 1114,
+            },
+            {
+                "name": "mistral-medium-latest",
+                "cost_per_token_input": 2.7e-06,
+                "cost_per_token_output": 8.1e-06,
+                "elo": 1114,
+            },
+            {
+                "name": "mistral-large-latest",
+                "cost_per_token_input": 8e-06,
+                "cost_per_token_output": 2.4e-05,
+                "elo": 1114,
             },
         ],
     },

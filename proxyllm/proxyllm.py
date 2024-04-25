@@ -15,6 +15,7 @@ from proxyllm.utils.exceptions.llmproxy_client import (
     LLMProxyConfigError,
     ModelRequestFailed,
     RequestsFailed,
+    UserChatHistoryError,
     UserConfigError,
 )
 from proxyllm.utils.exceptions.provider import UnsupportedModel
@@ -30,11 +31,13 @@ class CompletionResponse:
         response (str): The response text from the model, if successful; otherwise, an empty string.
         response_model (str): The model that successfully responded to the request.
         errors (List): A list of error messages from models that failed to respond.
+        chat_history (List): A list of chat messages/responses from the user and models.
     """
 
     response: str = ""
     response_model: str = ""
     errors: List = field(default_factory=list)
+    chat_history: List[Dict[str, str]] = field(default_factory=list)
 
 
 class RouteType(str, BaseEnum):
@@ -353,27 +356,36 @@ class LLMProxy:
     def route(
         self,
         prompt: str = "",
+        chat_history: List[Dict[str, str]] = None,
     ) -> CompletionResponse:
         """
         Routes the request to the appropriate models based on the routing strategy.
 
         Args:
             prompt (str): The input prompt to generate text for.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
             CompletionResponse: The generated text response along with any errors encountered.
         """
-        match RouteType(self.route_type):
-            case RouteType.COST:
-                return self._cost_route(prompt=prompt)
-            case RouteType.CATEGORY:
-                return self._category_route(prompt=prompt)
-            case RouteType.ELO:
-                return self._elo_route(prompt=prompt)
-            case _:
-                raise ValueError("Invalid route type, please try again")
+        if isinstance(chat_history, list) or chat_history is None:
+            match RouteType(self.route_type):
+                case RouteType.COST:
+                    return self._cost_route(prompt=prompt, chat_history=chat_history)
+                case RouteType.CATEGORY:
+                    return self._category_route(
+                        prompt=prompt, chat_history=chat_history
+                    )
+                case RouteType.ELO:
+                    return self._elo_route(prompt=prompt, chat_history=chat_history)
+                case _:
+                    raise ValueError("Invalid route type, please try again")
+        else:
+            raise UserChatHistoryError(
+                "Incorrect format for chat_history: chat_history needs to be a List[Dict[str,str]]."
+            )
 
-    def _cost_route(self, prompt: str):
+    def _cost_route(self, prompt: str, chat_history: List[Dict[str, str]]):
         """
         Routes requests based on cost efficiency.
 
@@ -439,6 +451,7 @@ class LLMProxy:
         completion_res = None
         errors = []
         response_model = ""
+
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -451,7 +464,9 @@ class LLMProxy:
             logger.log(msg="ROUTING...")
 
             try:
-                completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                completion_res = instance_data["instance"].get_completion(
+                    prompt=prompt, chat_history=chat_history
+                )
                 response_model = instance_data["name"]
                 logger.log(
                     msg="==========COST ROUTING COMPLETE! Call to model successful!==========",
@@ -488,10 +503,13 @@ class LLMProxy:
             )
 
         return CompletionResponse(
-            response=completion_res, response_model=response_model, errors=errors
+            response=completion_res["response"],
+            response_model=response_model,
+            errors=errors,
+            chat_history=completion_res["chat_history"],
         )
 
-    def _category_route(self, prompt: str):
+    def _category_route(self, prompt: str, chat_history: List[Dict[str, str]]):
         """
         Routes requests based on the category elo of available models.
 
@@ -534,7 +552,9 @@ class LLMProxy:
             )
 
             try:
-                completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                completion_res = instance_data["instance"].get_completion(
+                    prompt=prompt, chat_history=chat_history
+                )
                 response_model = instance_data["name"]
                 logger.log(
                     msg="CATEGORY ROUTING COMPLETE! Call to model successful!",
@@ -572,10 +592,13 @@ class LLMProxy:
             )
 
         return CompletionResponse(
-            response=completion_res, response_model=response_model, errors=errors
+            response=completion_res["response"],
+            response_model=response_model,
+            errors=errors,
+            chat_history=completion_res["chat_history"],
         )
 
-    def _elo_route(self, prompt: str):
+    def _elo_route(self, prompt: str, chat_history: List[Dict[str, str]]):
         """
         Routes the request to the appropriate models based on elo elo rating of available models
 
@@ -621,7 +644,9 @@ class LLMProxy:
             logger.log(msg="ROUTING...")
 
             try:
-                completion_res = instance_data["instance"].get_completion(prompt=prompt)
+                completion_res = instance_data["instance"].get_completion(
+                    prompt=prompt, chat_history=chat_history
+                )
                 response_model = instance_data["name"]
                 logger.log(
                     msg="==========ELO ROUTING COMPLETE! Call to model successful!==========",
@@ -660,5 +685,8 @@ class LLMProxy:
             )
 
         return CompletionResponse(
-            response=completion_res, response_model=response_model, errors=errors
+            response=completion_res["response"],
+            response_model=response_model,
+            errors=errors,
+            chat_history=completion_res["chat_history"],
         )
