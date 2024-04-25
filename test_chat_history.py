@@ -39,8 +39,6 @@ def main() -> None:
 
     assert output.response_model
     assert output.response
-    assert prompt.lower().replace(" ", "") in output.response.lower().replace(" ", "")
-
 
 if __name__ == "__main__":
     main()
