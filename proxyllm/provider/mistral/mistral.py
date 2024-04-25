@@ -1,10 +1,10 @@
 import copy
-import logging
 from typing import Any, Dict, List
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
 from proxyllm.utils import proxy_logger, tokenizer
 from proxyllm.utils.exceptions.provider import MistralException
+
 # Mapping of Mistral model categories to their task performance ratings.
 mistral_category_data = {
     "model-categories": {
@@ -129,7 +129,6 @@ class MistralAdapter(BaseAdapter):
             chat_history = []
 
         from mistralai.client import MistralClient
-
         from mistralai.exceptions import (
             MistralAPIException,
             MistralAPIStatusException,

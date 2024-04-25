@@ -1,8 +1,9 @@
 import datetime as dt
 import logging
 import sys
-from typing import Literal
 from logging import NullHandler
+from typing import Literal
+
 
 class CustomFormatter(logging.Formatter):
     """
