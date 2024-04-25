@@ -168,7 +168,7 @@ class ClaudeAdapter(BaseAdapter):
         import copy
 
         system_chat_instance = None
-        system_message = None
+        system_message = ""
         proxy_chat_history = copy.deepcopy(chat_history)
 
         if proxy_chat_history and proxy_chat_history[0].get("role") == "system":

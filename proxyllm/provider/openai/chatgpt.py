@@ -176,13 +176,10 @@ class OpenAIAdapter(BaseAdapter):
                 timeout=self.timeout,
             )
             response_text = response.choices[0].message.content
-
-            chat_history.append({"role": "user", "content": prompt or self.prompt})
-            chat_history.append({"role": "assistant", "content": response_text})
-
+            openai_chat_history.append({"role": "assistant", "content": response_text})
             provider_response = {
                 "response": response_text,
-                "chat_history": chat_history,
+                "chat_history": openai_chat_history,
             }
         except OpenAIError as e:
             raise OpenAIException(
