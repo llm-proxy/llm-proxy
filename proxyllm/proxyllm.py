@@ -535,7 +535,7 @@ class LLMProxy:
             min_heap.push(category_rank, item)
 
             proxy_logger.log(
-                msg="========End Model Fetch=============\n",
+                msg="========Finished Fetching Model For Category Routing=============\n",
             )
 
         completion_res = None
@@ -631,7 +631,7 @@ class LLMProxy:
             min_heap.push(-1 * elo_rating, item)
 
             proxy_logger.log(
-                msg="=========End Fetch=============\n",
+                msg="========Finished Model Fetching For Elo Routing=============\n",
             )
 
         completion_res = None
