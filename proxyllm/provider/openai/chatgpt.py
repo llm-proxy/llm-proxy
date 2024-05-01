@@ -230,7 +230,6 @@ class OpenAIAdapter(BaseAdapter):
         """
         proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
-
         category_rank = open_ai_category_data["model-categories"][self.model][category]
 
         proxy_logger.log(msg=f"MODEL CATEGORY RANK: {category_rank}", color="BLUE")
