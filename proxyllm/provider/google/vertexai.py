@@ -167,7 +167,7 @@ class VertexAIAdapter(BaseAdapter):
             if self.model in ModelType.GEMINI.value:
                 from vertexai.preview.generative_models import GenerativeModel
 
-                context, vertexai_chat_history = self._format_chat_history(
+                context, vertexai_chat_history = self.format_chat_history(
                     chat_history=chat_history, model_type="gemini"
                 )
 
@@ -202,7 +202,7 @@ class VertexAIAdapter(BaseAdapter):
                 else:
                     from vertexai.language_models import ChatModel
 
-                    context, vertexai_chat_history = self._format_chat_history(
+                    context, vertexai_chat_history = self.format_chat_history(
                         chat_history=chat_history, model_type="palm"
                     )
 
@@ -227,7 +227,7 @@ class VertexAIAdapter(BaseAdapter):
                 if self.model == "codechat-bison":
                     from vertexai.language_models import CodeChatModel
 
-                    context, vertexai_chat_history = self._format_chat_history(
+                    context, vertexai_chat_history = self.format_chat_history(
                         chat_history=chat_history, model_type="codey"
                     )
                     chat_model = CodeChatModel.from_pretrained(self.model)
@@ -264,59 +264,6 @@ class VertexAIAdapter(BaseAdapter):
 
         except Exception as e:
             result["exception"] = e
-
-    def _format_chat_history(
-        self,
-        chat_history: List[Dict[str, str]] | None = None,
-        model_type: str = "",
-    ) -> Tuple[str, List[Dict[str, str]]]:
-        """
-        Formats the chat history by separating system messages from user messages.
-        The remaining messages are converted into ChatMessage objects based on the provided model type.
-
-        Args:
-            chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
-                Each dictionary should contain 'role' and 'content' keys indicating the role of the speaker
-                (system, user, or assistant) and the content of the message, respectively. Defaults to None.
-            model_type (str, optional): The type of the model used for formatting the chat history.
-                This determines the role mappings for the ChatMessage objects. Defaults to "".
-
-        Returns:
-            Tuple[str, List[Dict[str, str]]]: A tuple containing the system message (if present) and the formatted chat history.
-                The system message is a string representing the context, and the formatted chat history is a list of dictionaries
-                containing 'content' and 'author' keys, similar to the input but converted into ChatMessage objects.
-
-        Notes:
-            - System messages are extracted and separated from the chat history.
-            - The original chat history is not modified; a deep copy is created for processing.
-        """
-        context = ""
-        vertexai_chat_history = []
-
-        if chat_history and chat_history[0].get("role") == "system":
-            context = chat_history[0].get("content")
-            chat_history = chat_history[1:]
-
-        if model_type == "gemini":
-            from vertexai.preview.generative_models import Content, Part
-
-            for chat in chat_history:
-                message = Content(
-                    role=GEMINI_ROLE_MAPPINGS.get(chat["role"]),
-                    parts=[Part.from_text(chat["content"])],
-                )
-                vertexai_chat_history.append(message)
-        else:
-            from vertexai.language_models import ChatMessage
-
-            for chat in chat_history:
-                message = ChatMessage(
-                    content=chat["content"],
-                    author=PALM_CODEY_ROLE_MAPPINGS.get(chat["role"]),
-                )
-                vertexai_chat_history.append(message)
-
-        return context, vertexai_chat_history
 
     def get_completion(
         self, prompt: str = "", chat_history: List[Dict[str, str]] = None
@@ -394,9 +341,61 @@ class VertexAIAdapter(BaseAdapter):
             int: Rank of the model in the specified category.
         """
         proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = vertexai_category_data["model-categories"][self.model][category]
 
-        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"MODEL CATEGORY RANK: {category_rank}", color="BLUE")
         return category_rank
+
+    def format_chat_history(
+        self,
+        chat_history: List[Dict[str, str]] | None = None,
+        model_type: str = "",
+    ) -> Tuple[str, List[Dict[str, str]]]:
+        """
+        Formats the chat history by separating system messages from user messages.
+        The remaining messages are converted into ChatMessage objects based on the provided model type.
+
+        Args:
+            chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
+                Each dictionary should contain 'role' and 'content' keys indicating the role of the speaker
+                (system, user, or assistant) and the content of the message, respectively. Defaults to None.
+            model_type (str, optional): The type of the model used for formatting the chat history.
+                This determines the role mappings for the ChatMessage objects. Defaults to "".
+
+        Returns:
+            Tuple[str, List[Dict[str, str]]]: A tuple containing the system message (if present) and the formatted chat history.
+                The system message is a string representing the context, and the formatted chat history is a list of dictionaries
+                containing 'content' and 'author' keys, similar to the input but converted into ChatMessage objects.
+
+        Notes:
+            - System messages are extracted and separated from the chat history.
+            - The original chat history is not modified; a deep copy is created for processing.
+        """
+        context = ""
+        vertexai_chat_history = []
+
+        if chat_history and chat_history[0].get("role") == "system":
+            context = chat_history[0].get("content")
+            chat_history = chat_history[1:]
+
+        if model_type == "gemini":
+            from vertexai.preview.generative_models import Content, Part
+
+            for chat in chat_history:
+                message = Content(
+                    role=GEMINI_ROLE_MAPPINGS.get(chat["role"]),
+                    parts=[Part.from_text(chat["content"])],
+                )
+                vertexai_chat_history.append(message)
+        else:
+            from vertexai.language_models import ChatMessage
+
+            for chat in chat_history:
+                message = ChatMessage(
+                    content=chat["content"],
+                    author=PALM_CODEY_ROLE_MAPPINGS.get(chat["role"]),
+                )
+                vertexai_chat_history.append(message)
+
+        return context, vertexai_chat_history
