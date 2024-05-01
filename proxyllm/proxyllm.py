@@ -523,25 +523,25 @@ class LLMProxy:
         """
         min_heap = MinHeap()
         best_fit_category = categorization.categorize_text(prompt)
+        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {best_fit_category}")
+
         for model_name, instance in self.user_models.items():
             proxy_logger.log(
-                msg="========Fetching model for category routing===========",
+                msg="========Fetching Model For Category Routing===========",
             )
 
-            proxy_logger.log(
-                msg="Sorting fetched models based on elo...",
-            )
             category_rank = instance.get_category_rank(best_fit_category)
             item = {"name": model_name, "rank": category_rank, "instance": instance}
             min_heap.push(category_rank, item)
 
             proxy_logger.log(
-                msg="========Finished fetching model for category routing=============\n",
+                msg="========End Model Fetch=============\n",
             )
 
         completion_res = None
         errors = []
         response_model = ""
+
         while not completion_res:
             # Iterate through heap until there are no more options
             min_val_instance = min_heap.pop_min()
@@ -549,6 +549,7 @@ class LLMProxy:
                 break
 
             instance_data = min_val_instance["data"]
+            proxy_logger.log(msg="========START COST ROUTING===========")
             proxy_logger.log(
                 msg=f"Making request to model: {instance_data['name']}",
             )
@@ -617,7 +618,7 @@ class LLMProxy:
         )
         for model_name, instance in self.user_models.items():
             proxy_logger.log(
-                msg="========Fetching models for elo routing===========",
+                msg="========Fetching Models for Elo Routing===========",
             )
 
             proxy_logger.log(msg=f"MODEL: {model_name}", color="PURPLE")
@@ -630,7 +631,7 @@ class LLMProxy:
             min_heap.push(-1 * elo_rating, item)
 
             proxy_logger.log(
-                msg="========Finished fetching model for elo routing=============\n",
+                msg="=========End Fetch=============\n",
             )
 
         completion_res = None

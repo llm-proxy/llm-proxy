@@ -135,9 +135,7 @@ class CohereAdapter(BaseAdapter):
                 chat_history = []
 
             # Convert the proxy chat history into a format that Cohere can process
-            cohere_chat_history = self.convert_to_cohere_chat_history_format(
-                chat_history
-            )
+            cohere_chat_history = self.format_chat_history(chat_history)
 
             co = Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
@@ -200,15 +198,14 @@ class CohereAdapter(BaseAdapter):
             int: Rank of the model in the specified category.
         """
         proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = cohere_category_data["model-categories"][self.model][category]
 
-        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"MODEL CATEGORY RANK: {category_rank}", color="BLUE")
 
         return category_rank
 
-    def convert_to_cohere_chat_history_format(self, chat_history):
+    def format_chat_history(self, chat_history):
         cohere_chat_history = []
         for chat in chat_history:
             cohere_chat_obj = {

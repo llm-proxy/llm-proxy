@@ -26,7 +26,7 @@ def main() -> None:
 
     # Round 2... FIGHT!
 
-    prompt2 = "Repeat the question that I previously asked you"
+    prompt2 = "What was the first question that I asked you?"
     start = time.time()
     output = proxy_client.route(prompt=prompt2, chat_history=chat_history)
     end = time.time()

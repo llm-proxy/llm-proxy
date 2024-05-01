@@ -293,10 +293,9 @@ class Llama2Adapter(BaseAdapter):
             int: Performance rank of the model in the specified category.
         """
         proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = llama2_category_data["model-categories"][self.model][category]
 
-        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"MODEL CATEGORY RANK: {category_rank}", color="BLUE")
 
         return category_rank

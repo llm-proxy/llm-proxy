@@ -146,35 +146,6 @@ class ClaudeAdapter(BaseAdapter):
             ) from e
         return provider_response or None
 
-    def format_chat_history(
-        self, chat_history: List[Dict[str, str]] = None
-    ) -> Tuple[str, List[Dict[str, str]]]:
-        """
-        Formats the chat history by for claude by ignoring the system role and extracting it as a system message variable
-
-        Args:
-            chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
-                Each dictionary contains 'role' and 'content' keys indicating the role of the speaker (system, user, or assistant)
-                and the content of the message, respectively. Defaults to None.
-
-        Returns:
-            Tuple[str, List[Dict[str, str]]]: A tuple containing the system message (if present) and the formatted chat history.
-                The system message is a string, and the formatted chat history is a list of dictionaries similar to the input.
-        """
-        import copy
-
-        system_message = ""
-        claude_chat_history = []
-
-        if chat_history and chat_history[0].get("role") == "system":
-            system_message = chat_history[0].get("content")
-            claude_chat_history = copy.deepcopy(chat_history[1:])
-
-        elif chat_history:
-            claude_chat_history = copy.deepcopy(chat_history)
-
-        return system_message, claude_chat_history
-
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
         Tokenizes the provided prompt using the tokenizer.
@@ -212,11 +183,39 @@ class ClaudeAdapter(BaseAdapter):
         """
 
         proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        proxy_logger.log(msg=f"CATEGORY OF PROMPT: {category}")
 
         category_rank = anthropic_category_data["model-categories"][self.model][
             category
         ]
 
-        proxy_logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"MODEL CATEGORY RANK: {category_rank}", color="BLUE")
         return category_rank
+
+    def format_chat_history(
+        self, chat_history: List[Dict[str, str]] = None
+    ) -> Tuple[str, List[Dict[str, str]]]:
+        """
+        Formats the chat history by for claude by ignoring the system role and extracting it as a system message variable
+
+        Args:
+            chat_history (List[Dict[str, str]], optional): A list of dictionaries representing the chat history.
+                Each dictionary contains 'role' and 'content' keys indicating the role of the speaker (system, user, or assistant)
+                and the content of the message, respectively. Defaults to None.
+
+        Returns:
+            Tuple[str, List[Dict[str, str]]]: A tuple containing the system message (if present) and the formatted chat history.
+                The system message is a string, and the formatted chat history is a list of dictionaries similar to the input.
+        """
+        import copy
+
+        system_message = ""
+        claude_chat_history = []
+
+        if chat_history and chat_history[0].get("role") == "system":
+            system_message = chat_history[0].get("content")
+            claude_chat_history = copy.deepcopy(chat_history[1:])
+
+        elif chat_history:
+            claude_chat_history = copy.deepcopy(chat_history)
+
+        return system_message, claude_chat_history
