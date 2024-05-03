@@ -111,7 +111,7 @@ poetry run config --default-config
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
-
+### Basic Usage
 Currently, the LLM Proxy provides 2 different route types: Cost and Category.
 
 To get started import the LLMProxy client:
@@ -156,8 +156,58 @@ print("ERRORS: ", output.errors)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ROADMAP -->
+### Chat History
+The user can pass in their own custom chat history to the proxy and it will route to the correct LLM with this chat history.
+The data type of the chat history is:
+`chat_history: List[Dict[str,str]]`
 
+The chat history supports the following roles:
+- `system`: Helps define the LLM's behavior. You can customize its personality or specify detailed instructions on how it should interact during conversations. It's important to note that while providing a system message is optional, if none is given, the assistant's behavior is likely to resemble that of a generic message, such as "You are a helpful assistant." If you plan on using the system role, place it in the first index of `chat_history` rather than later on in the conversation.
+- `user`: Contain requests or comments for the LLM to address. 
+- `assistant`: Are the response messages by the LLMs, and can also be authored by you to showcase desired behaviors.
+
+An example of how chat history could be formatted is as such:
+
+```python
+chat_history = [
+        {
+            "role": "system",
+            "content": "you are math bot, and you're responses must be short and sweet",
+        },
+        {
+            "role": "user",
+            "content": "what is 1 + 1",
+        },
+        {
+            "role": "assistant",
+            "content": "2",
+        }
+  ]
+```
+
+By default the chat history would be an empty array and will not need to be instantiated. But in order for you to retrieve the chat history after routing, simply set your chat history variable to `output.chat_history` and then this chat history can be passed into the proxy's route() function.
+
+The following example shows the usage of chat history with the proxy library:
+
+```python
+prompt = "what is 1 + 1"
+proxy_client = LLMProxy(route_type="cost")
+output = proxy_client.route(prompt=prompt)
+chat_history = output.chat_history
+
+prompt2 = "what was the question i just asked u before this?"
+output = proxy_client.route(prompt=prompt2, chat_history=chat_history)
+chat_history = output.chat_history
+```
+
+Notes:
+- When passing in a populated custom chat history, the first message in the chat history has to be either a `system` or `assistant` message. The last message has to be an `assistant` message.  The 'user' message cannot be appended to the chat history, it has to be passed in the form of the `prompt` to the proxy's `route` function.
+- You must use only the following roles otherwise routing will not work: `user`, `assistant`, `system` 
+- In order to keep track of your chat history, make sure to set it equal to the `output.chat_history` each time you make a call to the proxy's route() function
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ROADMAP -->
 ## Roadmap
 
 - [ ] Support for more providers
