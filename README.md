@@ -185,7 +185,7 @@ chat_history = [
   ]
 ```
 
-By default the chat history would be an empty array and will not need to be instantiated. But in order for you to retrieve the chat history after routing, simply set your chat history variable to `output.chat_history` and then this chat history can be passed into the proxy's route() function.
+By default the chat history would be an empty array and will not need to be instantiated. But in order for you to retrieve the chat history after routing, simplyset your chat history variable to `output.chat_history` and then this chat history can be passed into the proxy's route() function.
 
 The following example shows the usage of chat history with the proxy library:
 
@@ -214,9 +214,10 @@ Notes:
   - [ ] Replicate
   - [x] Claude
 - [ ] Support for multimodal Models
-- [ ] Custom, optimized model for category routing
+- [ ] Custom, optimized model for general router
 - [x] Elo Routing
 - [ ] Context Injection
+- [ ] Filter/Security Layer
 
 See the [open issues](https://github.com/llm-proxy/llm-proxy/issues) for a full list of proposed features (and known issues).
 
