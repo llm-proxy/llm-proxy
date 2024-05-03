@@ -3,11 +3,11 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from proxyllm.provider.huggingface.mistral import MistralAdapter, MistralException
+from proxyllm.provider.mistral.mistral import MistralAdapter, MistralException
 
 load_dotenv(".env.test")
 
-mistral_api_key = os.getenv("HUGGING_FACE_API_KEY")
+mistral_api_key = os.getenv("MISTRAL_API_KEY")
 
 
 def test_mistral_constructor_default() -> None:

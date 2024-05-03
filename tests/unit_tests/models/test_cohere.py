@@ -3,8 +3,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from proxyllm.provider.cohere.cohere import CohereAdapter
-from proxyllm.utils.exceptions.provider import CohereException
+from proxyllm.provider.cohere.cohere import CohereAdapter, CohereException
 
 load_dotenv(".env.test")
 

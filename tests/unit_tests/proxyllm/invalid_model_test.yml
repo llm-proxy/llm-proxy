@@ -31,7 +31,7 @@ provider_settings:
         cost_per_hour: 0.06
 
   - provider: Mistral
-    class: proxyllm.provider.huggingface.mistral.Mistral
+    class: proxyllm.provider.mistral.mistral.Mistral
     models:
       - name: Mistral-7B-v0.1
         cost_per_hour: 0.06

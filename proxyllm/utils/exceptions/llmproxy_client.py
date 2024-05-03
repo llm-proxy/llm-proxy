@@ -12,3 +12,7 @@ class LLMProxyConfigError(Exception):
 
 class UserConfigError(Exception):
     pass
+
+
+class UserChatHistoryError(Exception):
+    pass

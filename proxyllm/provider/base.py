@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -15,15 +16,18 @@ class BaseAdapter(ABC):
     """
 
     @abstractmethod
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
+    ) -> Dict[str, Any] | None:
         """
         Abstract method to retrieve completion for a given prompt.
 
         Parameters:
         - prompt (str): The prompt for which completion is requested. Defaults to an empty string.
+        - chat_history (List[Dict[str, str]]): The chat history for conversation. Defaults to None.
 
         Returns:
-        - str or None: The completion for the provided prompt, or None if no completion is available.
+        - Dict[str, Any] or None: The model's text response and chat history, or None if an error occurs.
         """
 
     @abstractmethod

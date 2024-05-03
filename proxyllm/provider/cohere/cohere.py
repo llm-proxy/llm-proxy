@@ -1,7 +1,9 @@
+from typing import Any, Dict, List
+
 from tokenizers import Encoding
 
 from proxyllm.provider.base import BaseAdapter, TokenizeResponse
-from proxyllm.utils import logger, tokenizer
+from proxyllm.utils import proxy_logger, tokenizer
 from proxyllm.utils.exceptions.provider import CohereException
 
 # Dictionary mapping Cohere model categories to task performance ratings.
@@ -70,6 +72,13 @@ cohere_category_data = {
     }
 }
 
+# Mapping from role names to Cohere's format
+ROLE_NAME_TO_REP = {
+    "user": "USER",
+    "assistant": "CHATBOT",
+    "system": "SYSTEM",
+}
+
 
 class CohereAdapter(BaseAdapter):
     """
@@ -103,37 +112,57 @@ class CohereAdapter(BaseAdapter):
         self.max_output_tokens = max_output_tokens
         self.timeout = timeout
 
-    def get_completion(self, prompt: str = "") -> str | None:
+    def get_completion(
+        self, prompt: str = "", chat_history: List[Dict[str, str]] | None = None
+    ) -> Dict[str, Any] | None:
         """
         Requests a text completion from the Cohere model.
 
         Args:
-            prompt (str): Input text prompt for the model.
+            prompt (str): The text prompt for generating completion.
+            chat_history (List[Dict[str, str]]): The chat history for conversation
 
         Returns:
-            str | None: The text completion result from the model, or None if an error occurs.
+            Dict[str, Any] | None: The model's text response and chat history, or None if an error occurs.
 
         Raises:
             CohereException: If an error occurs during the API request.
         """
-
         from cohere import Client, CohereError
 
         try:
+            if chat_history is None:
+                chat_history = []
+
+            # Convert the proxy chat history into a format that Cohere can process
+            cohere_chat_history = self.format_chat_history(chat_history)
+
             co = Client(api_key=self.api_key, timeout=self.timeout)
             response = co.chat(
                 max_tokens=self.max_output_tokens,
                 message=prompt or self.prompt,
                 model=self.model,
                 temperature=self.temperature,
+                chat_history=cohere_chat_history,
             )
-            return response.text
+
+            # append and return original to avoid reformatting
+            chat_history.append({"role": "user", "content": self.prompt or prompt})
+            chat_history.append({"role": "assistant", "content": response.text})
+
+            provider_response = {
+                "response": response.text,
+                "chat_history": chat_history,
+            }
+
         except CohereError as e:
             raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
             raise CohereException(
                 exception=str(e), error_type="Unknown Cohere Error"
             ) from e
+
+        return provider_response or None
 
     def tokenize(self, prompt: str = "") -> TokenizeResponse:
         """
@@ -168,11 +197,20 @@ class CohereAdapter(BaseAdapter):
         Returns:
             int: Rank of the model in the specified category.
         """
-        logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
-        logger.log(msg=f"CATEGORY OF PROMPT: {category}")
+        proxy_logger.log(msg=f"MODEL: {self.model}", color="PURPLE")
 
         category_rank = cohere_category_data["model-categories"][self.model][category]
 
-        logger.log(msg=f"RANK OF PROMPT: {category_rank}", color="BLUE")
+        proxy_logger.log(msg=f"MODEL CATEGORY RANK: {category_rank}", color="BLUE")
 
         return category_rank
+
+    def format_chat_history(self, chat_history):
+        cohere_chat_history = []
+        for chat in chat_history:
+            cohere_chat_obj = {
+                "role": ROLE_NAME_TO_REP.get(chat["role"]),
+                "message": chat["content"],
+            }
+            cohere_chat_history.append(cohere_chat_obj)
+        return cohere_chat_history

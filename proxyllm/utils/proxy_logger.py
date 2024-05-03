@@ -1,6 +1,7 @@
 import datetime as dt
 import logging
 import sys
+from logging import NullHandler
 from typing import Literal
 
 
@@ -118,6 +119,10 @@ class CustomLogger:
         CustomLogger._file_logger = file_logger
         return file_logger
 
+
+# Prevent external loggers from using our custom loggers
+null_handler = NullHandler()
+logging.getLogger().addHandler(null_handler)
 
 file_logger = CustomLogger.get_file_logger()
 console_logger = CustomLogger.get_console_logger()

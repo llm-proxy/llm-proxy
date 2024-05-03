@@ -36,6 +36,8 @@ jobs:
           envkey_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           envkey_COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
           envkey_HUGGING_FACE_API_KEY: ${{ secrets.HUGGING_FACE_API_KEY }}
+          envkey_MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          envkey_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           #directory: <directory_name> # optional
           file_name: .env # optional (default: .env)
           fail_on_empty: false # optional (default: false)
