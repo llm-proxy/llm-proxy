@@ -204,6 +204,15 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- ACKNOWLEDGMENTS -->
-<!-- ## Acknowledgments -->
+## Acknowledgments
+- Hadi Hemmati: https://www.linkedin.com/in/hhemmati/
+- Adrien Laurent: https://www.linkedin.com/in/adrienlaurent/
+- Alain Ballen: https://www.linkedin.com/in/alain-ballen/
+- Mohamed Ahmed: https://www.linkedin.com/in/mohamed-ahmed-soft-eng/
+- Ahmed Ali: https://www.linkedin.com/in/ahmed-ali00/
+- Victor Chung: https://www.linkedin.com/in/victor-chung-ca/
+- Ye-Ting Ke: https://www.linkedin.com/in/yi-ting-ke-8563a5204/
+- Laxit Shahi: https://www.linkedin.com/in/laxitshahi/
+- Dinuja Wattage: https://www.linkedin.com/in/dinuja-wattage/
 
 <!-- <p align="right">(<a href="#readme-top">back to top</a>)</p>-->
