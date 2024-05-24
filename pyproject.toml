@@ -8,7 +8,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 python-dotenv = "^1.0.0"
-cohere = "^4.27"
 google-cloud-aiplatform = "^1.35.0"
 openai = "^1.11.1"
 anthropic = "^0.20.0"
@@ -17,6 +16,7 @@ torch = "^2.2.1"
 transformers = "^4.38.2" # remove once we depricate classification routing
 tiktoken = "^0.6.0"
 mistralai = "^0.1.8"
+cohere = "^5.5.3"
 
 [tool.poetry.scripts]
 config = "proxyllm.cli:cli"

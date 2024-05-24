@@ -25,6 +25,18 @@ internal_config: List[Dict[str, Any]] = [
         "provider": "OpenAI",
         "adapter_path": "proxyllm.provider.openai.chatgpt.OpenAIAdapter",
         "models": [
+            {
+                "name": "gpt-4-turbo",
+                "cost_per_token_input": 10e-06,
+                "cost_per_token_output": 30e-06,
+                "elo": 1287,
+            },
+            {
+                "name": "gpt-4o",
+                "cost_per_token_input": 5e-06,
+                "cost_per_token_output": 15e-06,
+                "elo": 1287,
+            },
             # GPT-4 Turbo
             {
                 "name": "gpt-4-0125-preview",
@@ -87,7 +99,7 @@ internal_config: List[Dict[str, Any]] = [
                 "name": "gpt-3.5-turbo-0301",
                 "cost_per_token_input": 1.5e-06,
                 "cost_per_token_output": 2e-06,
-                "elo": 0,  # no data for this model
+                "elo": 499,  # no data for this model
             },
         ],
     },
@@ -173,6 +185,12 @@ internal_config: List[Dict[str, Any]] = [
         "provider": "Cohere",
         "adapter_path": "proxyllm.provider.cohere.cohere.CohereAdapter",
         "models": [
+            {
+                "name": "command-r-plus",
+                "cost_per_token_input": 3.0e-06,
+                "cost_per_token_output": 15.0e-06,
+                "elo": 1188,
+            },
             {
                 "name": "command-r",
                 "cost_per_token_input": 0.5e-06,
