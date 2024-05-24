@@ -6,7 +6,7 @@ from proxyllm import LLMProxy
 
 
 def main() -> None:
-    prompt = "what is 1+1"
+    prompt = "Say 'test'"
     proxy_client = LLMProxy(route_type="cost")
     start = time.time()
     output = proxy_client.route(prompt=prompt)
