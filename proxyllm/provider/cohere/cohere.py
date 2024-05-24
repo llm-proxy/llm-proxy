@@ -69,6 +69,18 @@ cohere_category_data = {
             "Financial Task": 3,
             "Content Recommendation Task": 2,
         },
+        "command-r-plus": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 3,
+            "Translation and Multilingual Applications Task": 3,
+            "Natural Language Processing Task": 4,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 3,
+            "Content Recommendation Task": 3,
+        },
     }
 }
 
@@ -128,7 +140,7 @@ class CohereAdapter(BaseAdapter):
         Raises:
             CohereException: If an error occurs during the API request.
         """
-        from cohere import Client, CohereError
+        from cohere import Client
 
         try:
             if chat_history is None:
@@ -155,8 +167,6 @@ class CohereAdapter(BaseAdapter):
                 "chat_history": chat_history,
             }
 
-        except CohereError as e:
-            raise CohereException(exception=str(e), error_type="CohereError") from e
         except Exception as e:
             raise CohereException(
                 exception=str(e), error_type="Unknown Cohere Error"

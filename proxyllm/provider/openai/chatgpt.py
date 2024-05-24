@@ -93,6 +93,30 @@ open_ai_category_data = {
             "Financial Task": 2,
             "Content Recommendation Task": 1,
         },
+        "gpt-4-turbo": {
+            "Code Generation Task": 3,
+            "Text Generation Task": 4,
+            "Translation and Multilingual Applications Task": 4,
+            "Natural Language Processing Task": 5,
+            "Conversational AI Task": 3,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 4,
+            "Content Recommendation Task": 5,
+        },
+        "gpt-4o": {
+            "Code Generation Task": 4,
+            "Text Generation Task": 4,
+            "Translation and Multilingual Applications Task": 4,
+            "Natural Language Processing Task": 5,
+            "Conversational AI Task": 4,
+            "Educational Applications Task": 3,
+            "Healthcare and Medical Task": 3,
+            "Legal Task": 3,
+            "Financial Task": 4,
+            "Content Recommendation Task": 5,
+        },
     }
 }
 
