@@ -34,6 +34,11 @@ class AnthropicException(Exception):
         super().__init__(f"Anthropic Error: {exception}, Type: {error_type}")
 
 
+class DeepSeekException(ModelException):
+    def __init__(self, exception: str, error_type: str) -> None:
+        super().__init__(f"DeepSeek Error: {exception}, Type: {error_type}")
+
+
 class UnsupportedModel(Exception):
     """
     General Exceptions shared across models
